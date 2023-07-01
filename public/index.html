@@ -174,7 +174,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <ul>
 <li class="fragment">Initialement spécifique au monde Unix</li>
 <li class="fragment">Isolation de l’espace utilisateur</li>
-<li class="fragment">« Partage » du noyau</li>
+<li class="fragment">« <em>Partage</em> » du noyau</li>
 <li class="fragment">outils de packaging de de manipulation</li>
 </ul>
 <p><code class="note fragment">Les conteneurs sont maintenant disponible sous Windows!</code></p>
@@ -194,19 +194,22 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul>
 </section><section id="cloud" class="slide level2">
 <h2>Cloud</h2>
-<p>Un petit mot sur le Cloud et la nécessité d’utiliser des conteneurs</p>
+<p>La notion de Cloud tel qu’on l’entend aujourd’hui a été popularisée par <em>Amazon</em> quand ces derniers ont eu l’idée de mettre à disposition de tous leurs serveurs inutilisés pendant les périodes creuses de leur activité. Il était nécessaire de fournir des solutions de virtualisations rapide et sûre.</p>
+<p>Petit à petit l’utilisation de conteneur pour simplifier les taches automatisées et améliorer le <em>TimeToMarket</em> s’est imposé. Aujourd’hui les plateforme de <strong>Paas</strong>, <strong>Saas</strong> et de <strong>Faas</strong> sont basés sur des conteneurs (pas forcément Docker car il existe des alternatives).</p>
 <aside class="notes">
 </aside>
 </section></section>
 <section><section id="docker-1" class="title-slide slide level1"><h1>Docker</h1></section><section id="historique" class="slide level2">
 <h2>Historique</h2>
-<p>populariser</p>
-<p>dotcloud solomon hyke</p>
-<p>git docker</p>
+<p>Inventé par Solomon Hyke , Docker est une technologie qui vise à populariser l’usage des conteneurs afin de faciliter la mise en place de méthodologies Devops.</p>
 <ul>
-<li class="fragment">chroot introduit en 1979</li>
-<li class="fragment">lxc en 2008</li>
-<li class="fragment">docker en 2013</li>
+<li class="fragment">1979 chroot</li>
+<li class="fragment">2007 La technologie cgroup est intégrée au noyau Linux</li>
+<li class="fragment">2008 Sortie de LXC ; il s’appuie sur les espaces de nom de cgroups et Linux, comme Docker le fera par la suite</li>
+<li class="fragment">2013 Sortie de Docker comme logiciel open source par dotCloud Inc. qui deviendra Docker Inc.</li>
+<li class="fragment">2014 Docker est disponible sur Amazon EC2</li>
+<li class="fragment">2015 Google sort de Kubernetes</li>
+<li class="fragment">2018 Kubernetes est certifié Docker et devient la solution incontournable du marché</li>
 </ul>
 </section><section id="pourquoi-docker" class="slide level2">
 <h2>Pourquoi Docker</h2>
@@ -221,7 +224,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Des <strong>Conteneurs</strong> constitués :</p>
 <ul>
 <li class="fragment">1 process (<del>ou plusieurs</del>)</li>
-<li class="fragment">isolation par rapport à l’OS hôte (cgroups/namespaces)</li>
+<li class="fragment">Isolation par rapport à l’OS hôte (cgroups/namespaces)</li>
 <li class="fragment">Utilisant le noyau de l’hôte</li>
 </ul>
 <p>Des <strong>Image</strong> contenants :</p>
@@ -282,21 +285,19 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Depuis mars 2017, la nomenclature des versions suit la forme des versions de Ubuntu à savoir <em>AA.MM</em> avec AA l’année et MM le mois (ex. : 17.04 pour la version d’avril 2017).</p>
 <ul>
 <li class="fragment">une version <em>stable</em> est compilée tous les trimestre (ex : 17.03, 17.06, 17.09, 17.12…) ;</li>
-<li class="fragment">une version <em>edge</em> est compilée tous les mois et contient les nouvelles fonctionnalitées.</li>
+<li class="fragment">une version <em>edge</em> est compilée tous les mois et contient les nouvelles fonctionnalités.</li>
 </ul>
 </section><section id="architecture" class="slide level2">
 <h2>Architecture</h2>
-<p>Un conteneur ne devrait isoler qu’un seul et unique processus, une fois ce processus terminé le conteneur s’arrête.</p>
-</section><section id="extentions" class="slide level2">
-<h2>Extentions</h2>
+<p>Un conteneur ne devrait isoler qu’un seul et unique processus à la fois, une fois ce processus terminé le conteneur s’arrête. Cette règle peut parfois être transgressé lorsqu’une amélioration notable peut être apportée par l’exécution de plusieurs processus dans un même conteneur (par ex: apache et php).</p>
 </section><section id="installation" class="slide level2">
 <h2>Installation</h2>
 <p>Mickaël Borne (IGN) à préparé une excellente documentation, basée sur la documentation officielle (<a href="https://docs.docker.com/engine/install/ubuntu/" class="uri">https://docs.docker.com/engine/install/ubuntu/</a>) pour installer Docker dans l’environnement IGN.</p>
 <p><a href="http://dev-env.sai-experimental.ign.fr/outils/docker/installation-docker-ce/" class="uri">http://dev-env.sai-experimental.ign.fr/outils/docker/installation-docker-ce/</a></p>
 <p>Pour une installation à l’ENSG, nous simplifieront quelques aspects.</p>
-<p><code class="note">Action : Nous allons installer Docker dans la machine virtuelle Ubuntu à partir de la documentation officielle</code></p>
+<p><code class="note">Nous allons installer Docker dans la machine virtuelle Ubuntu à partir de la documentation officielle</code></p>
 <aside class="notes">
-<p>Il est nécéssaire d’installer curl</p>
+<p>Il est nécessaire d’installer curl</p>
 </aside>
 </section><section id="installation-particularités-ign-1" class="slide level2">
 <h2>Installation : particularités IGN 1</h2>
@@ -1206,7 +1207,6 @@ docker container run -p 8080:80 -e LIBREQR_CUSTOM_TEXT=&quot;Générateur de QR 
 <li class="fragment">relation/dépendance</li>
 </ul></li>
 <li class="fragment">Compose pilote directement le daemon docker</li>
-<li class="fragment"><em>Compose permet de scaler un conteneur en particulier</em></li>
 </ul>
 </section><section id="le-fichier-de-définition" class="slide level2">
 <h2>Le fichier de définition</h2>
