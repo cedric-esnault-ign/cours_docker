@@ -732,7 +732,6 @@ docker tag bce5g99azq58 registry.ul.geoportail.rie.gouv.fr/rok4/rok4-builder
 * Démarrez un conteneur avec un shell interactif basé sur l'image "alpine
 * Dans un second terminal, observez les conteneurs en cours d’exécution
 * Stoppez le conteneur (sans le détruire)
-
 * Relancez le conteneur et se rattacher à son terminal
 * Faire le ménage
 
@@ -915,7 +914,8 @@ docker exec -ti existingContainer /bin/bash
 ## Autres commandes docker ##
 
 Il existe d'autres commandes docker dont la documentation est disponible sur <https://docs.docker.com/engine/reference/commandline/docker/>
-Attention, certaines de ces commandes sont propres au mode d'exécution en **cluster swarm**
+
+⚠️ Attention, certaines de ces commandes sont propres au mode d'exécution en **cluster swarm**
 
 # TP LAMP #
 
@@ -1000,7 +1000,7 @@ docker exec -it database mariadb -u user -D mymap --password="s3cr3t"
 
 Détruisez les conteneurs, puis reconstruisez l'ensemble. Les points sont perdus :-(
   
-* *Résolvez ce problème
+* Résolvez ce problème
 
 <aside class="notes">
 
@@ -1120,7 +1120,7 @@ Globalement identiques mais :
 * `ADD` décompresse les archives
 * gestion du cache de build différente
 * `COPY` est plus "prévisible"
-* `COPY` est compatible aves le *Multi-stage*
+* `COPY` est compatible avec le *Multi-stage*
 
 ## Instructions Dockerfile ##
 
@@ -1206,21 +1206,18 @@ CMD /opt/bin/monBinaire
 
 Nous allons créer pas à pas une image Docker pour répondre à un besoin simple.
 
-Le code de l'application est disponible dans le dépot <>
+Le code de l'application est disponible dans le dépot https://github.com/cedricici/findmefast
 
-Commençons par y créer un fichier nommé `Dockerfile`
-
-Premièrement, il faut choisir une image de base, pour node, nous allons choisir une version récente basé sur un OS Alpine : **(node:18-alpine)[https://hub.docker.com/layers/library/node/18-alpine/images/sha256-d51f2f5ce2dc7dfcc27fc2aa27a6edc66f6b89825ed4c7249ed0a7298c20a45a?context=explore]**
-
-Il faut ensuite réaliser ces actions :
-
-* Créer un dossier `/app` à la racine du conteneur
-* Définir l'espace de travail dans ce nouveau dossier
-* Copier le fichier `package.json` dans ce dossier
-* Exécuter la commande `npm install --production` afin d'installer les dépendances
-* Copier les sources (le dossier `/public` et le fichier `server.js` ) dans ce dossier
-* exposer le port `1111`
-* définir la commande par défaut : `npm start`
+* Commençons par cloner ce dépôt, puis créer un fichier nommé `Dockerfile`
+* Il faut choisir une image de base, pour node, nous allons choisir une version récente basé sur un OS Alpine : [node:18-alpine](https://hub.docker.com/layers/library/node/18-alpine/images/sha256-d51f2f5ce2dc7dfcc27fc2aa27a6edc66f6b89825ed4c7249ed0a7298c20a45a?context=explore)
+* Il faut ensuite réaliser ces actions :
+  * Créer un dossier `/app` à la racine du conteneur
+  * Définir l'espace de travail dans ce nouveau dossier
+  * Copier le fichier `package.json` dans ce dossier
+  * Exécuter la commande `npm install --production` afin d'installer les dépendances
+  * Copier les sources (le dossier `/public` et le fichier `server.js` ) dans ce dossier
+  * exposer le port `1111`
+  * définir la commande par défaut : `npm start`
 
 <aside class="notes">
 
@@ -1292,7 +1289,7 @@ Nous allons améliorer l'image en créant une image multistage
 * Laissez la commande par défaut
 * Générez une nouvelle image appelée **prime:multi**
 
-/!\ n'écrasez pas l'image **prime:normal** /!\
+⚠️ n'écrasez pas l'image **prime:normal** ⚠️
 
 * Comparez le poids des deux images
 * Comparez les vitesses d’exécution
