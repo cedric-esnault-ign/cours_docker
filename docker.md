@@ -5,8 +5,6 @@ author : Cédric Esnault
 date : 04/07/2023 - IGN/ENSG
 ---
 
-
-
 # Docker #
 
 ## Plan de la présentation ##
@@ -15,18 +13,17 @@ date : 04/07/2023 - IGN/ENSG
   - Virtualisation
   - Cloud
 - Docker
-  - Historique
-  - Organisation
-  - Installation
-  - Premier conteneur
-  - Première image
+  - Historique / installation
+  - Utilisation
+  - TPs
+  - Dockerfile
+  - TPs
 - Docker-compose
-  - Installation
-  - première Stack
-  - swarm
-- Kubernetes
-- Concurrence?
-- La suite
+  - Utilisation
+  - Tps
+- Swarm / Kubernetes
+  - Utilisation
+  - Demo
 
 <aside class="notes">
 
@@ -159,14 +156,31 @@ Et un peu aussi des **réseaux** et des **volumes**
 
 ## Docker : l'outil ##
 
-Les installation classiques de Docker sont composées de 2 éléments principaux (sans descendre plus bas niveau).
+Les installations classiques de Docker sont composées de 2 éléments principaux (sans descendre plus bas niveau).
 
 * Un  **Daemon** avec une API qui va s'occuper des interaction avec les conteneurs , les images, les réseaux ...
 * Un client **CLI** pour parler à cette API
 
-## Versions ##
+l'[OCI](https://opencontainers.org
+) est Un organisme qui à pour but de normaliser les éléments constitutifs de la virtualisation et des conteneurs.
 
-containerd runc etc,
+<aside class=notes>
+
+Il existe des alternatives/concurrents à Docker.
+
+OCI : Open Container Initiative
+CNCF : Cloud Native Computing Foundation https://www.cncf.io/
+Docker :
+  runc : CLI
+  containerd : démon
+rkt :  coreOS rocket
+Buildah : build images
+Kaniko : build images
+podman : deamonles docker
+
+<aside>
+
+## Versions ##
 
 - CE : *community edition* qui est la version gratuite que nous allons utiliser ;
 - EE : *entreprise edition* qui est plus évoluée avec des fonctionnalités supplémentaires et une certification de fonctionnement sur certain matériel.
@@ -277,15 +291,19 @@ Si on souhaite interagir avec les environnements interne à l'IGN, il faut égal
 
 Pour éviter d'avoir à faire sudo docker, on peut ajouter un utilisateur au groupe docker :
 
-* Ajouter l'utilisateur au groupe docker : 
-```bash 
+* Ajouter l'utilisateur au groupe docker :
+  
+```bash
 sudo adduser $USER docker
 ```
+
 * Redémarrer la session
 * Tester
+
 ```bash
 docker run --rm hello-world
 ```
+
 Nous venons de lancer notre premier conteneur
 
 note : Le projet [PWD](http://play-with-docker.com) permet également de tester Docker sans l'installer au travers d'une interface web. Les sessions de travail durent 4h et la vitesse de l'interface dépend souvent de l'activité des autres utilisateurs...
@@ -314,9 +332,9 @@ C'est le moule pour créer les conteneurs.
 
 * Sur des *registry* sur internet, principalement hub.docker.com
 * sur votre machine si vous avez déjà téléchargé l'image
-* *from sracth* ou basée sur des images de base (ubuntu, centOs, alpine)
+* *from scratch* ou basée sur des images de base (ubuntu, centOs, alpine)
 * à partir d'un *Dockerfile*
-* en *commitant* un conteneur
+* en *commitant* un conteneur (à décourager)
 
 ## Nomenclature des Images ##
 
@@ -341,7 +359,7 @@ par exemple :
 
 Nous verrons plus tard comment travailler avec les images
 
-#TODO: lien vers Images
+[Les images Docker](#/les-images-docker)
 
 ## Les conteneurs ##
 
@@ -440,18 +458,16 @@ docker container rm NOM
 
 Il en existe beaucoup d'autres : gestion des ressources, environnement d’exécution...
 
-
 ## Mise en réseau ##
 
 Le conteneur dispose généralement de son propre réseau virtuel.
 
 Docker permet de définir :
 
-*  les liens réseaux entre conteneurs
-* les liens entre le réseau physique de l'hôte et les réseaux virtuels
+* Les liens réseaux entre conteneurs
+* Les liens entre le réseau physique de l'hôte et les réseaux virtuels
 
 ## Création de réseaux ##
-
 
 ```bash
 # Créer un réseau
@@ -491,8 +507,6 @@ docker container run --rm --net host alpine ip a
        valid_lft forever preferred_lft forever
 ```
 
-
-
 ## Réseau bridge par défaut ##
 
 - Les conteneurs sont sur un réseau séparé
@@ -518,17 +532,15 @@ Le port 8080 de la machine hôte est redirigé vers le port 80 du conteneur.
 
 Un conteneur est "jetable"
 
-* Lorsqu'on détruit un conteneur, on supprime aussi les modifications apportées au système de fichier.
+* Lorsqu'on détruit un conteneur, on supprime aussi les modifications apportées au système de fichier (dernière couche).
 * Les conteneurs ont des systèmes de fichiers isolés.
 
 **Les volumes apportent une solution à cela**
-
 
 ## 2 types de volumes ##
 
 - un dossier de la machine hôte
 - un volume géré par docker
-
 
 ## Volume hôte ##
 
@@ -545,9 +557,9 @@ docker container run --rm -it -v /:/mondossierlocal:ro alpine /bin/sh
 ## Volume docker ##
 
 * Gestion des volumes avec un workflow dédié :
-  * create
-  * ls
-  * rm
+  * `docker volume create`
+  * `docker volume ls`
+  * `docker volume rm`
 * Abstraction du backend de stockage :
   * local
   * partage réseau
@@ -566,7 +578,6 @@ docker container run -v [NAME]:[PATH_ON_CONTAINER]:[OPTS]
 ```
 
 On peut préciser le *driver* à utiliser. Le driver dépend du backend, par défaut local.
-
 
 ## Volume anonyme ##
 
@@ -597,8 +608,7 @@ local               minidlna
 local               mongodb
 ```
 
-*Dans certains cas, Docker créé des volumes "anonymes", leur nom est une longue chaîne alphanumérique*
-
+Dans certains cas, Docker créé des volumes *"anonymes"*, leur nom est une longue chaîne alphanumérique
 
 ## Supprimer un volume ##
 
@@ -606,7 +616,7 @@ local               mongodb
 docker volume rm NAME
 ```
 
-## Supprimer un volume lors de la suppression d'un conteneur
+## Supprimer un volume lors de la suppression d'un conteneur ##
 
 ```bash
 docker container rm -v CONTAINER_NAME
@@ -619,13 +629,12 @@ docker container rm -v CONTAINER_NAME
 - un volume hôte remplace totalement un chemin du conteneur.
 - un volume docker utilisé pour la première fois est initialisé avec le contenu du chemin de montage dans le conteneur.
 
-
 ## Volumes avancés ##
 
 L'option `--mount` permet des montages plus élaborés :
+
 - autant de possibilités qu'avec le fichier `/etc/fstab`
 - suppose que le support existe, pas de création à la volée comme avec un `docker volume create` (ex. : pas de création de l'export NFS sur le serveur)
-
 
 ## Volumes avancés ##
 
@@ -635,12 +644,11 @@ Un volume hôte est un `--mount` particulier.
 
 `docker run -it --mount type=bind,source=/chemin/sur/mon/ordi,target=/data alpine sh`
 
-
-## A vous de jouer ##
+## A vous de jouer  maintenant ##
 
 Lors de l'installation , nous avons créé un conteneur pour vérifier que Docker était bien installé
 
-`Observer que le conteneur est bien existant et à l'arrêt`{.note}
+* Observez que le conteneur est bien existant et à l'arrêt
 
 ## correction ##
 
@@ -655,7 +663,7 @@ La première commande n'affiche rien car le conteneur lancé est déjà arrêté
 
 ## Gérer les conteneurs : supprimer ##
 
-`Supprimer le(s) conteneur(s) déjà créé`{.note}
+* Essayez de supprimer le(s) conteneur(s) déjà créé
 
 ## correction ##
 
@@ -669,9 +677,9 @@ On pourrait aussi utiliser l'identifiant du conteneur à la place du nom.
 
 ## Gérer les images ##
 
-`Afficher la liste des images`{.note}
-
-`Créez un nouveau conteneur hello-world, notez le temps de chargement de l'image , supprimer ensuite la(s) images(s) existantes`{.note}
+* Affichez la liste des images
+* Créez un nouveau conteneur **hello-world**, notez le temps de chargement de l'image
+* Supprimez ensuite la(s) images(s) existantes
 
 ## Correction ##
 
@@ -692,7 +700,7 @@ Il faut donc supprimer le conteneur avant de pouvoir supprimer l'image.
 
 <https://hub.docker.com/_/alpine/>
 
-`Télécharger la dernière version de l'image "alpine" sur dockerhub`{.note}
+* Téléchargez la dernière version de l'image **alpine** sur *dockerhub*
 
 ## Correction ##
 
@@ -710,16 +718,23 @@ On affiche ensuite les métadonnées de l'image téléchargée, on y trouvera de
 * commande par défaut
 * ...
 
+## Docker tag ##
 
+La commande docker tag permet de gérer les tag de vos images locales, cela est utile pour "renommer" une image afin de l'envoyer sur un repository distant.
+Cette commande permet de "nommer" l'image *bce5g99azq58* afin de l'uploader dans le registry du géoportail (Il faut les droits associés)
+
+```bash
+docker tag bce5g99azq58 registry.ul.geoportail.rie.gouv.fr/rok4/rok4-builder
+```
 
 ## Gérer les entrées/sorties ##
 
-`Action : Démarrer un conteneur avec un shell interactif basé sur l'image "alpine" puis, dans un second terminal, observer les conteneurs en cours d’exécution. Stopper le conteneur (sans le détruire).`{.note}
+* Démarrez un conteneur avec un shell interactif basé sur l'image "alpine
+* Dans un second terminal, observez les conteneurs en cours d’exécution
+* Stoppez le conteneur (sans le détruire)
 
-`Action : relancer le conteneur et se rattacher à son terminal .`{.note}
-
-`Action : Faire le ménage .`{.note}
-
+* Relancez le conteneur et se rattacher à son terminal
+* Faire le ménage
 
 ## Correction ##
 
@@ -727,6 +742,7 @@ On affiche ensuite les métadonnées de l'image téléchargée, on y trouvera de
 docker run --rm -i -t alpine sh
 docker run --rm -i -t alpine cat /etc/hostname
 ```
+
 Une fois dans le conteneur, on peut afficher le nom d'hôte du conteneur avec la commande `cat /etc/hostname`.
 On peut également modifier la commande (unique) lancée dans un conteneur.
 
@@ -737,7 +753,6 @@ docker ls
 ```
 
 On peut voir le conteneur en état `Exited`. Dans le premier terminal, on peut voir que le shell est arrêté.
-
 
 ## Correction ##
 
@@ -751,7 +766,7 @@ docker stop NAME
 docker rm NAME 
 ```
 
-Pour aller plus loin, chercher des informations sur les options `-d`, `-w`, `-h`, `--rm` et `--name` de la commande `docker container run` et tester ces options.
+Pour aller plus loin, cherchez des informations sur les options `-d`, `-w`, `-h`, `--rm` et `--name` de la commande `docker container run` et testez ces options.
 
 ```bash
 docker container run --help
@@ -759,7 +774,8 @@ docker container run --help
 
 ## Gérer les volumes "host" ##
 
-`Action : Démarrer un conteneur "alpine" avec un TTY en montant la racine de la machine hôte sur "/host" en mode "volume hote" et en lecture seule dans le conteneur. Observer le contenu de "/host", par exemple, ajouter un nouveau fichier dans votre "~/"`{.note}
+* Démarrez un conteneur **alpine** avec un TTY en montant la racine de la machine hôte sur `/host` en mode *volume hote* et en lecture seule dans le conteneur
+* Observez le contenu de `/host`, par exemple, ajouter un nouveau fichier dans votre `~/`
 
 ## Correction ##
 
@@ -771,11 +787,11 @@ Le fichier `/etc/hostname` contient bien le nom d'hôte du conteneur. Le fichier
 
 ## Gérer les volumes docker ##
 
-`Action : Démarrer un conteneur "alpine" avec un TTY et un volume docker sur "/data", créer un fichier dans "/data/" puis supprimer le conteneur `{.note}
-
-`Action : Démarrer un nouveau conteneur "alpine" avec un TTY et un volume docker avec le même nom sur "/data", Observer le contenu de "/data/"`{.note}
-
-`Action : Lister puis supprimer les volumes `{.note}
+* Démarrez un conteneur **alpine** avec un TTY et un volume docker sur `/data`
+* Créez un fichier dans `/data/` puis supprimez le conteneur
+* Démarrez un nouveau conteneur **alpine** avec un TTY et un volume docker avec le même nom sur `/data`
+* Observez le contenu de `/data/`
+* Listez puis supprimez les volumes
 
 ## Correction ##
 
@@ -797,9 +813,8 @@ Error response from daemon: remove Data: volume is in use - [a1bf0b7f7cb74abd283
 
 ## Gérer le Réseau ##
 
-`Action : Affichez la liste des interfaces de votre machine hôte puis d'un conteneur avec la commande "ip a"`{.note}
-
-`Action : Lancez un nouveau conteneur avec l'option "--net host" puis regarder les interfaces`{.note}
+* Affichez la liste des interfaces de votre machine hôte puis d'un conteneur avec la commande `ip a`
+* Lancez un nouveau conteneur avec l'option `--net host` puis regardez les interfaces
 
 ## Correction ## 
 
@@ -815,10 +830,7 @@ L'option `--net host` branche le conteneur sur les interfaces réseaux de la mac
 
 <https://hub.docker.com/r/containous/whoami/>
 
-`Action : Démarrez un conteneur basé sur l'image "whoami", inspectez le et trouver l'IP pour tester une requete HTTP sur cette IP. `{.note}
-
-
-`Action : Démarrez un conteneur basé sur l'image "whoami", inspectez le et trouver l'IP pour tester une requete HTTP sur cette IP `{.note}
+* Démarrez un conteneur basé sur l'image "whoami", inspectez le et trouver l'IP pour tester une requête HTTP sur cette IP.
 
 ## Correction ##
 
@@ -828,16 +840,15 @@ docker container inspect NAME
 curl -s http://<IP_CONTENEUR>
 ```
 
-L'IP du conteneur n'est accessible que depuis la machine hébergeant le conteneur. On ne peut pas y accéder depuis l'exterieur de la machine hôte avec son adresse IP car c'est un réseau privé, interne à notre hôte.
+L'IP du conteneur n'est accessible que depuis la machine hébergeant le conteneur. On ne peut pas y accéder depuis l’extérieur de la machine hôte avec son adresse IP car c'est un réseau privé, interne à notre hôte.
 
 <aside class="notes">
-        NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
+  NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 </aside>
 
 ## Exposition de ports ##
 
-`Action : Recréez un conteneur en ajoutant cette fois l'exposition du port 80 du conteneur sur le port 8080 de la machine et refaire les tests `{.note}
-
+* Recréez un conteneur en ajoutant cette fois l'exposition du port 80 du conteneur sur le port 8080 de la machine et refaire les tests
 
 ## Correction ##
 
@@ -849,9 +860,62 @@ curl -s http://<IP_HOST>
 
 On peut toujours accéder au port 80 de l'IP du conteneur. On peut maintenant également accéder au port 8080 de la machine grâce à l'option `-p`.
 
-## Création de Réseau ##
+## Création de réseaux ##
 
-#TODO: miniexo réseau
+* Créez un nouveau réseau **test-nginx**
+* Utilisez `docker inspect` pour voir ce qui a été créé
+* Créez un premier conteneur basé sur l'image `nginx` nommé (`--name`) *nginx* , attachée au réseau **test-ningx** et qui tourne en daemon.
+* Créer un conteneur basé sur l'image `alpine/curl` sans préciser de réseau , avec un terminal interactif (`/bin/sh`)
+  * Essayez d'atteindre le serveur *nginx* précédemment créé
+* Créez un nouveau conteneur basé sur `alpine/curl` attaché au réseau **test-nginx** avec un terminal interactif
+  * Réessayez de joindre le server *nginx*
+
+## Correction ##
+
+```bash
+docker network create test-nginx
+docker inspect test-nginx
+docker run --network test-nginx --name nginx -d nginx
+docker run --rm -ti alpine/curl /bin/sh
+#  / # curl nginx
+#  curl: (6) Could not resolve host: nginx
+docker run --rm -ti --network test-nginx alpine/curl /bin/sh
+# / # curl nginx
+# <!DOCTYPE html>
+# ...
+```
+
+## Docker : le grand nettoyage ##
+
+Les commandes suivantes vont tenter de nettoyer tout ce qui n'est pas utilisé.
+A utiliser avec tact, mais peut être salvateur !
+
+```bash
+docker system prune
+docker volume prune
+```
+
+## Docker Context ##
+
+Il est possible de décorréler la CLI du Daemon Docker de votre Machine et ainsi de "piloter" un autre host avec votre CLI.
+Les Contexte Docker sont fait pour cela.
+
+```bash
+#TODO : conf docker contexte
+```
+
+## Docker Exec ##
+
+La commande `Docker Exec` permet de lancer un nouveau processus dans un conteneur actif existant, cette commande est pratique pour lancer un *Shell* d'observation ou de debug par exemple.
+
+```bash
+docker exec -ti existingContainer /bin/bash
+```
+
+## Autres commandes docker ##
+
+Il existe d'autres commandes docker dont la documentation est disponible sur <https://docs.docker.com/engine/reference/commandline/docker/>
+Attention, certaines de ces commandes sont propres au mode d'exécution en **cluster swarm**
 
 # TP LAMP #
 
@@ -864,16 +928,16 @@ Le but de ce TP est de mettre en place les éléments nécessaires d'un serveur 
 > - **M**ySql
 > - **P**HP
 
-Les fichiers nécessaires sont disponible dans le dépôt GIT suivant
+Les fichiers nécessaires sont disponibles dans le dépôt GIT de ce cours, dans le dossier `ressources`
 
-<https://exo.git>
+<https://github.com/cedric-esnault-ign/cours_docker.git>
 
 ## Apache ##
 
 L'image à utiliser ici est `httpd`. Les options `--name -d -p -v ` peuvent être utiles. La racine du serveur web dans l'image est `/usr/local/apache2/htdocs/`
 
-* Lancez un conteneur exposant le port *80* du conteneur sur le port *8080* de la machine. Qu'affiche la page <http://127.0.0.1:8080> ?
-
+* Lancez un conteneur exposant le port *80* du conteneur sur le port *8080* de la machine.
+* Qu'affiche la page <http://127.0.0.1:8080> ?
 * Utilisez le fichier `index-lamp.html` pour remplacer la page d’accueil
 
 ## Un peu de php ##
@@ -944,7 +1008,6 @@ docker run -v databasedata:/var/lib/mysql --net lamp -d --name database -e MARIA
 
 </aside>
 
-
 # TP NextCloud #
 
 ## Déployer un nextCloud ##
@@ -965,8 +1028,7 @@ un serveur simple avec une base de données SQLite (un fichier)
 
 * Ajoutez un volume pour persister les données lorsque le conteneur est détruit (testez)
 * Préparez run réseau **nextcloud** pour notre application
-* Lancez un conteneur MariaDB ou PostgreSQL avec persistence de données, un nom et utilisant le réseau **nextcloud** et reconstruisez l'application en utilisant cette base de données
-
+* Lancez un conteneur MariaDB ou PostgreSQL avec persistence de données, un nom et utilisant le réseau **nextcloud** et reconstruisez l' application en utilisant cette base de données
 
 <aside class="notes">
 
@@ -1000,13 +1062,17 @@ docker image build DOCKERFILE_PATH
 
 `DOCKERFILE_PATH` est le chemin du dossier contenant le Dockerfile.
 
+La documentation de référence du docker file est présente ici :
+
+<https://docs.docker.com/engine/reference/builder/>
+
 ## Instructions Dockerfile ##
 
 Le **Dockerfile** est constitué d'une suite d'instructions, chaque ligne résultant en une nouvelle **couche** dans l'image.
 
 [Architecture des images](#/architecture-des-images)
 
-Un Dockerfile commence généralement par l'identification de l'image de base.
+Un Dockerfile commence généralement par l'identification de l'image de base. (la seule exception est le passage d'un argument `ARG` permettant de définir l'image de `FROM`)
 
 ```dockerfile
 FROM debian:jessie
@@ -1076,9 +1142,14 @@ Modifier l’exécution
 CMD    #Commande par défaut
 EXPOSE #Déclarer un port réseau
 VOLUME #Déclarer un volume
+HEALTHCHECK  #Définit une sonde de vie
 ```
 
+D'autres instructions  son disponible sur <https://docs.docker.com/engine/reference/builder/>
+
 ## Avancé : paramétriser le Dockerfile ##
+
+Il est possible de passer des paramètres lors du *build* de l'image.
 
 ```dockerfile
 ARG <name>[=<default value>]
@@ -1091,6 +1162,8 @@ Pour définir la valeur lors de la construction :
 ```bash
 docker image build --build-arg name=value .
 ```
+
+Certaines variables sont automatiquement ajouté (Les réglages de Proxy)
 
 ## Multistage build ##
 
@@ -1180,7 +1253,6 @@ Et on pourra tester l'application avec la commande `docker run` en mappant un po
 
 => Pour pouvoir tester l'application entre vous il faudra faire une petite manipulation pour mapper également ce port dans la VM Virtualbox.
 
-
 ## Une compilation C ##
 
 Nous allons maintenant créer une petite image **multistage** pour compiler puis exécuter un petit programme qui calcul **n** n nombre premier (le seul intérêt de ce programme est de solliciter le CPU).
@@ -1190,7 +1262,6 @@ Nous profiterons de ce programme pour bien comprendre la notion de *Kernel* et d
 * Installez `gcc` : `sudo apt-get update && sudo apt-get install gcc`
 * Compiler le programme : `gcc prime.c -o prime`
 * Mesurez le temps nécéssaire pour calculer les 10000 premiers nombres premiers (utilisez `time`, le programme `./prime` prends en argument la quantité de nombre premier à trouver.
-
 
 <aside class="notes">
 
@@ -1211,7 +1282,6 @@ Créez une nouvelle image que vous nommerez **prime:normal**
 
 Que pensez vous des résultats obtenus, est-ce normal d'après vous?
 
-
 ## Amélioration multistage ##
 
 Nous allons améliorer l'image en créant une image multistage
@@ -1220,13 +1290,12 @@ Nous allons améliorer l'image en créant une image multistage
 * Une fois le fichier compilé, créer un nouveau *stage*
 * Récupérer le fichier compilé lors du premier *stage*
 * Laissez la commande par défaut
-* Générez une nouvelle image appelée **prime:multi** 
+* Générez une nouvelle image appelée **prime:multi**
 
 /!\ n'écrasez pas l'image **prime:normal** /!\
 
 * Comparez le poids des deux images
 * Comparez les vitesses d’exécution
-
 
 <aside class="notes">
 
@@ -1296,8 +1365,7 @@ ENV LIBREQR_THEME=libreqr \
     LIBREQR_DEFAULT_FGCOLOR=000000
 ```
 
-!!! abstract "config.inc.php"
-```
+```php
 <?php
 // Basé sur https://code.antopie.org/miraty/libreqr/src/branch/main/config.inc.php
 // This file is part of LibreQR, which is distributed under the GNU AGPLv3+ license
@@ -1323,7 +1391,7 @@ define("DEFAULT_FGCOLOR", $_ENV["LIBREQR_DEFAULT_FGCOLOR"]);
 
 ```
 
-```
+```bash
 docker image build -t qr .
 docker container run -p 8080:80 -e LIBREQR_CUSTOM_TEXT="Générateur de QR code dans docker" qr
 
@@ -1334,64 +1402,6 @@ docker container run -p 8080:80 -e LIBREQR_CUSTOM_TEXT="Générateur de QR code 
 ## Proposez vos projets 
 
 Nous pouvez voir ensemble les étapes nécessaires à la **Dockerisation** de vos applications.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 # Docker-compose #
 
@@ -1410,7 +1420,6 @@ Imaginez la complexité pour déployer un CMS comprenant :
 - un FTP pour déposer des fichiers à publier
 - un système de cache pour soulager la BDD
 - un proxy inverse pour gérer le reste du cache
-
 
 <aside class="notes">
 ![Déploiement wordpress en docker](/img/docker-wordpress.png)
@@ -1431,19 +1440,17 @@ Docker-compose permet de définir tous les éléments nécessaires pour faire to
 
 L'application est définie dans un fichier au format YAML avec 3 sections principales, plus quelques autres informations :
 
-- *la version du format*
+- *la version du format* (obligatoire, en 2023 : `version: "3"`)
 - les **services**
 - les **volumes**
 - les **réseaux**
-- *des configs (pour une utilisation swarmkit)*
-- *des secrets (pour une utilisation swarmkit)*
 
 ## Les versions ##
 
 Le modèle du docker-compose.yml a plusieurs versions possibles.
 
 | Compose file format | Docker Engine |
-| ------------------: | :------------ |
+| :-----------------: | :------------ |
 | 3.8                 | 19.03.0+      |
 | 3.7                 | 18.06.0+      |
 | 3.6                 | 18.02.0+      |
@@ -1487,7 +1494,7 @@ build:
     ...
 ```
 
-Utiliser une image est plus sûr. Un pipeline de CI est chargé de construire les images avec une gestion des Tags permettant d'avoir des releases connues.
+Utiliser une image est plus sûr. Un pipeline de CI est chargé de construire les images avec une gestion des *Tags* permettant d'avoir des releases connues.
 La création de l'image "à la volée" dans le docker-compose est une option viable en mode de développement.
 
 ## Services : volumes ##
@@ -1528,11 +1535,7 @@ services:
 ```
 
 Seuls les services qui seront exposés doivent être connecté au réseau "externe" , les autres services doivent être connectés au même réseau interne pour pouvoir communiquer entres eux.
-
-
-
-
-
+Il n'est nécéssaire de déclarer que les ports ouvert sur le host. Les conteneurs d'un même réseau ont un accès total aux autre conteneurs de ce réseau.
 
 ## Services : dépendances inter-conteneurs ##
 
@@ -1546,8 +1549,6 @@ depends_on:
   - service2
 ```
 
-
-
 ## Services : command ##
 
 Pour surcharger la commande par défaut, on utilise le paramètre **command**
@@ -1555,8 +1556,6 @@ Pour surcharger la commande par défaut, on utilise le paramètre **command**
 ```yaml
 command: some command && some other
 ```
-
-
 
 ## Les volumes ##
 
@@ -1594,10 +1593,6 @@ networks:
           gateway: 192.168.91.1
 ```
 
-#TODO :  plein d'autres choses à dire sur les réseaux
-
-
-
 ## CLI ##
 
 Depuis la version2 de docker compose, la commande `docker-compose` est intégré à la commande `docker` et devient donc une sous-commande de la commande `docker`.
@@ -1611,7 +1606,6 @@ docker compose up [SERVICE]
 L'option `-d` permet de lancer les conteneurs en arrière-plan.
 L'option `-f` permet de spécifier un fichier compose différent (par défaut `docker-compose.yaml`)
 
-
 ## Commandes ##
 
 Gestion des conteneurs
@@ -1619,23 +1613,22 @@ Gestion des conteneurs
 ```bash
 docker compose stop [SERVICE]
 docker compose kill [SERVICE]
+docker compose logs -f 
 ```
 
 ## Commandes ##
 
 Nettoyage des conteneurs stoppés
 
-```
+```bash
 docker-compose rm
 ```
 
 Nettoyage des éléments
 
-```
+```bash
 docker-compose down
 ```
-
-
 
 ## Documentation ##
 
@@ -1644,3 +1637,66 @@ docker-compose down
 ou
 
 [Compose command-line reference](https://docs.docker.com/compose/reference/)
+
+# TP docker-compose #
+
+## On prends les mêmes... ##
+
+Pour ce TP, nous alons tenter de reproduire le TP LAMP en utilisant un docker-compose.yaml
+
+* Écrivez le docker-compose qui va réaliser les mêmes actions. n'oubliez pas  :
+  * les volumes
+  * les réseaux
+  * les variables d'environnements
+  * les dépendances
+* Lancez la stack en mode démon
+* Observez les logs
+* notez le nom des conteneurs créés
+
+note : Il existe des solutions plus "sûr" pour passer des variables d'environnement sensibles (mot de passe)
+
+<aside class="notes">
+
+```yaml
+version: "3"
+services:
+  web:
+    image: lavoweb/php-7.1
+    volumes:
+      - ./mondossier:/var/www/html
+    ports:
+      - "8080:80"
+    networks:
+      - lamp
+    depends_on:
+      - database
+  database:
+    image: mariadb
+    environment:
+      - MARIADB_RANDOM_ROOT_PASSWORD=yes
+      - MARIADB_DATABASE=mymap
+      - MARIADB_USER=user
+      - MARIADB_PASSWORD=s3cr3t
+    volumes:
+      - databasedata:/var/lib/mysql
+    networks:
+      - lamp
+
+volumes:
+  databasedata:
+
+networks:
+  lamp:
+
+```
+
+</aside>
+
+# Kubernetes #
+
+## Orchestration de conteneurs ##
+
+Le but de ce cours n'est pas d'aborder Kubernetes **K8S** mais on ne peut décemment pas parler de **Docker** en 2023 sans parler de Kubernetes.
+**K8S** est une solution d'orchestration de conteneur mis au point par Google et devenue la référence en la matière. Kubernetest a permis d'amener les conteneurs **Docker** en production en apportant le contrôle et la sécurité qui n'était pas au niveau d'un outils créé avant tout pour les développeurs.
+
+**Docker** propose lui aussi son orchestrateur **SWARM**, dont a CLI est intégré au client `docker`. Celui -ci n'étant pas au niveau de kubernetes, nous n'en parlerons pas , même si il a eu l'avantage d'êtr plus simple que K8S il y a quelques années.
