@@ -719,9 +719,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <ul>
 <li class="fragment">Démarrez un conteneur avec un shell interactif basé sur l’image "alpine</li>
 <li class="fragment">Dans un second terminal, observez les conteneurs en cours d’exécution</li>
-<li class="fragment"><p>Stoppez le conteneur (sans le détruire)</p></li>
+<li class="fragment">Stoppez le conteneur (sans le détruire)</li>
 <li class="fragment">Relancez le conteneur et se rattacher à son terminal</li>
-<li class="fragment"><p>Faire le ménage</p></li>
+<li class="fragment">Faire le ménage</li>
 </ul>
 </section><section id="correction-4" class="slide level2">
 <h2>Correction</h2>
@@ -850,7 +850,8 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 <div class="sourceCode" id="cb47"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb47-1" title="1"><span class="ex">docker</span> exec -ti existingContainer /bin/bash</a></code></pre></div>
 </section><section id="autres-commandes-docker" class="slide level2">
 <h2>Autres commandes docker</h2>
-<p>Il existe d’autres commandes docker dont la documentation est disponible sur <a href="https://docs.docker.com/engine/reference/commandline/docker/" class="uri">https://docs.docker.com/engine/reference/commandline/docker/</a> Attention, certaines de ces commandes sont propres au mode d’exécution en <strong>cluster swarm</strong></p>
+<p>Il existe d’autres commandes docker dont la documentation est disponible sur <a href="https://docs.docker.com/engine/reference/commandline/docker/" class="uri">https://docs.docker.com/engine/reference/commandline/docker/</a></p>
+<p>⚠️ Attention, certaines de ces commandes sont propres au mode d’exécution en <strong>cluster swarm</strong></p>
 </section></section>
 <section><section id="tp-lamp" class="title-slide slide level1"><h1>TP LAMP</h1></section><section id="objectif-lamp" class="slide level2">
 <h2>Objectif LAMP</h2>
@@ -948,7 +949,7 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 <h2>Persistence de la Base De Données</h2>
 <p>Détruisez les conteneurs, puis reconstruisez l’ensemble. Les points sont perdus :-(</p>
 <ul>
-<li class="fragment">*Résolvez ce problème</li>
+<li class="fragment">Résolvez ce problème</li>
 </ul>
 <aside class="notes">
 <p>docker run -v databasedata:/var/lib/mysql –net lamp -d –name database -e MARIADB_RANDOM_ROOT_PASSWORD=yes -e MARIADB_DATABASE=mymap -e MARIADB_USER=user -e MARIADB_PASSWORD=s3cr3t mariadb</p>
@@ -1037,7 +1038,7 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 <li class="fragment"><code>ADD</code> décompresse les archives</li>
 <li class="fragment">gestion du cache de build différente</li>
 <li class="fragment"><code>COPY</code> est plus “prévisible”</li>
-<li class="fragment"><code>COPY</code> est compatible aves le <em>Multi-stage</em></li>
+<li class="fragment"><code>COPY</code> est compatible avec le <em>Multi-stage</em></li>
 </ul>
 </section><section id="instructions-dockerfile-4" class="slide level2">
 <h2>Instructions Dockerfile</h2>
@@ -1098,10 +1099,11 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 <section><section id="tp-dockerfile" class="title-slide slide level1"><h1>TP Dockerfile</h1></section><section id="une-application-node.js" class="slide level2">
 <h2>Une application node.js</h2>
 <p>Nous allons créer pas à pas une image Docker pour répondre à un besoin simple.</p>
-<p>Le code de l’application est disponible dans le dépot &lt;&gt;</p>
-<p>Commençons par y créer un fichier nommé <code>Dockerfile</code></p>
-<p>Premièrement, il faut choisir une image de base, pour node, nous allons choisir une version récente basé sur un OS Alpine : <strong>(node:18-alpine)[https://hub.docker.com/layers/library/node/18-alpine/images/sha256-d51f2f5ce2dc7dfcc27fc2aa27a6edc66f6b89825ed4c7249ed0a7298c20a45a?context=explore]</strong></p>
-<p>Il faut ensuite réaliser ces actions :</p>
+<p>Le code de l’application est disponible dans le dépot https://github.com/cedricici/findmefast</p>
+<ul>
+<li class="fragment">Commençons par cloner ce dépôt, puis créer un fichier nommé <code>Dockerfile</code></li>
+<li class="fragment">Il faut choisir une image de base, pour node, nous allons choisir une version récente basé sur un OS Alpine : <a href="https://hub.docker.com/layers/library/node/18-alpine/images/sha256-d51f2f5ce2dc7dfcc27fc2aa27a6edc66f6b89825ed4c7249ed0a7298c20a45a?context=explore">node:18-alpine</a></li>
+<li class="fragment">Il faut ensuite réaliser ces actions :
 <ul>
 <li class="fragment">Créer un dossier <code>/app</code> à la racine du conteneur</li>
 <li class="fragment">Définir l’espace de travail dans ce nouveau dossier</li>
@@ -1110,6 +1112,7 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 <li class="fragment">Copier les sources (le dossier <code>/public</code> et le fichier <code>server.js</code> ) dans ce dossier</li>
 <li class="fragment">exposer le port <code>1111</code></li>
 <li class="fragment">définir la commande par défaut : <code>npm start</code></li>
+</ul></li>
 </ul>
 <aside class="notes">
 <div class="sourceCode" id="cb58"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><a class="sourceLine" id="cb58-1" title="1"><span class="kw">FROM</span> node:18-alpine</a>
@@ -1167,8 +1170,7 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 <li class="fragment">Laissez la commande par défaut</li>
 <li class="fragment">Générez une nouvelle image appelée <strong>prime:multi</strong></li>
 </ul>
-<p>/! n’écrasez pas l’image <strong>prime:normal</strong> /!<br />
-</p>
+<p>⚠️ n’écrasez pas l’image <strong>prime:normal</strong> ⚠️</p>
 <ul>
 <li class="fragment">Comparez le poids des deux images</li>
 <li class="fragment">Comparez les vitesses d’exécution</li>
