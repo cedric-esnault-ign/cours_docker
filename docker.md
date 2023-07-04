@@ -968,7 +968,7 @@ docker  run -d --name web -p 8080:80 -v $PWD/mondossier:/var/www/html/ php:7.4-a
 
 Notre site web évolue ! Il va maintenant afficher une carte. Un clic permet de créer un point, sauvegardé en base de données. Un clic sur un point le supprime. Au chargement de la page, on affiche tous les points de la base de données.
 
-* remplacer le fichier `index.php` par le fichier `index-bdd.php`, observez les erreurs
+* Utilisez l'image `cedricici/php:7.4-apache-mysql` puis remplacer le fichier `index.php` par le fichier `index-bdd.php`, observez les erreurs
 
 Pour respecter le principe d'un seul processus par conteneur, il faut lancer un second conteneur pour notre base de données. Utilisez l'image `mariadb`. Vous trouverez des informations sur la configuration de cette image sur [hub.docker.com](https://hub.docker.com/_/mariadb).
 
@@ -992,7 +992,7 @@ Avec la commande `docker exec ...`, lancez le client mariadb en ligne de command
 Le fait de définir les paramètres de connexion à la base de données dans un code source est une mauvaise pratique. Il faudrait que le code PHP détermine ces informations à partir de variable d'environnement.
 
 docker network create lamp
-docker run --net lamp -d --name web -p 8080:80 -v $PWD/mondossier:/var/www/html/ php:7.4-apache
+docker run --net lamp -d --name web -p 8080:80 -v $PWD/mondossier:/var/www/html/ cedricici/php:7.4-apache-mysql
 docker run --net lamp -d --name database -e MARIADB_RANDOM_ROOT_PASSWORD=yes -e MARIADB_DATABASE=mymap -e MARIADB_USER=user -e MARIADB_PASSWORD=s3cr3t  mariadb
 docker exec -it database mariadb -u user -D mymap --password="s3cr3t"
 
