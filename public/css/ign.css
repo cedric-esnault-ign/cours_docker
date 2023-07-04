@@ -47,6 +47,7 @@
 
 .reveal p {
     line-height: 1.1;
+    margin-bottom:0px;
     font-size: 0.8em;
 }
 .reveal table {
@@ -58,7 +59,8 @@
 }
 .reveal ul, .reveal ol, .reveal dl {
     margin-left: 0px;
-    font-size: 0.9em;
+    margin-top: 0.5em;
+    font-size: 0.8em;
     width:99%;
 }
 .reveal ul>li::before {

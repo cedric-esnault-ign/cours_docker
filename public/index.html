@@ -181,8 +181,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p><code class="note fragment">Les conteneurs sont maintenant disponible sous Windows!</code></p>
 <aside class="notes">
 </aside>
-</section><section id="isolation-applicative-.figcenter" class="slide level2">
-<h2>Isolation applicative ##{.figcenter}</h2>
+</section><section id="isolation-applicative-1" class="slide level2 figcenter">
+<h2>Isolation applicative</h2>
 <p><img data-src="img/Diagramme_ArchiIsolateur.png" /></p>
 <aside class="notes">
 </aside>
@@ -882,14 +882,15 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 <p><code>httpd</code> est de base un simple serveur web sans fonctionnalité php. Il faudrait ajouter php dans cette image et configurer httpd pour interpréter les fichiers php. Sans cela, httpd cherche uniquement les fichiers <code>index.html</code> si aucun fichier n’est précisé dans l’URL.</p>
 <p>Même en ajoutant <code>index.php</code> à l’URL, le résultat n’est pas satisfaisant, il n’y a qu’une page verte alors qu’elle devrait afficher l’heure.</p>
 <ul>
-<li class="fragment">Recréez votre conteneur en utilisant l’image <strong>lavoweb/php-7.1</strong> qui contient l’interpréteur PHP. Attention, dans cette image, la racine du serveur Web est maintenant <code>/var/www/html</code></li>
+<li class="fragment">Recréez votre conteneur en utilisant l’image <strong>php:7.4-apache</strong> qui contient l’interpréteur PHP. Attention, dans cette image, la racine du serveur Web est maintenant <code>/var/www/html</code></li>
 </ul>
 <p>Note : On déroge ici un peu à la règle 1 processus par conteneur. On pourrait séparer apache et PHP, mais la liaison serait plus complexe.</p>
 <ul>
 <li class="fragment">Utilisez le site et profitez en pour regarder les logs <code>docker logs &lt;NAME&gt;</code></li>
 </ul>
 <aside class="notes">
-<p>docker run -d –name web -p 8080:80 -v $PWD/mondossier:/var/www/html/ lavoweb/php-7.1</p>
+<p>tester plutôt : php:7.2-apache</p>
+<p>docker run -d –name web -p 8080:80 -v $PWD/mondossier:/var/www/html/ php:7.4-apache</p>
 </aside>
 </section><section id="ajout-dune-base-de-données" class="slide level2">
 <h2>Ajout d’une Base De Données</h2>
@@ -943,7 +944,7 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 <p>Avec la commande <code>docker exec ...</code>, lancez le client mariadb en ligne de commande pour explorer la base de données et observez le contenu de la table point au fur et à mesure des interactions avec la carte. (<code>select * from point;</code> sur la table <em>mymap</em> )</p>
 <aside class="notes">
 <p>Le fait de définir les paramètres de connexion à la base de données dans un code source est une mauvaise pratique. Il faudrait que le code PHP détermine ces informations à partir de variable d’environnement.</p>
-<p>docker network create lamp docker run –net lamp -d –name web -p 8080:80 -v $PWD/mondossier:/var/www/html/ lavoweb/php-7.1 docker run –net lamp -d –name database -e MARIADB_RANDOM_ROOT_PASSWORD=yes -e MARIADB_DATABASE=mymap -e MARIADB_USER=user -e MARIADB_PASSWORD=s3cr3t mariadb docker exec -it database mariadb -u user -D mymap –password=“s3cr3t”</p>
+<p>docker network create lamp docker run –net lamp -d –name web -p 8080:80 -v $PWD/mondossier:/var/www/html/ php:7.4-apache docker run –net lamp -d –name database -e MARIADB_RANDOM_ROOT_PASSWORD=yes -e MARIADB_DATABASE=mymap -e MARIADB_USER=user -e MARIADB_PASSWORD=s3cr3t mariadb docker exec -it database mariadb -u user -D mymap –password=“s3cr3t”</p>
 </aside>
 </section><section id="persistence-de-la-base-de-données" class="slide level2">
 <h2>Persistence de la Base De Données</h2>
@@ -1096,13 +1097,24 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 </ul></li>
 </ul>
 </section></section>
-<section><section id="tp-dockerfile" class="title-slide slide level1"><h1>TP Dockerfile</h1></section><section id="une-application-node.js" class="slide level2">
+<section><section id="tp-dockerfile" class="title-slide slide level1"><h1>TP Dockerfile</h1></section><section id="reprise-de-notre-application-de-cartopoint" class="slide level2">
+<h2>reprise de notre application de cartopoint</h2>
+<p>Nous allons ici simplement créer une nouvelle image pour avoir une moyen de livrer notre application.</p>
+<ul>
+<li class="fragment">Cette image sera basée sur l’image déjà référencé : <code>php:7.4-apache</code></li>
+<li class="fragment">Copiez le fichier <code>index-bdd.php</code> en <code>index.php</code> dans le dossier par défaut du serveur web.</li>
+<li class="fragment">Et c’est tout :D</li>
+<li class="fragment">Construisez une image nommée <strong>cartopoint:1.0</strong> à partir de ce Dockerfile eavec la commande <code>docker build -t cartopoint:1.0 .</code></li>
+<li class="fragment">Nous avons maintenant une image autonome pour ce qui est de la partie statique de notre site Web (les données restent bien entendu dans la base de donnée)</li>
+<li class="fragment">Testez cette image !</li>
+</ul>
+</section><section id="une-application-node.js" class="slide level2">
 <h2>Une application node.js</h2>
-<p>Nous allons créer pas à pas une image Docker pour répondre à un besoin simple.</p>
-<p>Le code de l’application est disponible dans le dépot https://github.com/cedricici/findmefast</p>
+<p>Cette fois ci, nous allons créer pas à pas une image Docker pour une application <strong>node.js</strong> dont le code de l’application est disponible dans le dépôt</p>
+<p><a href="https://github.com/cedricici/findmefast" class="uri">https://github.com/cedricici/findmefast</a></p>
 <ul>
 <li class="fragment">Commençons par cloner ce dépôt, puis créer un fichier nommé <code>Dockerfile</code></li>
-<li class="fragment">Il faut choisir une image de base, pour node, nous allons choisir une version récente basé sur un OS Alpine : <a href="https://hub.docker.com/layers/library/node/18-alpine/images/sha256-d51f2f5ce2dc7dfcc27fc2aa27a6edc66f6b89825ed4c7249ed0a7298c20a45a?context=explore">node:18-alpine</a></li>
+<li class="fragment">Avec l’image Alpine : <a href="https://hub.docker.com/layers/library/node/18-alpine/images/sha256-d51f2f5ce2dc7dfcc27fc2aa27a6edc66f6b89825ed4c7249ed0a7298c20a45a?context=explore">node:18-alpine</a></li>
 <li class="fragment">Il faut ensuite réaliser ces actions :
 <ul>
 <li class="fragment">Créer un dossier <code>/app</code> à la racine du conteneur</li>
@@ -1129,21 +1141,20 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 <a class="sourceLine" id="cb58-12" title="12"><span class="kw">EXPOSE</span> 1111</a>
 <a class="sourceLine" id="cb58-13" title="13"></a>
 <a class="sourceLine" id="cb58-14" title="14"><span class="kw">CMD</span> [<span class="st">&quot;npm&quot;</span>, <span class="st">&quot;start&quot;</span>]</a></code></pre></div>
-<p>Docker build -t findmefast .</p>
+<div class="sourceCode" id="cb59"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb59-1" title="1"><span class="ex">docker</span> build -t findmefast .</a></code></pre></div>
 </aside>
 </section><section id="une-application-node.js-1" class="slide level2">
 <h2>Une application node.js</h2>
-<p>On construira l’image avec la commande <code>docker build -t findmefast .</code></p>
 <p>Et on pourra tester l’application avec la commande <code>docker run</code> en mappant un port de votre machine sur le port <code>1111</code> du conteneur.</p>
 <p>=&gt; Pour pouvoir tester l’application entre vous il faudra faire une petite manipulation pour mapper également ce port dans la VM Virtualbox.</p>
 </section><section id="une-compilation-c" class="slide level2">
 <h2>Une compilation C</h2>
 <p>Nous allons maintenant créer une petite image <strong>multistage</strong> pour compiler puis exécuter un petit programme qui calcul <strong>n</strong> n nombre premier (le seul intérêt de ce programme est de solliciter le CPU). Nous profiterons de ce programme pour bien comprendre la notion de <em>Kernel</em> et de <em>Userspace</em> dans les conteneurs. DAns un premier temps , nous allons compiler le programme sur notre host.</p>
 <ul>
-<li class="fragment">Placez vous dans le dossier <code>/prime</code> du dépot git</li>
+<li class="fragment">Placez vous dans le dossier <code>/prime</code> du dépôt git</li>
 <li class="fragment">Installez <code>gcc</code> : <code>sudo apt-get update &amp;&amp; sudo apt-get install gcc</code></li>
 <li class="fragment">Compiler le programme : <code>gcc prime.c -o prime</code></li>
-<li class="fragment">Mesurez le temps nécéssaire pour calculer les 10000 premiers nombres premiers (utilisez <code>time</code>, le programme <code>./prime</code> prends en argument la quantité de nombre premier à trouver.</li>
+<li class="fragment">Mesurez le temps nécessaire pour calculer les 10000 premiers nombres premiers (utilisez <code>time</code>, le programme <code>./prime</code> prends en argument la quantité de nombre premier à trouver.</li>
 </ul>
 <aside class="notes">
 <p>time ….</p>
@@ -1176,18 +1187,18 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 <li class="fragment">Comparez les vitesses d’exécution</li>
 </ul>
 <aside class="notes">
-<div class="sourceCode" id="cb59"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><a class="sourceLine" id="cb59-1" title="1"><span class="kw">FROM</span> debian:bookworm as builder</a>
-<a class="sourceLine" id="cb59-2" title="2"></a>
-<a class="sourceLine" id="cb59-3" title="3"><span class="kw">RUN</span> apt-get update &amp;&amp; apt-get install -y gcc</a>
-<a class="sourceLine" id="cb59-4" title="4"><span class="kw">ADD</span> ./prime.c /prime.c</a>
-<a class="sourceLine" id="cb59-5" title="5"><span class="kw">RUN</span> gcc prime.c -o prime</a>
-<a class="sourceLine" id="cb59-6" title="6"></a>
-<a class="sourceLine" id="cb59-7" title="7"><span class="kw">FROM</span> debian:bookworm-slim</a>
-<a class="sourceLine" id="cb59-8" title="8"></a>
-<a class="sourceLine" id="cb59-9" title="9"><span class="kw">COPY</span> --from=builder prime prime</a>
-<a class="sourceLine" id="cb59-10" title="10"></a>
-<a class="sourceLine" id="cb59-11" title="11"><span class="kw">CMD</span> [ ./prime 1 ]</a></code></pre></div>
-<div class="sourceCode" id="cb60"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb60-1" title="1"><span class="ex">docker</span> run -ti prime ./prime 10000</a></code></pre></div>
+<div class="sourceCode" id="cb60"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><a class="sourceLine" id="cb60-1" title="1"><span class="kw">FROM</span> debian:bookworm as builder</a>
+<a class="sourceLine" id="cb60-2" title="2"></a>
+<a class="sourceLine" id="cb60-3" title="3"><span class="kw">RUN</span> apt-get update &amp;&amp; apt-get install -y gcc</a>
+<a class="sourceLine" id="cb60-4" title="4"><span class="kw">ADD</span> ./prime.c /prime.c</a>
+<a class="sourceLine" id="cb60-5" title="5"><span class="kw">RUN</span> gcc prime.c -o prime</a>
+<a class="sourceLine" id="cb60-6" title="6"></a>
+<a class="sourceLine" id="cb60-7" title="7"><span class="kw">FROM</span> debian:bookworm-slim</a>
+<a class="sourceLine" id="cb60-8" title="8"></a>
+<a class="sourceLine" id="cb60-9" title="9"><span class="kw">COPY</span> --from=builder prime prime</a>
+<a class="sourceLine" id="cb60-10" title="10"></a>
+<a class="sourceLine" id="cb60-11" title="11"><span class="kw">CMD</span> [ ./prime 1 ]</a></code></pre></div>
+<div class="sourceCode" id="cb61"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb61-1" title="1"><span class="ex">docker</span> run -ti prime ./prime 10000</a></code></pre></div>
 </aside>
 </section></section>
 <section><section id="tp-libreqr" class="title-slide slide level1"><h1>TP LibreQR</h1></section><section id="création-du-dockerfile" class="slide level2">
@@ -1195,68 +1206,68 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 <p>Vous êtes en avance, voici une proposition de Dockerfile à créer en toute autonomie : dockeriser une application <strong>LibreQR</strong>, une application web de génération de QR Code. Voici les ressources nécéssaires :</p>
 <ul>
 <li class="fragment">Le code source et la documentation se trouvent là : <a href="https://code.antopie.org/miraty/libreqr" class="uri">https://code.antopie.org/miraty/libreqr</a></li>
-<li class="fragment">basé sur l’image <code>php:apache</code></li>
+<li class="fragment">basé sur l’image <code>php:4.7-apache</code></li>
 <li class="fragment">Pour installer la dépendance <code>php-gd</code> on utilisera plutôt <a href="https://github.com/mlocati/docker-php-extension-installer" class="uri">https://github.com/mlocati/docker-php-extension-installer</a></li>
 <li class="fragment">Penser à rendre le dossier et les fichiers accessibles à l’utilisateur du service httpd <code>www-data</code>.</li>
 <li class="fragment">Utiliser la configuration PHP de production et non de développement (voir la partie “Configuration” de <a href="https://hub.docker.com/_/php" class="uri">https://hub.docker.com/_/php</a> )</li>
 <li class="fragment">Modifier le fichier de configuration à inclure pour changer le texte affiché en bas de page.</li>
 </ul>
 <aside class="notes">
-<div class="sourceCode" id="cb61"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><a class="sourceLine" id="cb61-1" title="1"><span class="kw">FROM</span> php:apache</a>
-<a class="sourceLine" id="cb61-2" title="2"></a>
-<a class="sourceLine" id="cb61-3" title="3"><span class="kw">ADD</span> https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/</a>
-<a class="sourceLine" id="cb61-4" title="4"></a>
-<a class="sourceLine" id="cb61-5" title="5"><span class="kw">RUN</span> chmod +x /usr/local/bin/install-php-extensions &amp;&amp; \</a>
-<a class="sourceLine" id="cb61-6" title="6">    install-php-extensions gd</a>
-<a class="sourceLine" id="cb61-7" title="7"></a>
-<a class="sourceLine" id="cb61-8" title="8"><span class="kw">ADD</span> https://code.antopie.org/miraty/libreqr/archive/main.zip /main.zip</a>
-<a class="sourceLine" id="cb61-9" title="9"></a>
-<a class="sourceLine" id="cb61-10" title="10"><span class="kw">RUN</span> apt-get update &amp;&amp; \</a>
-<a class="sourceLine" id="cb61-11" title="11">    apt-get install -y unzip &amp;&amp; \</a>
-<a class="sourceLine" id="cb61-12" title="12">    cd /var/www/html &amp;&amp; \</a>
-<a class="sourceLine" id="cb61-13" title="13">    unzip /main.zip &amp;&amp; \</a>
-<a class="sourceLine" id="cb61-14" title="14">    mv libreqr/* . &amp;&amp; \</a>
-<a class="sourceLine" id="cb61-15" title="15">    chown -R www-data:www-data /var/www/html/</a>
-<a class="sourceLine" id="cb61-16" title="16"></a>
-<a class="sourceLine" id="cb61-17" title="17"><span class="kw">ADD</span> config.inc.php /var/www/html</a>
-<a class="sourceLine" id="cb61-18" title="18"><span class="kw">RUN</span> chown -R www-data:www-data /var/www/html/</a>
-<a class="sourceLine" id="cb61-19" title="19"><span class="kw">ENV</span> LIBREQR_THEME=libreqr \</a>
-<a class="sourceLine" id="cb61-20" title="20">    LIBREQR_DEFAULT_LOCALE=fr \</a>
-<a class="sourceLine" id="cb61-21" title="21">    LIBREQR_CUSTOM_TEXT_ENABLED=true \</a>
-<a class="sourceLine" id="cb61-22" title="22">    LIBREQR_CUSTOM_TEXT=<span class="st">&quot;LibreQR on docker&quot;</span> \</a>
-<a class="sourceLine" id="cb61-23" title="23">    LIBREQR_DEFAULT_REDUNDANCY=high \</a>
-<a class="sourceLine" id="cb61-24" title="24">    LIBREQR_DEFAULT_MARGIN=20 \</a>
-<a class="sourceLine" id="cb61-25" title="25">    LIBREQR_DEFAULT_SIZE=300 \</a>
-<a class="sourceLine" id="cb61-26" title="26">    LIBREQR_DEFAULT_BGCOLOR=FFFFFF \</a>
-<a class="sourceLine" id="cb61-27" title="27">    LIBREQR_DEFAULT_FGCOLOR=000000</a></code></pre></div>
-<div class="sourceCode" id="cb62"><pre class="sourceCode php"><code class="sourceCode php"><a class="sourceLine" id="cb62-1" title="1"><span class="kw">&lt;?php</span></a>
-<a class="sourceLine" id="cb62-2" title="2"><span class="co">// Basé sur https://code.antopie.org/miraty/libreqr/src/branch/main/config.inc.php</span></a>
-<a class="sourceLine" id="cb62-3" title="3"><span class="co">// This file is part of LibreQR, which is distributed under the GNU AGPLv3+ license</span></a>
+<div class="sourceCode" id="cb62"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><a class="sourceLine" id="cb62-1" title="1"><span class="kw">FROM</span> php:7.4-apache</a>
+<a class="sourceLine" id="cb62-2" title="2"></a>
+<a class="sourceLine" id="cb62-3" title="3"><span class="kw">ADD</span> https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/</a>
 <a class="sourceLine" id="cb62-4" title="4"></a>
-<a class="sourceLine" id="cb62-5" title="5"><span class="co">// LIBREQR SETTINGS</span></a>
-<a class="sourceLine" id="cb62-6" title="6"></a>
-<a class="sourceLine" id="cb62-7" title="7"><span class="co">// Theme&#39;s directory name</span></a>
-<a class="sourceLine" id="cb62-8" title="8"><span class="fu">define</span><span class="ot">(</span><span class="st">&quot;THEME&quot;</span><span class="ot">,</span> <span class="kw">$_ENV</span><span class="ot">[</span><span class="st">&quot;LIBREQR_THEME&quot;</span><span class="ot">]);</span></a>
+<a class="sourceLine" id="cb62-5" title="5"><span class="kw">RUN</span> chmod +x /usr/local/bin/install-php-extensions &amp;&amp; \</a>
+<a class="sourceLine" id="cb62-6" title="6">    install-php-extensions gd</a>
+<a class="sourceLine" id="cb62-7" title="7"></a>
+<a class="sourceLine" id="cb62-8" title="8"><span class="kw">ADD</span> https://code.antopie.org/miraty/libreqr/archive/main.zip /main.zip</a>
 <a class="sourceLine" id="cb62-9" title="9"></a>
-<a class="sourceLine" id="cb62-10" title="10"><span class="co">// Language used if those requested by the user are not available</span></a>
-<a class="sourceLine" id="cb62-11" title="11"><span class="fu">define</span><span class="ot">(</span><span class="st">&quot;DEFAULT_LOCALE&quot;</span><span class="ot">,</span> <span class="kw">$_ENV</span><span class="ot">[</span><span class="st">&quot;LIBREQR_DEFAULT_LOCALE&quot;</span><span class="ot">]);</span></a>
-<a class="sourceLine" id="cb62-12" title="12"></a>
-<a class="sourceLine" id="cb62-13" title="13"><span class="co">// Will be printed at the bottom of the interface</span></a>
-<a class="sourceLine" id="cb62-14" title="14"><span class="fu">define</span><span class="ot">(</span><span class="st">&quot;CUSTOM_TEXT_ENABLED&quot;</span><span class="ot">,</span> <span class="kw">$_ENV</span><span class="ot">[</span><span class="st">&quot;LIBREQR_CUSTOM_TEXT_ENABLED&quot;</span><span class="ot">]</span> == <span class="st">&quot;true&quot;</span><span class="ot">);</span></a>
-<a class="sourceLine" id="cb62-15" title="15"><span class="fu">define</span><span class="ot">(</span><span class="st">&quot;CUSTOM_TEXT&quot;</span><span class="ot">,</span> <span class="kw">$_ENV</span><span class="ot">[</span><span class="st">&quot;LIBREQR_CUSTOM_TEXT&quot;</span><span class="ot">]);</span></a>
+<a class="sourceLine" id="cb62-10" title="10"><span class="kw">RUN</span> apt-get update &amp;&amp; \</a>
+<a class="sourceLine" id="cb62-11" title="11">    apt-get install -y unzip &amp;&amp; \</a>
+<a class="sourceLine" id="cb62-12" title="12">    cd /var/www/html &amp;&amp; \</a>
+<a class="sourceLine" id="cb62-13" title="13">    unzip /main.zip &amp;&amp; \</a>
+<a class="sourceLine" id="cb62-14" title="14">    mv libreqr/* . &amp;&amp; \</a>
+<a class="sourceLine" id="cb62-15" title="15">    chown -R www-data:www-data /var/www/html/</a>
 <a class="sourceLine" id="cb62-16" title="16"></a>
-<a class="sourceLine" id="cb62-17" title="17"><span class="co">// Default values</span></a>
-<a class="sourceLine" id="cb62-18" title="18"><span class="fu">define</span><span class="ot">(</span><span class="st">&quot;DEFAULT_REDUNDANCY&quot;</span><span class="ot">,</span> <span class="kw">$_ENV</span><span class="ot">[</span><span class="st">&quot;LIBREQR_DEFAULT_REDUNDANCY&quot;</span><span class="ot">]);</span></a>
-<a class="sourceLine" id="cb62-19" title="19"><span class="fu">define</span><span class="ot">(</span><span class="st">&quot;DEFAULT_MARGIN&quot;</span><span class="ot">,</span> <span class="fu">intval</span><span class="ot">(</span><span class="kw">$_ENV</span><span class="ot">[</span><span class="st">&quot;LIBREQR_DEFAULT_MARGIN&quot;</span><span class="ot">]));</span></a>
-<a class="sourceLine" id="cb62-20" title="20"><span class="fu">define</span><span class="ot">(</span><span class="st">&quot;DEFAULT_SIZE&quot;</span><span class="ot">,</span> <span class="fu">intval</span><span class="ot">(</span><span class="kw">$_ENV</span><span class="ot">[</span><span class="st">&quot;LIBREQR_DEFAULT_SIZE&quot;</span><span class="ot">]));</span></a>
-<a class="sourceLine" id="cb62-21" title="21"><span class="fu">define</span><span class="ot">(</span><span class="st">&quot;DEFAULT_BGCOLOR&quot;</span><span class="ot">,</span> <span class="kw">$_ENV</span><span class="ot">[</span><span class="st">&quot;LIBREQR_DEFAULT_BGCOLOR&quot;</span><span class="ot">]);</span></a>
-<a class="sourceLine" id="cb62-22" title="22"><span class="fu">define</span><span class="ot">(</span><span class="st">&quot;DEFAULT_FGCOLOR&quot;</span><span class="ot">,</span> <span class="kw">$_ENV</span><span class="ot">[</span><span class="st">&quot;LIBREQR_DEFAULT_FGCOLOR&quot;</span><span class="ot">]);</span></a></code></pre></div>
-<div class="sourceCode" id="cb63"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb63-1" title="1"><span class="ex">docker</span> image build -t qr .</a>
-<a class="sourceLine" id="cb63-2" title="2"><span class="ex">docker</span> container run -p 8080:80 -e LIBREQR_CUSTOM_TEXT=<span class="st">&quot;Générateur de QR code dans docker&quot;</span> qr</a></code></pre></div>
+<a class="sourceLine" id="cb62-17" title="17"><span class="kw">ADD</span> config.inc.php /var/www/html</a>
+<a class="sourceLine" id="cb62-18" title="18"><span class="kw">RUN</span> chown -R www-data:www-data /var/www/html/</a>
+<a class="sourceLine" id="cb62-19" title="19"><span class="kw">ENV</span> LIBREQR_THEME=libreqr \</a>
+<a class="sourceLine" id="cb62-20" title="20">    LIBREQR_DEFAULT_LOCALE=fr \</a>
+<a class="sourceLine" id="cb62-21" title="21">    LIBREQR_CUSTOM_TEXT_ENABLED=true \</a>
+<a class="sourceLine" id="cb62-22" title="22">    LIBREQR_CUSTOM_TEXT=<span class="st">&quot;LibreQR on docker&quot;</span> \</a>
+<a class="sourceLine" id="cb62-23" title="23">    LIBREQR_DEFAULT_REDUNDANCY=high \</a>
+<a class="sourceLine" id="cb62-24" title="24">    LIBREQR_DEFAULT_MARGIN=20 \</a>
+<a class="sourceLine" id="cb62-25" title="25">    LIBREQR_DEFAULT_SIZE=300 \</a>
+<a class="sourceLine" id="cb62-26" title="26">    LIBREQR_DEFAULT_BGCOLOR=FFFFFF \</a>
+<a class="sourceLine" id="cb62-27" title="27">    LIBREQR_DEFAULT_FGCOLOR=000000</a></code></pre></div>
+<div class="sourceCode" id="cb63"><pre class="sourceCode php"><code class="sourceCode php"><a class="sourceLine" id="cb63-1" title="1"><span class="kw">&lt;?php</span></a>
+<a class="sourceLine" id="cb63-2" title="2"><span class="co">// Basé sur https://code.antopie.org/miraty/libreqr/src/branch/main/config.inc.php</span></a>
+<a class="sourceLine" id="cb63-3" title="3"><span class="co">// This file is part of LibreQR, which is distributed under the GNU AGPLv3+ license</span></a>
+<a class="sourceLine" id="cb63-4" title="4"></a>
+<a class="sourceLine" id="cb63-5" title="5"><span class="co">// LIBREQR SETTINGS</span></a>
+<a class="sourceLine" id="cb63-6" title="6"></a>
+<a class="sourceLine" id="cb63-7" title="7"><span class="co">// Theme&#39;s directory name</span></a>
+<a class="sourceLine" id="cb63-8" title="8"><span class="fu">define</span><span class="ot">(</span><span class="st">&quot;THEME&quot;</span><span class="ot">,</span> <span class="kw">$_ENV</span><span class="ot">[</span><span class="st">&quot;LIBREQR_THEME&quot;</span><span class="ot">]);</span></a>
+<a class="sourceLine" id="cb63-9" title="9"></a>
+<a class="sourceLine" id="cb63-10" title="10"><span class="co">// Language used if those requested by the user are not available</span></a>
+<a class="sourceLine" id="cb63-11" title="11"><span class="fu">define</span><span class="ot">(</span><span class="st">&quot;DEFAULT_LOCALE&quot;</span><span class="ot">,</span> <span class="kw">$_ENV</span><span class="ot">[</span><span class="st">&quot;LIBREQR_DEFAULT_LOCALE&quot;</span><span class="ot">]);</span></a>
+<a class="sourceLine" id="cb63-12" title="12"></a>
+<a class="sourceLine" id="cb63-13" title="13"><span class="co">// Will be printed at the bottom of the interface</span></a>
+<a class="sourceLine" id="cb63-14" title="14"><span class="fu">define</span><span class="ot">(</span><span class="st">&quot;CUSTOM_TEXT_ENABLED&quot;</span><span class="ot">,</span> <span class="kw">$_ENV</span><span class="ot">[</span><span class="st">&quot;LIBREQR_CUSTOM_TEXT_ENABLED&quot;</span><span class="ot">]</span> == <span class="st">&quot;true&quot;</span><span class="ot">);</span></a>
+<a class="sourceLine" id="cb63-15" title="15"><span class="fu">define</span><span class="ot">(</span><span class="st">&quot;CUSTOM_TEXT&quot;</span><span class="ot">,</span> <span class="kw">$_ENV</span><span class="ot">[</span><span class="st">&quot;LIBREQR_CUSTOM_TEXT&quot;</span><span class="ot">]);</span></a>
+<a class="sourceLine" id="cb63-16" title="16"></a>
+<a class="sourceLine" id="cb63-17" title="17"><span class="co">// Default values</span></a>
+<a class="sourceLine" id="cb63-18" title="18"><span class="fu">define</span><span class="ot">(</span><span class="st">&quot;DEFAULT_REDUNDANCY&quot;</span><span class="ot">,</span> <span class="kw">$_ENV</span><span class="ot">[</span><span class="st">&quot;LIBREQR_DEFAULT_REDUNDANCY&quot;</span><span class="ot">]);</span></a>
+<a class="sourceLine" id="cb63-19" title="19"><span class="fu">define</span><span class="ot">(</span><span class="st">&quot;DEFAULT_MARGIN&quot;</span><span class="ot">,</span> <span class="fu">intval</span><span class="ot">(</span><span class="kw">$_ENV</span><span class="ot">[</span><span class="st">&quot;LIBREQR_DEFAULT_MARGIN&quot;</span><span class="ot">]));</span></a>
+<a class="sourceLine" id="cb63-20" title="20"><span class="fu">define</span><span class="ot">(</span><span class="st">&quot;DEFAULT_SIZE&quot;</span><span class="ot">,</span> <span class="fu">intval</span><span class="ot">(</span><span class="kw">$_ENV</span><span class="ot">[</span><span class="st">&quot;LIBREQR_DEFAULT_SIZE&quot;</span><span class="ot">]));</span></a>
+<a class="sourceLine" id="cb63-21" title="21"><span class="fu">define</span><span class="ot">(</span><span class="st">&quot;DEFAULT_BGCOLOR&quot;</span><span class="ot">,</span> <span class="kw">$_ENV</span><span class="ot">[</span><span class="st">&quot;LIBREQR_DEFAULT_BGCOLOR&quot;</span><span class="ot">]);</span></a>
+<a class="sourceLine" id="cb63-22" title="22"><span class="fu">define</span><span class="ot">(</span><span class="st">&quot;DEFAULT_FGCOLOR&quot;</span><span class="ot">,</span> <span class="kw">$_ENV</span><span class="ot">[</span><span class="st">&quot;LIBREQR_DEFAULT_FGCOLOR&quot;</span><span class="ot">]);</span></a></code></pre></div>
+<div class="sourceCode" id="cb64"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb64-1" title="1"><span class="ex">docker</span> image build -t qr .</a>
+<a class="sourceLine" id="cb64-2" title="2"><span class="ex">docker</span> container run -p 8080:80 -e LIBREQR_CUSTOM_TEXT=<span class="st">&quot;Générateur de QR code dans docker&quot;</span> qr</a></code></pre></div>
 </aside>
 </section><section id="proposez-vos-projets" class="slide level2">
 <h2>Proposez vos projets</h2>
-<p>Nous pouvez voir ensemble les étapes nécessaires à la <strong>Dockerisation</strong> de vos applications.</p>
+<p>Nous pouvons voir ensemble les étapes nécessaires à la <strong>Dockerisation</strong> de vos applications.</p>
 </section></section>
 <section><section id="docker-compose" class="title-slide slide level1"><h1>Docker-compose</h1></section><section id="bilan-docker" class="slide level2">
 <h2>Bilan docker</h2>
@@ -1356,47 +1367,47 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 <ul>
 <li class="fragment">une image</li>
 </ul>
-<div class="sourceCode" id="cb64"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb64-1" title="1"><span class="fu">image:</span><span class="at"> httpd:alpine</span></a></code></pre></div>
+<div class="sourceCode" id="cb65"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb65-1" title="1"><span class="fu">image:</span><span class="at"> httpd:alpine</span></a></code></pre></div>
 <ul>
 <li class="fragment">un <em>DockerFile</em></li>
 </ul>
-<div class="sourceCode" id="cb65"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb65-1" title="1"><span class="fu">build:</span><span class="at"> ./path</span></a>
-<a class="sourceLine" id="cb65-2" title="2"><span class="co"># ou</span></a>
-<a class="sourceLine" id="cb65-3" title="3"><span class="fu">build:</span></a>
-<a class="sourceLine" id="cb65-4" title="4">  <span class="fu">context:</span><span class="at"> ./path</span></a>
-<a class="sourceLine" id="cb65-5" title="5">  <span class="fu">dockerfile:</span><span class="at"> monDockerFile</span></a>
-<a class="sourceLine" id="cb65-6" title="6">  <span class="fu">args:</span></a>
-<a class="sourceLine" id="cb65-7" title="7">    ...</a></code></pre></div>
+<div class="sourceCode" id="cb66"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb66-1" title="1"><span class="fu">build:</span><span class="at"> ./path</span></a>
+<a class="sourceLine" id="cb66-2" title="2"><span class="co"># ou</span></a>
+<a class="sourceLine" id="cb66-3" title="3"><span class="fu">build:</span></a>
+<a class="sourceLine" id="cb66-4" title="4">  <span class="fu">context:</span><span class="at"> ./path</span></a>
+<a class="sourceLine" id="cb66-5" title="5">  <span class="fu">dockerfile:</span><span class="at"> monDockerFile</span></a>
+<a class="sourceLine" id="cb66-6" title="6">  <span class="fu">args:</span></a>
+<a class="sourceLine" id="cb66-7" title="7">    ...</a></code></pre></div>
 <p>Utiliser une image est plus sûr. Un pipeline de CI est chargé de construire les images avec une gestion des <em>Tags</em> permettant d’avoir des releases connues. La création de l’image “à la volée” dans le docker-compose est une option viable en mode de développement.</p>
 </section><section id="services-volumes" class="slide level2">
 <h2>Services : volumes</h2>
 <p>Montage des volumes Docker ou host</p>
-<div class="sourceCode" id="cb66"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb66-1" title="1"><span class="fu">volumes:</span></a>
-<a class="sourceLine" id="cb66-2" title="2">  <span class="co"># sans précision, Docker créé un volume nommé (sans nom...)</span></a>
-<a class="sourceLine" id="cb66-3" title="3">  <span class="kw">-</span> /var/lib/mysql</a>
-<a class="sourceLine" id="cb66-4" title="4"></a>
-<a class="sourceLine" id="cb66-5" title="5">  <span class="co"># Un volume Docker nommé</span></a>
-<a class="sourceLine" id="cb66-6" title="6">  <span class="kw">-</span> datavolume:/var/lib/mysql</a>
-<a class="sourceLine" id="cb66-7" title="7">  </a>
-<a class="sourceLine" id="cb66-8" title="8">  <span class="co"># Un volume &quot;host&quot; en chemin absolu</span></a>
-<a class="sourceLine" id="cb66-9" title="9">  <span class="kw">-</span> /opt/data:/var/lib/mysql</a>
-<a class="sourceLine" id="cb66-10" title="10">  </a>
-<a class="sourceLine" id="cb66-11" title="11">  <span class="co"># Un volume &quot;host&quot; en chemin relatif au fichier docker-compose</span></a>
-<a class="sourceLine" id="cb66-12" title="12">  <span class="kw">-</span> ./cache:/tmp/cache</a>
-<a class="sourceLine" id="cb66-13" title="13">  </a>
-<a class="sourceLine" id="cb66-14" title="14">  <span class="co"># Un volume &quot;host&quot; en chemin relatif au home de l&#39;utilisateur</span></a>
-<a class="sourceLine" id="cb66-15" title="15">  <span class="kw">-</span> ~/configs:/etc/configs/:ro</a>
-<a class="sourceLine" id="cb66-16" title="16">  </a></code></pre></div>
+<div class="sourceCode" id="cb67"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb67-1" title="1"><span class="fu">volumes:</span></a>
+<a class="sourceLine" id="cb67-2" title="2">  <span class="co"># sans précision, Docker créé un volume nommé (sans nom...)</span></a>
+<a class="sourceLine" id="cb67-3" title="3">  <span class="kw">-</span> /var/lib/mysql</a>
+<a class="sourceLine" id="cb67-4" title="4"></a>
+<a class="sourceLine" id="cb67-5" title="5">  <span class="co"># Un volume Docker nommé</span></a>
+<a class="sourceLine" id="cb67-6" title="6">  <span class="kw">-</span> datavolume:/var/lib/mysql</a>
+<a class="sourceLine" id="cb67-7" title="7">  </a>
+<a class="sourceLine" id="cb67-8" title="8">  <span class="co"># Un volume &quot;host&quot; en chemin absolu</span></a>
+<a class="sourceLine" id="cb67-9" title="9">  <span class="kw">-</span> /opt/data:/var/lib/mysql</a>
+<a class="sourceLine" id="cb67-10" title="10">  </a>
+<a class="sourceLine" id="cb67-11" title="11">  <span class="co"># Un volume &quot;host&quot; en chemin relatif au fichier docker-compose</span></a>
+<a class="sourceLine" id="cb67-12" title="12">  <span class="kw">-</span> ./cache:/tmp/cache</a>
+<a class="sourceLine" id="cb67-13" title="13">  </a>
+<a class="sourceLine" id="cb67-14" title="14">  <span class="co"># Un volume &quot;host&quot; en chemin relatif au home de l&#39;utilisateur</span></a>
+<a class="sourceLine" id="cb67-15" title="15">  <span class="kw">-</span> ~/configs:/etc/configs/:ro</a>
+<a class="sourceLine" id="cb67-16" title="16">  </a></code></pre></div>
 </section><section id="services-réseau" class="slide level2">
 <h2>Services : réseau</h2>
 <p>Branchement des réseaux et exposition de ports sur la machine hôte</p>
-<div class="sourceCode" id="cb67"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb67-1" title="1"><span class="fu">services:</span></a>
-<a class="sourceLine" id="cb67-2" title="2">  <span class="fu">some-service:</span></a>
-<a class="sourceLine" id="cb67-3" title="3">    <span class="fu">networks:</span></a>
-<a class="sourceLine" id="cb67-4" title="4">     <span class="kw">-</span> some-network</a>
-<a class="sourceLine" id="cb67-5" title="5">     <span class="kw">-</span> other-network</a>
-<a class="sourceLine" id="cb67-6" title="6">    <span class="fu">ports:</span></a>
-<a class="sourceLine" id="cb67-7" title="7">     <span class="kw">-</span> <span class="st">&quot;80:80&quot;</span> <span class="co">#Bien mettre les guillemets</span></a></code></pre></div>
+<div class="sourceCode" id="cb68"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb68-1" title="1"><span class="fu">services:</span></a>
+<a class="sourceLine" id="cb68-2" title="2">  <span class="fu">some-service:</span></a>
+<a class="sourceLine" id="cb68-3" title="3">    <span class="fu">networks:</span></a>
+<a class="sourceLine" id="cb68-4" title="4">     <span class="kw">-</span> some-network</a>
+<a class="sourceLine" id="cb68-5" title="5">     <span class="kw">-</span> other-network</a>
+<a class="sourceLine" id="cb68-6" title="6">    <span class="fu">ports:</span></a>
+<a class="sourceLine" id="cb68-7" title="7">     <span class="kw">-</span> <span class="st">&quot;80:80&quot;</span> <span class="co">#Bien mettre les guillemets</span></a></code></pre></div>
 <p>Seuls les services qui seront exposés doivent être connecté au réseau “externe” , les autres services doivent être connectés au même réseau interne pour pouvoir communiquer entres eux. Il n’est nécéssaire de déclarer que les ports ouvert sur le host. Les conteneurs d’un même réseau ont un accès total aux autre conteneurs de ce réseau.</p>
 </section><section id="services-dépendances-inter-conteneurs" class="slide level2">
 <h2>Services : dépendances inter-conteneurs</h2>
@@ -1404,13 +1415,13 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 <ul>
 <li class="fragment">on peut déclarer des dépendances avec <strong>depends_on</strong></li>
 </ul>
-<div class="sourceCode" id="cb68"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb68-1" title="1"><span class="fu">depends_on:</span></a>
-<a class="sourceLine" id="cb68-2" title="2">  <span class="kw">-</span> service1</a>
-<a class="sourceLine" id="cb68-3" title="3">  <span class="kw">-</span> service2</a></code></pre></div>
+<div class="sourceCode" id="cb69"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb69-1" title="1"><span class="fu">depends_on:</span></a>
+<a class="sourceLine" id="cb69-2" title="2">  <span class="kw">-</span> service1</a>
+<a class="sourceLine" id="cb69-3" title="3">  <span class="kw">-</span> service2</a></code></pre></div>
 </section><section id="services-command" class="slide level2">
 <h2>Services : command</h2>
 <p>Pour surcharger la commande par défaut, on utilise le paramètre <strong>command</strong></p>
-<div class="sourceCode" id="cb69"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb69-1" title="1"><span class="fu">command:</span><span class="at"> some command &amp;&amp; some other</span></a></code></pre></div>
+<div class="sourceCode" id="cb70"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb70-1" title="1"><span class="fu">command:</span><span class="at"> some command &amp;&amp; some other</span></a></code></pre></div>
 </section><section id="les-volumes-1" class="slide level2">
 <h2>Les volumes</h2>
 <ul>
@@ -1419,10 +1430,10 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 <li class="fragment">Les montages host-&gt;container ne sont pas concernés</li>
 </ul>
 <p>Tous les détails sur la <a href="https://docs.docker.com/compose/compose-file/#volume-configuration-reference">doc</a>.</p>
-<div class="sourceCode" id="cb70"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb70-1" title="1"><span class="fu">volumes:</span></a>
-<a class="sourceLine" id="cb70-2" title="2">  <span class="fu">monvolume:</span></a>
-<a class="sourceLine" id="cb70-3" title="3">  <span class="fu">monsecondvolume:</span></a>
-<a class="sourceLine" id="cb70-4" title="4">    <span class="fu">driver:</span><span class="at"> toto</span></a></code></pre></div>
+<div class="sourceCode" id="cb71"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb71-1" title="1"><span class="fu">volumes:</span></a>
+<a class="sourceLine" id="cb71-2" title="2">  <span class="fu">monvolume:</span></a>
+<a class="sourceLine" id="cb71-3" title="3">  <span class="fu">monsecondvolume:</span></a>
+<a class="sourceLine" id="cb71-4" title="4">    <span class="fu">driver:</span><span class="at"> toto</span></a></code></pre></div>
 </section><section id="les-réseaux" class="slide level2">
 <h2>Les réseaux</h2>
 <ul>
@@ -1434,31 +1445,31 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 <p>Tous les détails sur la <a href="https://docs.docker.com/compose/compose-file/#/network-configuration-reference">doc</a>.</p>
 </section><section id="réseaux-driver-par-défaut-bridge" class="slide level2">
 <h2>Réseaux : driver par défaut (bridge)</h2>
-<div class="sourceCode" id="cb71"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb71-1" title="1"><span class="fu">networks:</span></a>
-<a class="sourceLine" id="cb71-2" title="2">  <span class="fu">monreseau:</span></a>
-<a class="sourceLine" id="cb71-3" title="3">    <span class="fu">ipam:</span></a>
-<a class="sourceLine" id="cb71-4" title="4">      <span class="fu">config:</span></a>
-<a class="sourceLine" id="cb71-5" title="5">        <span class="kw">-</span> <span class="fu">subnet:</span><span class="at"> 192.168.91.1/24</span></a>
-<a class="sourceLine" id="cb71-6" title="6">          <span class="fu">ip_range:</span><span class="at"> 192.168.91.0/25</span></a>
-<a class="sourceLine" id="cb71-7" title="7">          <span class="fu">gateway:</span><span class="at"> </span><span class="fl">192.168.91.1</span></a></code></pre></div>
+<div class="sourceCode" id="cb72"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb72-1" title="1"><span class="fu">networks:</span></a>
+<a class="sourceLine" id="cb72-2" title="2">  <span class="fu">monreseau:</span></a>
+<a class="sourceLine" id="cb72-3" title="3">    <span class="fu">ipam:</span></a>
+<a class="sourceLine" id="cb72-4" title="4">      <span class="fu">config:</span></a>
+<a class="sourceLine" id="cb72-5" title="5">        <span class="kw">-</span> <span class="fu">subnet:</span><span class="at"> 192.168.91.1/24</span></a>
+<a class="sourceLine" id="cb72-6" title="6">          <span class="fu">ip_range:</span><span class="at"> 192.168.91.0/25</span></a>
+<a class="sourceLine" id="cb72-7" title="7">          <span class="fu">gateway:</span><span class="at"> </span><span class="fl">192.168.91.1</span></a></code></pre></div>
 </section><section id="cli" class="slide level2">
 <h2>CLI</h2>
 <p>Depuis la version2 de docker compose, la commande <code>docker-compose</code> est intégré à la commande <code>docker</code> et devient donc une sous-commande de la commande <code>docker</code>.</p>
 <p>On lance l’application avec la commande</p>
-<div class="sourceCode" id="cb72"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb72-1" title="1"><span class="ex">docker</span> compose up [SERVICE]</a></code></pre></div>
+<div class="sourceCode" id="cb73"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb73-1" title="1"><span class="ex">docker</span> compose up [SERVICE]</a></code></pre></div>
 <p>L’option <code>-d</code> permet de lancer les conteneurs en arrière-plan. L’option <code>-f</code> permet de spécifier un fichier compose différent (par défaut <code>docker-compose.yaml</code>)</p>
 </section><section id="commandes" class="slide level2">
 <h2>Commandes</h2>
 <p>Gestion des conteneurs</p>
-<div class="sourceCode" id="cb73"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb73-1" title="1"><span class="ex">docker</span> compose stop [SERVICE]</a>
-<a class="sourceLine" id="cb73-2" title="2"><span class="ex">docker</span> compose kill [SERVICE]</a>
-<a class="sourceLine" id="cb73-3" title="3"><span class="ex">docker</span> compose logs -f </a></code></pre></div>
+<div class="sourceCode" id="cb74"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb74-1" title="1"><span class="ex">docker</span> compose stop [SERVICE]</a>
+<a class="sourceLine" id="cb74-2" title="2"><span class="ex">docker</span> compose kill [SERVICE]</a>
+<a class="sourceLine" id="cb74-3" title="3"><span class="ex">docker</span> compose logs -f </a></code></pre></div>
 </section><section id="commandes-1" class="slide level2">
 <h2>Commandes</h2>
 <p>Nettoyage des conteneurs stoppés</p>
-<div class="sourceCode" id="cb74"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb74-1" title="1"><span class="ex">docker-compose</span> rm</a></code></pre></div>
+<div class="sourceCode" id="cb75"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb75-1" title="1"><span class="ex">docker-compose</span> rm</a></code></pre></div>
 <p>Nettoyage des éléments</p>
-<div class="sourceCode" id="cb75"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb75-1" title="1"><span class="ex">docker-compose</span> down</a></code></pre></div>
+<div class="sourceCode" id="cb76"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb76-1" title="1"><span class="ex">docker-compose</span> down</a></code></pre></div>
 </section><section id="documentation" class="slide level2">
 <h2>Documentation</h2>
 <p><code>docker-compose help</code></p>
@@ -1469,7 +1480,7 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 <h2>On prends les mêmes…</h2>
 <p>Pour ce TP, nous alons tenter de reproduire le TP LAMP en utilisant un docker-compose.yaml</p>
 <ul>
-<li class="fragment">Écrivez le docker-compose qui va réaliser les mêmes actions. n’oubliez pas :
+<li class="fragment">Écrivez le docker-compose qui va réaliser les mêmes actions. N’oubliez pas :
 <ul>
 <li class="fragment">les volumes</li>
 <li class="fragment">les réseaux</li>
@@ -1478,45 +1489,46 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 </ul></li>
 <li class="fragment">Lancez la stack en mode démon</li>
 <li class="fragment">Observez les logs</li>
-<li class="fragment">notez le nom des conteneurs créés</li>
+<li class="fragment">Notez le nom des conteneurs créés</li>
 </ul>
 <p>note : Il existe des solutions plus “sûr” pour passer des variables d’environnement sensibles (mot de passe)</p>
 <aside class="notes">
-<div class="sourceCode" id="cb76"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb76-1" title="1"><span class="fu">version:</span><span class="at"> </span><span class="st">&quot;3&quot;</span></a>
-<a class="sourceLine" id="cb76-2" title="2"><span class="fu">services:</span></a>
-<a class="sourceLine" id="cb76-3" title="3">  <span class="fu">web:</span></a>
-<a class="sourceLine" id="cb76-4" title="4">    <span class="fu">image:</span><span class="at"> lavoweb/php-7.1</span></a>
-<a class="sourceLine" id="cb76-5" title="5">    <span class="fu">volumes:</span></a>
-<a class="sourceLine" id="cb76-6" title="6">      <span class="kw">-</span> ./mondossier:/var/www/html</a>
-<a class="sourceLine" id="cb76-7" title="7">    <span class="fu">ports:</span></a>
-<a class="sourceLine" id="cb76-8" title="8">      <span class="kw">-</span> <span class="st">&quot;8080:80&quot;</span></a>
-<a class="sourceLine" id="cb76-9" title="9">    <span class="fu">networks:</span></a>
-<a class="sourceLine" id="cb76-10" title="10">      <span class="kw">-</span> lamp</a>
-<a class="sourceLine" id="cb76-11" title="11">    <span class="fu">depends_on:</span></a>
-<a class="sourceLine" id="cb76-12" title="12">      <span class="kw">-</span> database</a>
-<a class="sourceLine" id="cb76-13" title="13">  <span class="fu">database:</span></a>
-<a class="sourceLine" id="cb76-14" title="14">    <span class="fu">image:</span><span class="at"> mariadb</span></a>
-<a class="sourceLine" id="cb76-15" title="15">    <span class="fu">environment:</span></a>
-<a class="sourceLine" id="cb76-16" title="16">      <span class="kw">-</span> MARIADB_RANDOM_ROOT_PASSWORD=yes</a>
-<a class="sourceLine" id="cb76-17" title="17">      <span class="kw">-</span> MARIADB_DATABASE=mymap</a>
-<a class="sourceLine" id="cb76-18" title="18">      <span class="kw">-</span> MARIADB_USER=user</a>
-<a class="sourceLine" id="cb76-19" title="19">      <span class="kw">-</span> MARIADB_PASSWORD=s3cr3t</a>
-<a class="sourceLine" id="cb76-20" title="20">    <span class="fu">volumes:</span></a>
-<a class="sourceLine" id="cb76-21" title="21">      <span class="kw">-</span> databasedata:/var/lib/mysql</a>
-<a class="sourceLine" id="cb76-22" title="22">    <span class="fu">networks:</span></a>
-<a class="sourceLine" id="cb76-23" title="23">      <span class="kw">-</span> lamp</a>
-<a class="sourceLine" id="cb76-24" title="24"></a>
-<a class="sourceLine" id="cb76-25" title="25"><span class="fu">volumes:</span></a>
-<a class="sourceLine" id="cb76-26" title="26">  <span class="fu">databasedata:</span></a>
-<a class="sourceLine" id="cb76-27" title="27"></a>
-<a class="sourceLine" id="cb76-28" title="28"><span class="fu">networks:</span></a>
-<a class="sourceLine" id="cb76-29" title="29">  <span class="fu">lamp:</span></a></code></pre></div>
-</aside>
+<div class="sourceCode" id="cb77"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb77-1" title="1"><span class="fu">version:</span><span class="at"> </span><span class="st">&quot;3&quot;</span></a>
+<a class="sourceLine" id="cb77-2" title="2"><span class="fu">services:</span></a>
+<a class="sourceLine" id="cb77-3" title="3">  <span class="fu">web:</span></a>
+<a class="sourceLine" id="cb77-4" title="4">    <span class="fu">image:</span><span class="at"> cartopoint:1.0</span></a>
+<a class="sourceLine" id="cb77-5" title="5">    <span class="fu">ports:</span></a>
+<a class="sourceLine" id="cb77-6" title="6">      <span class="kw">-</span> <span class="st">&quot;8080:80&quot;</span></a>
+<a class="sourceLine" id="cb77-7" title="7">    <span class="fu">networks:</span></a>
+<a class="sourceLine" id="cb77-8" title="8">      <span class="kw">-</span> lamp</a>
+<a class="sourceLine" id="cb77-9" title="9">    <span class="fu">depends_on:</span></a>
+<a class="sourceLine" id="cb77-10" title="10">      <span class="kw">-</span> database</a>
+<a class="sourceLine" id="cb77-11" title="11">  <span class="fu">database:</span></a>
+<a class="sourceLine" id="cb77-12" title="12">    <span class="fu">image:</span><span class="at"> mariadb</span></a>
+<a class="sourceLine" id="cb77-13" title="13">    <span class="fu">environment:</span></a>
+<a class="sourceLine" id="cb77-14" title="14">      <span class="kw">-</span> MARIADB_RANDOM_ROOT_PASSWORD=yes</a>
+<a class="sourceLine" id="cb77-15" title="15">      <span class="kw">-</span> MARIADB_DATABASE=mymap</a>
+<a class="sourceLine" id="cb77-16" title="16">      <span class="kw">-</span> MARIADB_USER=user</a>
+<a class="sourceLine" id="cb77-17" title="17">      <span class="kw">-</span> MARIADB_PASSWORD=s3cr3t</a>
+<a class="sourceLine" id="cb77-18" title="18">    <span class="fu">volumes:</span></a>
+<a class="sourceLine" id="cb77-19" title="19">      <span class="kw">-</span> databasedata:/var/lib/mysql</a>
+<a class="sourceLine" id="cb77-20" title="20">    <span class="fu">networks:</span></a>
+<a class="sourceLine" id="cb77-21" title="21">      <span class="kw">-</span> lamp</a>
+<a class="sourceLine" id="cb77-22" title="22"></a>
+<a class="sourceLine" id="cb77-23" title="23"><span class="fu">volumes:</span></a>
+<a class="sourceLine" id="cb77-24" title="24">  <span class="fu">databasedata:</span></a>
+<a class="sourceLine" id="cb77-25" title="25"></a>
+<a class="sourceLine" id="cb77-26" title="26"><span class="fu">networks:</span></a>
+<a class="sourceLine" id="cb77-27" title="27">  <span class="fu">lamp:</span></a></code></pre></div>
 </section></section>
 <section><section id="kubernetes" class="title-slide slide level1"><h1>Kubernetes</h1></section><section id="orchestration-de-conteneurs" class="slide level2">
 <h2>Orchestration de conteneurs</h2>
 <p>Le but de ce cours n’est pas d’aborder Kubernetes <strong>K8S</strong> mais on ne peut décemment pas parler de <strong>Docker</strong> en 2023 sans parler de Kubernetes. <strong>K8S</strong> est une solution d’orchestration de conteneur mis au point par Google et devenue la référence en la matière. Kubernetest a permis d’amener les conteneurs <strong>Docker</strong> en production en apportant le contrôle et la sécurité qui n’était pas au niveau d’un outils créé avant tout pour les développeurs.</p>
-<p><strong>Docker</strong> propose lui aussi son orchestrateur <strong>SWARM</strong>, dont a CLI est intégré au client <code>docker</code>. Celui -ci n’étant pas au niveau de kubernetes, nous n’en parlerons pas , même si il a eu l’avantage d’êtr plus simple que K8S il y a quelques années.</p>
+<p><strong>Docker</strong> propose lui aussi son orchestrateur <strong>SWARM</strong>, dont a CLI est intégré au client <code>docker</code>. Celui -ci n’étant pas au niveau de kubernetes, nous n’en parlerons pas, même si il a eu l’avantage d’êtr plus simple que K8S il y a quelques années.</p>
+<aside class="notes">
+<p>curl -sfL https://get.k3s.io | sh - export KUBECONFIG=“/etc/rancher/k3s/k3s.yaml”</p>
+<p>kompose pour convertire une application docker-compose en manifests K8S</p>
+</aside>
 </section></section>
             </div>
         </div>

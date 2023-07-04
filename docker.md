@@ -65,7 +65,7 @@ Ce cours est librement inspiré de plusieurs sources dont celles de Thibault Cou
 
 </aside>
 
-## Isolation applicative ##{.figcenter} ##
+## Isolation applicative ##{.figcenter}
 
 ![](img/Diagramme_ArchiIsolateur.png)
 
@@ -1211,17 +1211,18 @@ Nous allons ici simplement créer une nouvelle image pour avoir une moyen de liv
 * Cette image sera basée sur l'image déjà référencé : `php:7.4-apache`
 * Copiez le fichier `index-bdd.php` en `index.php` dans le dossier par défaut du serveur web.
 * Et c'est tout :D
-* Construisez une image nommée **cartopoint:1.0** à partir de ce Dockerfile
+* Construisez une image nommée **cartopoint:1.0** à partir de ce Dockerfile eavec la commande `docker build -t cartopoint:1.0 .`
 * Nous avons maintenant une image autonome pour ce qui est de la partie statique de notre site Web (les données restent bien entendu dans la base de donnée)
+* Testez cette image !
 
 ## Une application node.js ##
 
-Cette fois ci, nous allons créer pas à pas une image Docker pour une application **node.js**
+Cette fois ci, nous allons créer pas à pas une image Docker pour une application **node.js** dont le code de l'application est disponible dans le dépôt 
 
-Le code de l'application est disponible dans le dépôt <https://github.com/cedricici/findmefast>
+<https://github.com/cedricici/findmefast>
 
 * Commençons par cloner ce dépôt, puis créer un fichier nommé `Dockerfile`
-* Il faut choisir une image de base, pour node, nous allons choisir une version récente basé sur un OS Alpine : [node:18-alpine](https://hub.docker.com/layers/library/node/18-alpine/images/sha256-d51f2f5ce2dc7dfcc27fc2aa27a6edc66f6b89825ed4c7249ed0a7298c20a45a?context=explore)
+* Avec l'image Alpine : [node:18-alpine](https://hub.docker.com/layers/library/node/18-alpine/images/sha256-d51f2f5ce2dc7dfcc27fc2aa27a6edc66f6b89825ed4c7249ed0a7298c20a45a?context=explore)
 * Il faut ensuite réaliser ces actions :
   * Créer un dossier `/app` à la racine du conteneur
   * Définir l'espace de travail dans ce nouveau dossier
@@ -1258,8 +1259,6 @@ docker build -t findmefast .
 
 ## Une application node.js ##
 
-On construira l'image avec la commande `docker build -t findmefast .`
-
 Et on pourra tester l'application avec la commande `docker run` en mappant un port de votre machine sur le port `1111` du conteneur.
 
 => Pour pouvoir tester l'application entre vous il faudra faire une petite manipulation pour mapper également ce port dans la VM Virtualbox.
@@ -1269,10 +1268,10 @@ Et on pourra tester l'application avec la commande `docker run` en mappant un po
 Nous allons maintenant créer une petite image **multistage** pour compiler puis exécuter un petit programme qui calcul **n** n nombre premier (le seul intérêt de ce programme est de solliciter le CPU).
 Nous profiterons de ce programme pour bien comprendre la notion de *Kernel* et de *Userspace* dans les conteneurs. DAns un premier temps , nous allons compiler le programme sur notre host.
 
-* Placez vous dans le dossier `/prime` du dépot git
+* Placez vous dans le dossier `/prime` du dépôt git
 * Installez `gcc` : `sudo apt-get update && sudo apt-get install gcc`
 * Compiler le programme : `gcc prime.c -o prime`
-* Mesurez le temps nécéssaire pour calculer les 10000 premiers nombres premiers (utilisez `time`, le programme `./prime` prends en argument la quantité de nombre premier à trouver.
+* Mesurez le temps nécessaire pour calculer les 10000 premiers nombres premiers (utilisez `time`, le programme `./prime` prends en argument la quantité de nombre premier à trouver.
 
 <aside class="notes">
 
@@ -1699,10 +1698,6 @@ networks:
 
 ```
 
-## Compos-ition ##
-
-
-</aside>
 
 # Kubernetes #
 
@@ -1713,13 +1708,13 @@ Le but de ce cours n'est pas d'aborder Kubernetes **K8S** mais on ne peut décem
 
 **Docker** propose lui aussi son orchestrateur **SWARM**, dont a CLI est intégré au client `docker`. Celui -ci n'étant pas au niveau de kubernetes, nous n'en parlerons pas, même si il a eu l'avantage d'êtr plus simple que K8S il y a quelques années.
 
-
+<aside class="notes">
 
 curl -sfL https://get.k3s.io | sh -
 export KUBECONFIG="/etc/rancher/k3s/k3s.yaml"
 
-
 kompose pour convertire une application docker-compose en manifests K8S
 
+</aside>
 
 
