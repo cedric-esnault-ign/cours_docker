@@ -950,7 +950,7 @@ L'image à utiliser ici est `httpd`. Les options `--name -d -p -v ` peuvent êtr
 
 Même en ajoutant `index.php` à l'URL, le résultat n'est pas satisfaisant, il n'y a qu'une page verte alors qu'elle devrait afficher l'heure.
 
-* Recréez votre conteneur en utilisant l'image **lavoweb/php-7.1** qui contient l'interpréteur PHP. Attention, dans cette image, la racine du serveur Web est maintenant `/var/www/html`
+* Recréez votre conteneur en utilisant l'image **php:7.4-apache** qui contient l'interpréteur PHP. Attention, dans cette image, la racine du serveur Web est maintenant `/var/www/html`
 
 Note : On déroge ici un peu à la règle 1 processus par conteneur. On pourrait séparer apache et PHP, mais la liaison serait plus complexe.
 
@@ -958,7 +958,9 @@ Note : On déroge ici un peu à la règle 1 processus par conteneur. On pourrait
 
 <aside class="notes">
 
-docker  run -d --name web -p 8080:80 -v $PWD/mondossier:/var/www/html/ lavoweb/php-7.1
+tester plutôt : php:7.2-apache
+
+docker  run -d --name web -p 8080:80 -v $PWD/mondossier:/var/www/html/ php:7.4-apache
 
 </aside>
 
@@ -990,7 +992,7 @@ Avec la commande `docker exec ...`, lancez le client mariadb en ligne de command
 Le fait de définir les paramètres de connexion à la base de données dans un code source est une mauvaise pratique. Il faudrait que le code PHP détermine ces informations à partir de variable d'environnement.
 
 docker network create lamp
-docker run --net lamp -d --name web -p 8080:80 -v $PWD/mondossier:/var/www/html/ lavoweb/php-7.1
+docker run --net lamp -d --name web -p 8080:80 -v $PWD/mondossier:/var/www/html/ php:7.4-apache
 docker run --net lamp -d --name database -e MARIADB_RANDOM_ROOT_PASSWORD=yes -e MARIADB_DATABASE=mymap -e MARIADB_USER=user -e MARIADB_PASSWORD=s3cr3t  mariadb
 docker exec -it database mariadb -u user -D mymap --password="s3cr3t"
 
@@ -1202,11 +1204,21 @@ CMD /opt/bin/monBinaire
 
 # TP Dockerfile #
 
+## reprise de notre application de cartopoint ##
+
+Nous allons ici simplement créer une nouvelle image pour avoir une moyen de livrer notre application.
+
+* Cette image sera basée sur l'image déjà référencé : `php:7.4-apache`
+* Copiez le fichier `index-bdd.php` en `index.php` dans le dossier par défaut du serveur web.
+* Et c'est tout :D
+* Construisez une image nommée **cartopoint:1.0** à partir de ce Dockerfile
+* Nous avons maintenant une image autonome pour ce qui est de la partie statique de notre site Web (les données restent bien entendu dans la base de donnée)
+
 ## Une application node.js ##
 
-Nous allons créer pas à pas une image Docker pour répondre à un besoin simple.
+Cette fois ci, nous allons créer pas à pas une image Docker pour une application **node.js**
 
-Le code de l'application est disponible dans le dépot https://github.com/cedricici/findmefast
+Le code de l'application est disponible dans le dépôt <https://github.com/cedricici/findmefast>
 
 * Commençons par cloner ce dépôt, puis créer un fichier nommé `Dockerfile`
 * Il faut choisir une image de base, pour node, nous allons choisir une version récente basé sur un OS Alpine : [node:18-alpine](https://hub.docker.com/layers/library/node/18-alpine/images/sha256-d51f2f5ce2dc7dfcc27fc2aa27a6edc66f6b89825ed4c7249ed0a7298c20a45a?context=explore)
@@ -1238,7 +1250,9 @@ EXPOSE 1111
 CMD ["npm", "start"]
 ```
 
-Docker build -t findmefast .
+```bash
+docker build -t findmefast .
+```
 
 </aside>
 
@@ -1324,7 +1338,7 @@ Vous êtes en avance, voici une proposition de Dockerfile à créer en toute aut
 Voici les ressources nécéssaires :
 
 * Le code source et la documentation se trouvent là : <https://code.antopie.org/miraty/libreqr>
-* basé sur l'image `php:apache`
+* basé sur l'image `php:4.7-apache`
 * Pour installer la dépendance `php-gd` on utilisera plutôt <https://github.com/mlocati/docker-php-extension-installer>
 * Penser à rendre le dossier et les fichiers accessibles à l'utilisateur du service httpd `www-data`.
 * Utiliser la configuration PHP de production et non de développement (voir la partie "Configuration" de <https://hub.docker.com/_/php> )
@@ -1333,7 +1347,7 @@ Voici les ressources nécéssaires :
 <aside class="notes">
 
 ```Dockerfile
-FROM php:apache
+FROM php:7.4-apache
 
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
@@ -1396,9 +1410,9 @@ docker container run -p 8080:80 -e LIBREQR_CUSTOM_TEXT="Générateur de QR code 
 
 </aside>
 
-## Proposez vos projets 
+## Proposez vos projets ##
 
-Nous pouvez voir ensemble les étapes nécessaires à la **Dockerisation** de vos applications.
+Nous pouvons voir ensemble les étapes nécessaires à la **Dockerisation** de vos applications.
 
 # Docker-compose #
 
@@ -1641,14 +1655,14 @@ ou
 
 Pour ce TP, nous alons tenter de reproduire le TP LAMP en utilisant un docker-compose.yaml
 
-* Écrivez le docker-compose qui va réaliser les mêmes actions. n'oubliez pas  :
+* Écrivez le docker-compose qui va réaliser les mêmes actions. N'oubliez pas  :
   * les volumes
   * les réseaux
   * les variables d'environnements
   * les dépendances
 * Lancez la stack en mode démon
 * Observez les logs
-* notez le nom des conteneurs créés
+* Notez le nom des conteneurs créés
 
 note : Il existe des solutions plus "sûr" pour passer des variables d'environnement sensibles (mot de passe)
 
@@ -1658,9 +1672,7 @@ note : Il existe des solutions plus "sûr" pour passer des variables d'environne
 version: "3"
 services:
   web:
-    image: lavoweb/php-7.1
-    volumes:
-      - ./mondossier:/var/www/html
+    image: cartopoint:1.0
     ports:
       - "8080:80"
     networks:
@@ -1687,6 +1699,9 @@ networks:
 
 ```
 
+## Compos-ition ##
+
+
 </aside>
 
 # Kubernetes #
@@ -1696,4 +1711,15 @@ networks:
 Le but de ce cours n'est pas d'aborder Kubernetes **K8S** mais on ne peut décemment pas parler de **Docker** en 2023 sans parler de Kubernetes.
 **K8S** est une solution d'orchestration de conteneur mis au point par Google et devenue la référence en la matière. Kubernetest a permis d'amener les conteneurs **Docker** en production en apportant le contrôle et la sécurité qui n'était pas au niveau d'un outils créé avant tout pour les développeurs.
 
-**Docker** propose lui aussi son orchestrateur **SWARM**, dont a CLI est intégré au client `docker`. Celui -ci n'étant pas au niveau de kubernetes, nous n'en parlerons pas , même si il a eu l'avantage d'êtr plus simple que K8S il y a quelques années.
+**Docker** propose lui aussi son orchestrateur **SWARM**, dont a CLI est intégré au client `docker`. Celui -ci n'étant pas au niveau de kubernetes, nous n'en parlerons pas, même si il a eu l'avantage d'êtr plus simple que K8S il y a quelques années.
+
+
+
+curl -sfL https://get.k3s.io | sh -
+export KUBECONFIG="/etc/rancher/k3s/k3s.yaml"
+
+
+kompose pour convertire une application docker-compose en manifests K8S
+
+
+
