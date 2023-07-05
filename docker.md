@@ -1339,7 +1339,7 @@ Voici les ressources nécéssaires :
 
 * Le code source et la documentation se trouvent là : <https://code.antopie.org/miraty/libreqr>
 * basé sur l'image `php:7.4-apache`
-* Installez les paquets libpng-dev et unzip
+* Installez les paquets `libpng-dev` et `unzip`
 * Installez le driver GD pour php `docker-php-ext-install gd`
 * Penser à rendre le dossier et les fichiers accessibles à l'utilisateur du service httpd `www-data`.
 * Utiliser la configuration PHP de production et non de développement (voir la partie "Configuration" de <https://hub.docker.com/_/php> )
