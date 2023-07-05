@@ -1218,7 +1218,7 @@ Nous allons ici simplement créer une nouvelle image pour avoir une moyen de liv
 
 ## Une application node.js ##
 
-Cette fois ci, nous allons créer pas à pas une image Docker pour une application **node.js** dont le code de l'application est disponible dans le dépôt 
+Cette fois ci, nous allons créer pas à pas une image Docker pour une application **node.js** dont le code de l'application est disponible dans le dépôt
 
 <https://github.com/cedricici/findmefast>
 
@@ -1349,10 +1349,7 @@ Voici les ressources nécéssaires :
 ```Dockerfile
 FROM php:7.4-apache
 
-ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
-
-RUN chmod +x /usr/local/bin/install-php-extensions && \
-    install-php-extensions gd
+RUN docker-php-ext-install gd
 
 ADD https://code.antopie.org/miraty/libreqr/archive/main.zip /main.zip
 
