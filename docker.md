@@ -1338,8 +1338,9 @@ Vous êtes en avance, voici une proposition de Dockerfile à créer en toute aut
 Voici les ressources nécéssaires :
 
 * Le code source et la documentation se trouvent là : <https://code.antopie.org/miraty/libreqr>
-* basé sur l'image `php:4.7-apache`
-* Pour installer la dépendance `php-gd` on utilisera plutôt <https://github.com/mlocati/docker-php-extension-installer>
+* basé sur l'image `php:7.4-apache`
+* Installez les paquets libpng-dev et unzip
+* Installez le driver GD pour php `docker-php-ext-install gd`
 * Penser à rendre le dossier et les fichiers accessibles à l'utilisateur du service httpd `www-data`.
 * Utiliser la configuration PHP de production et non de développement (voir la partie "Configuration" de <https://hub.docker.com/_/php> )
 * Modifier le fichier de configuration à inclure pour changer le texte affiché en bas de page.
