@@ -896,7 +896,7 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 <h2>Ajout d’une Base De Données</h2>
 <p>Notre site web évolue ! Il va maintenant afficher une carte. Un clic permet de créer un point, sauvegardé en base de données. Un clic sur un point le supprime. Au chargement de la page, on affiche tous les points de la base de données.</p>
 <ul>
-<li class="fragment">remplacer le fichier <code>index.php</code> par le fichier <code>index-bdd.php</code>, observez les erreurs</li>
+<li class="fragment">Utilisez l’image <code>cedricici/php:7.4-apache-mysql</code> puis remplacer le fichier <code>index.php</code> par le fichier <code>index-bdd.php</code>, observez les erreurs</li>
 </ul>
 <p>Pour respecter le principe d’un seul processus par conteneur, il faut lancer un second conteneur pour notre base de données. Utilisez l’image <code>mariadb</code>. Vous trouverez des informations sur la configuration de cette image sur <a href="https://hub.docker.com/_/mariadb">hub.docker.com</a>.</p>
 <ul>
@@ -944,7 +944,7 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 <p>Avec la commande <code>docker exec ...</code>, lancez le client mariadb en ligne de commande pour explorer la base de données et observez le contenu de la table point au fur et à mesure des interactions avec la carte. (<code>select * from point;</code> sur la table <em>mymap</em> )</p>
 <aside class="notes">
 <p>Le fait de définir les paramètres de connexion à la base de données dans un code source est une mauvaise pratique. Il faudrait que le code PHP détermine ces informations à partir de variable d’environnement.</p>
-<p>docker network create lamp docker run –net lamp -d –name web -p 8080:80 -v $PWD/mondossier:/var/www/html/ php:7.4-apache docker run –net lamp -d –name database -e MARIADB_RANDOM_ROOT_PASSWORD=yes -e MARIADB_DATABASE=mymap -e MARIADB_USER=user -e MARIADB_PASSWORD=s3cr3t mariadb docker exec -it database mariadb -u user -D mymap –password=“s3cr3t”</p>
+<p>docker network create lamp docker run –net lamp -d –name web -p 8080:80 -v $PWD/mondossier:/var/www/html/ cedricici/php:7.4-apache-mysql docker run –net lamp -d –name database -e MARIADB_RANDOM_ROOT_PASSWORD=yes -e MARIADB_DATABASE=mymap -e MARIADB_USER=user -e MARIADB_PASSWORD=s3cr3t mariadb docker exec -it database mariadb -u user -D mymap –password=“s3cr3t”</p>
 </aside>
 </section><section id="persistence-de-la-base-de-données" class="slide level2">
 <h2>Persistence de la Base De Données</h2>
@@ -1102,6 +1102,7 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 <p>Nous allons ici simplement créer une nouvelle image pour avoir une moyen de livrer notre application.</p>
 <ul>
 <li class="fragment">Cette image sera basée sur l’image déjà référencé : <code>php:7.4-apache</code></li>
+<li class="fragment">Installer les drivers mysql pour cette image : <code>docker-php-ext-install mysqli pdo_mysql</code></li>
 <li class="fragment">Copiez le fichier <code>index-bdd.php</code> en <code>index.php</code> dans le dossier par défaut du serveur web.</li>
 <li class="fragment">Et c’est tout :D</li>
 <li class="fragment">Construisez une image nommée <strong>cartopoint:1.0</strong> à partir de ce Dockerfile eavec la commande <code>docker build -t cartopoint:1.0 .</code></li>
@@ -1206,8 +1207,9 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 <p>Vous êtes en avance, voici une proposition de Dockerfile à créer en toute autonomie : dockeriser une application <strong>LibreQR</strong>, une application web de génération de QR Code. Voici les ressources nécéssaires :</p>
 <ul>
 <li class="fragment">Le code source et la documentation se trouvent là : <a href="https://code.antopie.org/miraty/libreqr" class="uri">https://code.antopie.org/miraty/libreqr</a></li>
-<li class="fragment">basé sur l’image <code>php:4.7-apache</code></li>
-<li class="fragment">Pour installer la dépendance <code>php-gd</code> on utilisera plutôt <a href="https://github.com/mlocati/docker-php-extension-installer" class="uri">https://github.com/mlocati/docker-php-extension-installer</a></li>
+<li class="fragment">basé sur l’image <code>php:7.4-apache</code></li>
+<li class="fragment">Installez les paquets <code>libpng-dev</code> et <code>unzip</code></li>
+<li class="fragment">Installez le driver GD pour php <code>docker-php-ext-install gd</code></li>
 <li class="fragment">Penser à rendre le dossier et les fichiers accessibles à l’utilisateur du service httpd <code>www-data</code>.</li>
 <li class="fragment">Utiliser la configuration PHP de production et non de développement (voir la partie “Configuration” de <a href="https://hub.docker.com/_/php" class="uri">https://hub.docker.com/_/php</a> )</li>
 <li class="fragment">Modifier le fichier de configuration à inclure pour changer le texte affiché en bas de page.</li>
@@ -1215,31 +1217,28 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 <aside class="notes">
 <div class="sourceCode" id="cb62"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><a class="sourceLine" id="cb62-1" title="1"><span class="kw">FROM</span> php:7.4-apache</a>
 <a class="sourceLine" id="cb62-2" title="2"></a>
-<a class="sourceLine" id="cb62-3" title="3"><span class="kw">ADD</span> https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/</a>
+<a class="sourceLine" id="cb62-3" title="3"><span class="kw">RUN</span> docker-php-ext-install gd</a>
 <a class="sourceLine" id="cb62-4" title="4"></a>
-<a class="sourceLine" id="cb62-5" title="5"><span class="kw">RUN</span> chmod +x /usr/local/bin/install-php-extensions &amp;&amp; \</a>
-<a class="sourceLine" id="cb62-6" title="6">    install-php-extensions gd</a>
-<a class="sourceLine" id="cb62-7" title="7"></a>
-<a class="sourceLine" id="cb62-8" title="8"><span class="kw">ADD</span> https://code.antopie.org/miraty/libreqr/archive/main.zip /main.zip</a>
-<a class="sourceLine" id="cb62-9" title="9"></a>
-<a class="sourceLine" id="cb62-10" title="10"><span class="kw">RUN</span> apt-get update &amp;&amp; \</a>
-<a class="sourceLine" id="cb62-11" title="11">    apt-get install -y unzip &amp;&amp; \</a>
-<a class="sourceLine" id="cb62-12" title="12">    cd /var/www/html &amp;&amp; \</a>
-<a class="sourceLine" id="cb62-13" title="13">    unzip /main.zip &amp;&amp; \</a>
-<a class="sourceLine" id="cb62-14" title="14">    mv libreqr/* . &amp;&amp; \</a>
-<a class="sourceLine" id="cb62-15" title="15">    chown -R www-data:www-data /var/www/html/</a>
-<a class="sourceLine" id="cb62-16" title="16"></a>
-<a class="sourceLine" id="cb62-17" title="17"><span class="kw">ADD</span> config.inc.php /var/www/html</a>
-<a class="sourceLine" id="cb62-18" title="18"><span class="kw">RUN</span> chown -R www-data:www-data /var/www/html/</a>
-<a class="sourceLine" id="cb62-19" title="19"><span class="kw">ENV</span> LIBREQR_THEME=libreqr \</a>
-<a class="sourceLine" id="cb62-20" title="20">    LIBREQR_DEFAULT_LOCALE=fr \</a>
-<a class="sourceLine" id="cb62-21" title="21">    LIBREQR_CUSTOM_TEXT_ENABLED=true \</a>
-<a class="sourceLine" id="cb62-22" title="22">    LIBREQR_CUSTOM_TEXT=<span class="st">&quot;LibreQR on docker&quot;</span> \</a>
-<a class="sourceLine" id="cb62-23" title="23">    LIBREQR_DEFAULT_REDUNDANCY=high \</a>
-<a class="sourceLine" id="cb62-24" title="24">    LIBREQR_DEFAULT_MARGIN=20 \</a>
-<a class="sourceLine" id="cb62-25" title="25">    LIBREQR_DEFAULT_SIZE=300 \</a>
-<a class="sourceLine" id="cb62-26" title="26">    LIBREQR_DEFAULT_BGCOLOR=FFFFFF \</a>
-<a class="sourceLine" id="cb62-27" title="27">    LIBREQR_DEFAULT_FGCOLOR=000000</a></code></pre></div>
+<a class="sourceLine" id="cb62-5" title="5"><span class="kw">ADD</span> https://code.antopie.org/miraty/libreqr/archive/main.zip /main.zip</a>
+<a class="sourceLine" id="cb62-6" title="6"></a>
+<a class="sourceLine" id="cb62-7" title="7"><span class="kw">RUN</span> apt-get update &amp;&amp; \</a>
+<a class="sourceLine" id="cb62-8" title="8">    apt-get install -y unzip &amp;&amp; \</a>
+<a class="sourceLine" id="cb62-9" title="9">    cd /var/www/html &amp;&amp; \</a>
+<a class="sourceLine" id="cb62-10" title="10">    unzip /main.zip &amp;&amp; \</a>
+<a class="sourceLine" id="cb62-11" title="11">    mv libreqr/* . &amp;&amp; \</a>
+<a class="sourceLine" id="cb62-12" title="12">    chown -R www-data:www-data /var/www/html/</a>
+<a class="sourceLine" id="cb62-13" title="13"></a>
+<a class="sourceLine" id="cb62-14" title="14"><span class="kw">ADD</span> config.inc.php /var/www/html</a>
+<a class="sourceLine" id="cb62-15" title="15"><span class="kw">RUN</span> chown -R www-data:www-data /var/www/html/</a>
+<a class="sourceLine" id="cb62-16" title="16"><span class="kw">ENV</span> LIBREQR_THEME=libreqr \</a>
+<a class="sourceLine" id="cb62-17" title="17">    LIBREQR_DEFAULT_LOCALE=fr \</a>
+<a class="sourceLine" id="cb62-18" title="18">    LIBREQR_CUSTOM_TEXT_ENABLED=true \</a>
+<a class="sourceLine" id="cb62-19" title="19">    LIBREQR_CUSTOM_TEXT=<span class="st">&quot;LibreQR on docker&quot;</span> \</a>
+<a class="sourceLine" id="cb62-20" title="20">    LIBREQR_DEFAULT_REDUNDANCY=high \</a>
+<a class="sourceLine" id="cb62-21" title="21">    LIBREQR_DEFAULT_MARGIN=20 \</a>
+<a class="sourceLine" id="cb62-22" title="22">    LIBREQR_DEFAULT_SIZE=300 \</a>
+<a class="sourceLine" id="cb62-23" title="23">    LIBREQR_DEFAULT_BGCOLOR=FFFFFF \</a>
+<a class="sourceLine" id="cb62-24" title="24">    LIBREQR_DEFAULT_FGCOLOR=000000</a></code></pre></div>
 <div class="sourceCode" id="cb63"><pre class="sourceCode php"><code class="sourceCode php"><a class="sourceLine" id="cb63-1" title="1"><span class="kw">&lt;?php</span></a>
 <a class="sourceLine" id="cb63-2" title="2"><span class="co">// Basé sur https://code.antopie.org/miraty/libreqr/src/branch/main/config.inc.php</span></a>
 <a class="sourceLine" id="cb63-3" title="3"><span class="co">// This file is part of LibreQR, which is distributed under the GNU AGPLv3+ license</span></a>
