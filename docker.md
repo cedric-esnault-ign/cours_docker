@@ -1209,6 +1209,7 @@ CMD /opt/bin/monBinaire
 Nous allons ici simplement créer une nouvelle image pour avoir une moyen de livrer notre application.
 
 * Cette image sera basée sur l'image déjà référencé : `php:7.4-apache`
+* Installer les drivers mysql pour cette image : `docker-php-ext-install mysqli pdo_mysql`
 * Copiez le fichier `index-bdd.php` en `index.php` dans le dossier par défaut du serveur web.
 * Et c'est tout :D
 * Construisez une image nommée **cartopoint:1.0** à partir de ce Dockerfile eavec la commande `docker build -t cartopoint:1.0 .`
