@@ -35,6 +35,17 @@
     color: black;/* was #DCDCDC */
 }
 
+/* .reveal div.sourceCode pre::before {
+    Content:"Afficher la correction"
+}
+.reveal div.sourceCode pre code{
+    visibility: hidden;
+}
+.reveal div.sourceCode pre::before:hover code{
+    visibility: visible;
+} */
+
+
 .reveal div.sourceCode{
     margin:0;
 }
@@ -85,7 +96,13 @@
 .reveal ul ul ul, .reveal ul ul ol, .reveal ul ul dl {
     font-size: 0.8em
 }
-/* retablissment bordure*/
+
+/* fond des pages de correction */
+.reveal section[id^="correction"] {
+    background-color: #efffe4;
+}
+
+/* rétablissement bordure*/
 .reveal section img{
     border:1px solid;
 }

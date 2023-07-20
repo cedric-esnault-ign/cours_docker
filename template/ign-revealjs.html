@@ -147,8 +147,8 @@ $body$
                     document.querySelector(".reveal .progress span").innerHTML=title;
                 }
             } );
-            /* Retire les fragments de nieme niveau*/
-            var unfragment=document.querySelectorAll(".reveal section ul li li")
+            /* Retire les fragments de liste */
+            var unfragment=document.querySelectorAll(".reveal section ul li ")
             for (var i=0; i<unfragment.length; i++){
                 unfragment[i].classList.remove("fragment");
             }
@@ -158,7 +158,7 @@ $body$
                 fragmentedImages[i].classList.add("fragment");
             }
             /* Fragment spécifique première page */
-            var planItem=document.querySelectorAll("section.planPrez ul li");
+            var planItem=document.querySelectorAll("#plan-de-la-prsentation ul li");
             for (var i=0; i<planItem.length; i++){
                 planItem[i].classList.add("grow");
             }

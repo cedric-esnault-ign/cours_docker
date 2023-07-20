@@ -79,17 +79,11 @@ Ce cours est librement inspiré de plusieurs sources dont celles de Thibault Cou
 * Un paquet contenant l'application et ses dépendances
 * Un segment réseau dédié
 
-
 ## Cloud ##
 
 La notion de Cloud tel qu'on l'entend aujourd'hui a été popularisée par *Amazon* quand ces derniers ont eu l'idée de mettre à disposition de tous leurs serveurs inutilisés pendant les périodes creuses de leur activité. Il était nécessaire de fournir des solutions de virtualisations rapide et sûre.
 
 Petit à petit l'utilisation de conteneur pour simplifier les taches automatisées et améliorer le *TimeToMarket* s'est imposé. Aujourd'hui les plateforme de **Paas**, **Saas** et de **Faas** sont basés sur des conteneurs (pas forcément Docker car il existe des alternatives).
-
-
-<aside class="notes">
-
-</aside>
 
 # Docker #
 
@@ -250,7 +244,6 @@ sudo systemctl restart docker
 
 </aside>
 
-
 ## Installation : particularités IGN 2 ##
 
 Le fichier */etc/docker/daemon.json* va permettre de définir les spécificités réseaux de l'installation Docker.
@@ -264,15 +257,15 @@ Le fichier */etc/docker/daemon.json* va permettre de définir les spécificités
     ]
 }
 ```
-Au niveau du réseau, cette configuration permet de ne pas avoir de collision avec les réseaux IGN/ENSG
 
+Au niveau du réseau, cette configuration permet de ne pas avoir de collision avec les réseaux IGN/ENSG
 
 ## Installation : particularités IGN 3 ##
 
 Si on souhaite interagir avec les environnements interne à l'IGN, il faut également préciser :
 
- - Les serveurs DNS
- - les registres Docker non sécurisés
+- Les serveurs DNS
+- les registres Docker non sécurisés
 
 ```json
     "dns": [
@@ -457,6 +450,14 @@ docker container rm NOM
 | `-d` | démarrer le conteneur en arrière-plan |
 
 Il en existe beaucoup d'autres : gestion des ressources, environnement d’exécution...
+
+## Interagir avec le conteneurs ##
+
+```bash
+docker container cp CONTENEUR:SRC DEST
+```
+
+Permet de copier des fichiers entre l'hôte et un conteneur actif.
 
 ## Mise en réseau ##
 
@@ -650,7 +651,7 @@ Lors de l'installation , nous avons créé un conteneur pour vérifier que Docke
 
 * Observez que le conteneur est bien existant et à l'arrêt
 
-## correction ##
+## Correction ##
 
 ```bash
 docker ls 
@@ -665,7 +666,7 @@ La première commande n'affiche rien car le conteneur lancé est déjà arrêté
 
 * Essayez de supprimer le(s) conteneur(s) déjà créé
 
-## correction ##
+## Correction ##
 
 ```bash
 docker container rm NAME
@@ -900,7 +901,7 @@ Il est possible de décorréler la CLI du Daemon Docker de votre Machine et ains
 Les Contexte Docker sont fait pour cela.
 
 ```bash
-#TODO : conf docker contexte
+#TODO : conf docker context
 ```
 
 ## Docker Exec ##
@@ -940,11 +941,18 @@ L'image à utiliser ici est `httpd`. Les options `--name -d -p -v ` peuvent êtr
 * Qu'affiche la page <http://127.0.0.1:8080> ?
 * Utilisez le fichier `index-lamp.html` pour remplacer la page d’accueil
 
+## Correction ##
+
+```bash
+docker run --name web -d -p 8080:80 -v "$(pwd):/usr/local/apache2/htdocs/" httpd:latest
+
+```
+
 ## Un peu de php ##
 
 * Remplacez le fichier html par `index-lamp.php` (pensez à le renommer). qu'observez vous?
 
-## Correction ##
+## Un peu de php ##
 
 `httpd` est de base un simple serveur web sans fonctionnalité php. Il faudrait ajouter php dans cette image et configurer httpd pour interpréter les fichiers php. Sans cela, httpd cherche uniquement les fichiers `index.html` si aucun fichier n'est précisé dans l'URL.
 
@@ -963,6 +971,13 @@ tester plutôt : php:7.2-apache
 docker  run -d --name web -p 8080:80 -v $PWD/mondossier:/var/www/html/ php:7.4-apache
 
 </aside>
+
+## Correction ##
+
+```bash
+docker run --name web -d -p 8080:80 -v "$(pwd):/var/www/html/" php:7.4-apache
+
+```
 
 ## Ajout d'une Base De Données ##
 
@@ -998,6 +1013,17 @@ docker exec -it database mariadb -u user -D mymap --password="s3cr3t"
 
 </aside>
 
+## Correction ##
+
+```bash
+
+docker network create lamp
+docker run --net lamp -d --name web -p 8080:80 -v $PWD/mondossier:/var/www/html/ cedricici/php:7.4-apache-mysql
+docker run --net lamp -d --name database -e MARIADB_RANDOM_ROOT_PASSWORD=yes -e MARIADB_DATABASE=mymap -e MARIADB_USER=user -e MARIADB_PASSWORD=s3cr3t  mariadb
+docker exec -it database mariadb -u user -D mymap --password="s3cr3t"
+
+```
+
 ## Persistence de la Base De Données ##
 
 Détruisez les conteneurs, puis reconstruisez l'ensemble. Les points sont perdus :-(
@@ -1009,6 +1035,14 @@ Détruisez les conteneurs, puis reconstruisez l'ensemble. Les points sont perdus
 docker run -v databasedata:/var/lib/mysql --net lamp -d --name database -e MARIADB_RANDOM_ROOT_PASSWORD=yes -e MARIADB_DATABASE=mymap -e MARIADB_USER=user -e MARIADB_PASSWORD=s3cr3t  mariadb
 
 </aside>
+
+## Correction ##
+
+```bash
+docker rm -f database
+docker volume prune
+docker run -v databasedata:/var/lib/mysql --net lamp -d --name database -e MARIADB_RANDOM_ROOT_PASSWORD=yes -e MARIADB_DATABASE=mymap -e MARIADB_USER=user -e MARIADB_PASSWORD=s3cr3t  mariadb
+```
 
 # TP NextCloud #
 
@@ -1039,6 +1073,14 @@ docker run -d --name nextcloud -v nextcloud-data:/var/www/html/data/ --net nextc
 docker run -d --name nextcloud-database -v databasedata:/var/lib/mysql --net nextcloud -e MARIADB_RANDOM_ROOT_PASSWORD=yes -e MARIADB_DATABASE=nextcloud -e MARIADB_USER=nextcloud -e MARIADB_PASSWORD=s3cr3t  mariadb
 
 </aside>
+
+## Correction ##
+
+```bash
+docker network create nextcloud
+docker run -d --name nextcloud -v nextcloud-data:/var/www/html/data/ --net nextcloud -p 8080:80  nextcloud
+docker run -d --name nextcloud-database -v databasedata:/var/lib/mysql --net nextcloud -e MARIADB_RANDOM_ROOT_PASSWORD=yes -e MARIADB_DATABASE=nextcloud -e MARIADB_USER=nextcloud -e MARIADB_PASSWORD=s3cr3t  mariadb
+```
 
 # Dockerfile #
 
@@ -1208,53 +1250,46 @@ CMD /opt/bin/monBinaire
 
 Nous allons ici simplement créer une nouvelle image pour avoir une moyen de livrer notre application.
 
-* Cette image sera basée sur l'image déjà référencé : `php:7.4-apache`
-* Installer les drivers mysql pour cette image : `docker-php-ext-install mysqli pdo_mysql`
+* Cette image sera basée sur l'image déjà référencé : `php:7.4-apache` (mais pas `cedricici/php:7.4-apache-mysql`)
+* Installer les drivers mysql pour cette image avec la commande : `docker-php-ext-install mysqli pdo_mysql`
 * Copiez le fichier `index-bdd.php` en `index.php` dans le dossier par défaut du serveur web.
 * Et c'est tout :D
-* Construisez une image nommée **cartopoint:1.0** à partir de ce Dockerfile eavec la commande `docker build -t cartopoint:1.0 .`
+* Construisez une image nommée **cartopoint:1.0** à partir de ce Dockerfile avec la commande `docker build`
 * Nous avons maintenant une image autonome pour ce qui est de la partie statique de notre site Web (les données restent bien entendu dans la base de donnée)
 * Testez cette image !
 
+## Correction ##
+
+```Dockerfile
+FROM php:7.4-apache
+RUN docker-php-ext-install mysqli pdo_mysql
+COPY index-bdd.php /var/www/html/index.php
+```
+
+```bash
+docker build -t cartopoint:1.0 .
+docker rm -f web
+docker run -d --name web --net lamp -p 8080:80 cartopoint:1.0
+```
+
+Si vous n'avez pas détruit la stack LAMP! Sinon, il faudra recréer réseau et base de donnée.
+
 ## Une application node.js ##
 
-Cette fois ci, nous allons créer pas à pas une image Docker pour une application **node.js** dont le code de l'application est disponible dans le dépôt
+Cette fois ci, nous allons créer pas à pas une image Docker pour une application **node.js** dont le code de l'application est disponible dans le dossier `ressources\findmefast\`
 
-<https://github.com/cedricici/findmefast>
-
-* Commençons par cloner ce dépôt, puis créer un fichier nommé `Dockerfile`
+* Commençons par créer un fichier nommé `Dockerfile`
 * Avec l'image Alpine : [node:18-alpine](https://hub.docker.com/layers/library/node/18-alpine/images/sha256-d51f2f5ce2dc7dfcc27fc2aa27a6edc66f6b89825ed4c7249ed0a7298c20a45a?context=explore)
 * Il faut ensuite réaliser ces actions :
+  * exposer le port `1111`
   * Créer un dossier `/app` à la racine du conteneur
   * Définir l'espace de travail dans ce nouveau dossier
   * Copier le fichier `package.json` dans ce dossier
   * Exécuter la commande `npm install --production` afin d'installer les dépendances
   * Copier les sources (le dossier `/public` et le fichier `server.js` ) dans ce dossier
-  * exposer le port `1111`
   * définir la commande par défaut : `npm start`
 
 <aside class="notes">
-
-```Dockerfile
-FROM node:18-alpine
-
-RUN mkdir -p /app
-WORKDIR /app
-
-COPY package.json /app/
-RUN npm install --production
-
-COPY public /app/public
-COPY server.js /app/
-
-EXPOSE 1111
-
-CMD ["npm", "start"]
-```
-
-```bash
-docker build -t findmefast .
-```
 
 </aside>
 
@@ -1262,27 +1297,51 @@ docker build -t findmefast .
 
 Et on pourra tester l'application avec la commande `docker run` en mappant un port de votre machine sur le port `1111` du conteneur.
 
-=> Pour pouvoir tester l'application entre vous il faudra faire une petite manipulation pour mapper également ce port dans la VM Virtualbox.
+=> Pour pouvoir tester l'application **entre vous** il faudra faire une petite manipulation pour [mapper ce port dans la VM Virtualbox](https://www.it-connect.fr/configurer-le-port-forwarding-sur-une-vm-virtualbox%EF%BB%BF/)
+
+## Correction ##
+
+
+```Dockerfile
+FROM node:18-alpine
+EXPOSE 1111
+RUN mkdir -p /app
+WORKDIR /app
+COPY package.json /app/
+RUN npm install --production
+COPY public /app/public
+COPY server.js /app/
+CMD ["npm", "start"]
+```
+
+```bash
+docker build -t findmefast .
+docker run -d --name findmefast -p 80:1111 findmefast
+```
 
 ## Une compilation C ##
 
 Nous allons maintenant créer une petite image **multistage** pour compiler puis exécuter un petit programme qui calcul **n** n nombre premier (le seul intérêt de ce programme est de solliciter le CPU).
 Nous profiterons de ce programme pour bien comprendre la notion de *Kernel* et de *Userspace* dans les conteneurs. DAns un premier temps , nous allons compiler le programme sur notre host.
 
-* Placez vous dans le dossier `/prime` du dépôt git
+* Placez vous dans le dossier `ressources/prime`
 * Installez `gcc` : `sudo apt-get update && sudo apt-get install gcc`
 * Compiler le programme : `gcc prime.c -o prime`
 * Mesurez le temps nécessaire pour calculer les 10000 premiers nombres premiers (utilisez `time`, le programme `./prime` prends en argument la quantité de nombre premier à trouver.
 
-<aside class="notes">
+## Correction ##
 
-time ....
-
-</aside>
+```bash
+$ time ./prime 10000
+Calcul des 10000 premiers nombres premiers
+real    0m1,821s
+user    0m1,818s
+sys     0m0,002s
+```
 
 ## Compilation dans un conteneur ##
 
-Créez une nouvelle image que vous nommerez **prime:normal**
+Créez une nouvelle image que vous nommerez **prime:debian**
 
 * Partir d'une image `debian` dernière version disponible
 * Installer les paquets nécessaires pour la compilation
@@ -1292,6 +1351,27 @@ Créez une nouvelle image que vous nommerez **prime:normal**
 * Mesurez le temps nécessaire pur calculer les 10000 premiers nombres premiers avec cette image.
 
 Que pensez vous des résultats obtenus, est-ce normal d'après vous?
+
+## Correction ##
+
+```Dockerfile
+FROM debian 
+RUN apt-get update && apt-get install -y gcc
+COPY prime.c prime.c
+RUN gcc prime.c -o prime
+CMD [ "./prime","1" ]
+```
+
+```bash
+$ docker build -t prime:debian .
+$ time docker run prime:debian ./prime 10000 
+Calcul des 10000 premiers nombres premiers
+real    0m2,624s
+user    0m0,022s
+sys     0m0,018s
+```
+
+Le temps dans l'espace utilisateur de notre Hote est nul car toute l'opération se déroule dans l'espace utilisateur du conteneur.
 
 ## Amélioration multistage ##
 
@@ -1303,32 +1383,45 @@ Nous allons améliorer l'image en créant une image multistage
 * Laissez la commande par défaut
 * Générez une nouvelle image appelée **prime:multi**
 
-⚠️ n'écrasez pas l'image **prime:normal** ⚠️
+⚠️ n'écrasez pas l'image **prime:debian** ⚠️
 
 * Comparez le poids des deux images
 * Comparez les vitesses d’exécution
 
-<aside class="notes">
+## Correction ##
 
 ```Dockerfile
-FROM debian:bookworm as builder
-
+FROM debian as builder
 RUN apt-get update && apt-get install -y gcc
-ADD ./prime.c /prime.c
+COPY prime.c prime.c
 RUN gcc prime.c -o prime
-
-FROM debian:bookworm-slim
-
+FROM debian:stable-slim as runner
 COPY --from=builder prime prime
+CMD [ "./prime","1" ]
 
-CMD [ ./prime 1 ]
+```
+
+## Correction ##
+
+On peut même aller plus loin et utiliser une image plus petite et se basant sur l'image **scratch** qui ne contient rien. Cela pose tout de même quelqueslimitation, l'image ne contenanat même pas de shell, il n'est pas possible de passer des paramètres.
+
+```Dockerfile
+FROM debian as builder
+RUN apt-get update && apt-get install -y gcc
+COPY prime.c prime.c
+RUN gcc prime.c -o prime -static 
+FROM scratch as runner
+COPY --from=builder prime /prime
+CMD ["/prime","10000"]
 ```
 
 ```bash
-docker run -ti prime ./prime 10000
+$ docker build -t prime:scratch  .
+$ docker image ls | grep prime
+prime  scratch  5759381e4528   2 minutes ago    810kB
+prime  multi    f36f1d448847   14 minutes ago   74.8MB
+prime  debian   a3c10b1c84ef   33 minutes ago   347MB
 ```
-
-</aside>
 
 # TP LibreQR #
 
@@ -1345,24 +1438,19 @@ Voici les ressources nécéssaires :
 * Utiliser la configuration PHP de production et non de développement (voir la partie "Configuration" de <https://hub.docker.com/_/php> )
 * Modifier le fichier de configuration à inclure pour changer le texte affiché en bas de page.
 
-<aside class="notes">
+## Correction ##
 
 ```Dockerfile
 FROM php:7.4-apache
-
-RUN docker-php-ext-install gd
-
-ADD https://code.antopie.org/miraty/libreqr/archive/main.zip /main.zip
-
 RUN apt-get update && \
-    apt-get install -y unzip && \
-    cd /var/www/html && \
-    unzip /main.zip && \
+    apt-get install -y unzip libpng-dev 
+RUN docker-php-ext-install gd
+ADD main.zip /main.zip
+ADD config.inc.php /var/www/html/
+WORKDIR /var/www/html
+RUN unzip /main.zip && \
     mv libreqr/* . && \
     chown -R www-data:www-data /var/www/html/
-
-ADD config.inc.php /var/www/html
-RUN chown -R www-data:www-data /var/www/html/
 ENV LIBREQR_THEME=libreqr \
     LIBREQR_DEFAULT_LOCALE=fr \
     LIBREQR_CUSTOM_TEXT_ENABLED=true \
@@ -1374,49 +1462,22 @@ ENV LIBREQR_THEME=libreqr \
     LIBREQR_DEFAULT_FGCOLOR=000000
 ```
 
-```php
-<?php
-// Basé sur https://code.antopie.org/miraty/libreqr/src/branch/main/config.inc.php
-// This file is part of LibreQR, which is distributed under the GNU AGPLv3+ license
-
-// LIBREQR SETTINGS
-
-// Theme's directory name
-define("THEME", $_ENV["LIBREQR_THEME"]);
-
-// Language used if those requested by the user are not available
-define("DEFAULT_LOCALE", $_ENV["LIBREQR_DEFAULT_LOCALE"]);
-
-// Will be printed at the bottom of the interface
-define("CUSTOM_TEXT_ENABLED", $_ENV["LIBREQR_CUSTOM_TEXT_ENABLED"] == "true");
-define("CUSTOM_TEXT", $_ENV["LIBREQR_CUSTOM_TEXT"]);
-
-// Default values
-define("DEFAULT_REDUNDANCY", $_ENV["LIBREQR_DEFAULT_REDUNDANCY"]);
-define("DEFAULT_MARGIN", intval($_ENV["LIBREQR_DEFAULT_MARGIN"]));
-define("DEFAULT_SIZE", intval($_ENV["LIBREQR_DEFAULT_SIZE"]));
-define("DEFAULT_BGCOLOR", $_ENV["LIBREQR_DEFAULT_BGCOLOR"]);
-define("DEFAULT_FGCOLOR", $_ENV["LIBREQR_DEFAULT_FGCOLOR"]);
-
-```
-
 ```bash
 docker image build -t qr .
 docker container run -p 8080:80 -e LIBREQR_CUSTOM_TEXT="Générateur de QR code dans docker" qr
 
 ```
 
-</aside>
-
 ## Proposez vos projets ##
 
 Nous pouvons voir ensemble les étapes nécessaires à la **Dockerisation** de vos applications.
+
 
 # Docker-compose #
 
 ## Bilan docker ##
 
-- Un commande par conteneurs
+- Une commande par conteneurs
 - Toutes les options à écrire
 - Gestion fine des conteneurs, réseaux et volumes
 
@@ -1540,7 +1601,7 @@ services:
      - some-network
      - other-network
     ports:
-     - "80:80" #Bien mettre les guillemets
+     - "80:80" # Bien mettre les guillemets
 ```
 
 Seuls les services qui seront exposés doivent être connecté au réseau "externe" , les autres services doivent être connectés au même réseau interne pour pouvoir communiquer entres eux.
@@ -1664,7 +1725,7 @@ Pour ce TP, nous alons tenter de reproduire le TP LAMP en utilisant un docker-co
 
 note : Il existe des solutions plus "sûr" pour passer des variables d'environnement sensibles (mot de passe)
 
-<aside class="notes">
+## Correction ##
 
 ```yaml
 version: "3"
@@ -1697,7 +1758,6 @@ networks:
 
 ```
 
-
 # Kubernetes #
 
 ## Orchestration de conteneurs ##
@@ -1715,5 +1775,3 @@ export KUBECONFIG="/etc/rancher/k3s/k3s.yaml"
 kompose pour convertire une application docker-compose en manifests K8S
 
 </aside>
-
-
