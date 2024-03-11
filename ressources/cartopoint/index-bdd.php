@@ -1,5 +1,7 @@
 <?php
 
+        ## TODO : intégrer des mécanismes de sécurité plus performants avec des requêtes préparée et des variables d'environnements! 
+
         $bdd = new PDO('mysql:host=database;dbname=mymap;charset=utf8', 'user', 's3cr3t');
         $bdd->exec("CREATE TABLE IF NOT EXISTS point (id INT KEY AUTO_INCREMENT, lon FLOAT, lat FLOAT);");
 

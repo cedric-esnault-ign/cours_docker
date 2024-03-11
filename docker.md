@@ -2,7 +2,7 @@
 title : Docker par la pratique
 sub-title : IGN
 author : Cédric Esnault
-date : 04/07/2023 - IGN/ENSG
+date : 12/03/2024 - IGN/ENSG
 ---
 
 # Docker #
@@ -21,7 +21,7 @@ date : 04/07/2023 - IGN/ENSG
 - Docker-compose
   - Utilisation
   - Tps
-- Swarm / Kubernetes
+- Kubernetes
   - Utilisation
   - Demo
 
@@ -99,6 +99,11 @@ Inventé par Solomon Hyke , Docker est une technologie qui vise à populariser l
 * 2015 Google sort de Kubernetes
 * 2018 Kubernetes est certifié Docker et devient la solution incontournable du marché
 
+<aside class="notes">
+
+</aside>
+
+
 ## Pourquoi Docker ##
 
 * Simplifier les déploiements : **API**
@@ -157,6 +162,8 @@ Les installations classiques de Docker sont composées de 2 éléments principau
 
 l'[OCI](https://opencontainers.org
 ) est Un organisme qui à pour but de normaliser les éléments constitutifs de la virtualisation et des conteneurs.
+C'est important car il existe également des alternatives/concurrents à Docker.
+
 
 <aside class=notes>
 
@@ -255,10 +262,11 @@ Le fichier */etc/docker/daemon.json* va permettre de définir les spécificités
     "default-address-pools" : [
         {"base" : "192.168.200.0/23","size" : 28}
     ]
+    //...
 }
 ```
 
-Au niveau du réseau, cette configuration permet de ne pas avoir de collision avec les réseaux IGN/ENSG
+Au niveau du réseau, cette configuration permet de ne pas avoir de collision avec les réseaux IGN/ENSG, particulièrement lors de l'utilisation du VPN.
 
 ## Installation : particularités IGN 3 ##
 
@@ -268,6 +276,8 @@ Si on souhaite interagir avec les environnements interne à l'IGN, il faut égal
 - les registres Docker non sécurisés
 
 ```json
+{
+//...
     "dns": [
         "172.21.2.14",
         "172.16.2.91"
@@ -278,6 +288,8 @@ Si on souhaite interagir avec les environnements interne à l'IGN, il faut égal
         "http://localhost:5000",
         "http://dockerforge.ign.fr:5000"
     ]
+//...
+}
 ```
 
 ## Installation : Droits ##
@@ -301,6 +313,12 @@ Nous venons de lancer notre premier conteneur
 
 note : Le projet [PWD](http://play-with-docker.com) permet également de tester Docker sans l'installer au travers d'une interface web. Les sessions de travail durent 4h et la vitesse de l'interface dépend souvent de l'activité des autres utilisateurs...
 
+<aside class="notes">
+
+Attention : alerte sur les problèmes de sécurité avec Docker et les images ROOT.
+
+</aside>
+
 ## Testons votre installation ##
 
 ```shell
@@ -310,6 +328,9 @@ docker container run hello-world
 
 La commande par défaut de cette image affiche un message confirmant la bonne installation de *Docker Engine*.
 Si l'image n'est pas disponible en local, elle sera téléchargée sans avoir à faire un `docker image pull hello-world`
+
+![HELLO WORLD](/img/Hello-world.png)
+
 
 # Docker : utilisation #
 
@@ -346,13 +367,20 @@ par exemple :
 
 ## Architecture des Images ##{.figcenter}
 
-![](https://docs.docker.com/storage/storagedriver/images/container-layers.jpg)
+![IMAGE DOCKER](/img/container-layers.jpg)
 
 ## Commandes relatives aux images ##
 
-Nous verrons plus tard comment travailler avec les images
+Dans un premier temps, nous allons juste les utiliser afin de construire [des Conteneurs Docker](#/les-conteneurs)
 
-[Les images Docker](#/les-images-docker)
+Nous verrons plus tard comment travailler avec les images :
+
+- `docker image ls`
+- `docker image pull`
+- `docker image inspect`
+- `docker image rm`
+- `docker image build`
+- ...
 
 ## Les conteneurs ##
 
@@ -378,7 +406,7 @@ Cette commande créé le conteneur (l'environnement d'exécution) et lance le pr
 Exemple :
 
 ```bash
-docker container run alpine cat /etc/hostname
+docker container run --rm alpine cat /etc/hostname
 ```
 
 * On utilise l'image `alpine`
@@ -397,6 +425,8 @@ Démarre un shell dans le conteneur.
 
 *Comme si on était dans une VM.*
 
+Vous pouvez explorez le système de fichier pour voir ce qui s'y trouve.
+
 ## Lister les conteneurs ##
 
 ```bash
@@ -406,13 +436,15 @@ CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
 
 Mais pourquoi on ne voit pas les conteneurs d'avant ?
 
-## Lister les conteneurs ##
+## Lister tous les conteneurs ##
 
 ```bash
 docker container ls -a
 CONTAINER ID    IMAGE       COMMAND              CREATED        STATUS                     PORTS       NAMES
 a5b74e24da65    alpine      "cat /etc/hostname"  9 seconds ago  Exited (0) 6 seconds ago               happy_cori
 ```
+
+L'option `--rm` permet de détruire le conteneur une fois la commande terminé (Sinon, le conteneur reste présent dans l'état "Exited" )
 
 ## L'activité des conteneurs ##
 
@@ -442,7 +474,7 @@ docker container rm NOM
 ## Options utiles ##
 
 | Options | Description|
-| :--: | :--:|
+| --: | :-- |
 | `--name` |  donner un nom au conteneur |
 | `-i` | interactif |
 | `-t` | forcer l'allocation d'un TTY |
@@ -508,6 +540,8 @@ docker container run --rm --net host alpine ip a
        valid_lft forever preferred_lft forever
 ```
 
+Ce mode est peu utilisé, il peut parfois entrer en collisions avec des réglages réseaux d'entreprise (VPN,...). Il pose aussi des problèmes de sécurité ( suppression de l'isolation réseau).
+
 ## Réseau bridge par défaut ##
 
 - Les conteneurs sont sur un réseau séparé
@@ -527,7 +561,7 @@ docker container run --rm -p 8080:80 httpd:alpine
 
 -> [http://127.0.0.1:8080](http://127.0.0.1:8080)
 
-Le port 8080 de la machine hôte est redirigé vers le port 80 du conteneur.
+Le port 8080 de la machine hôte est redirigé vers le port 80 du conteneur apache (httpd basé sur un OS alpine).
 
 ## Les volumes ##
 
@@ -585,14 +619,18 @@ On peut préciser le *driver* à utiliser. Le driver dépend du backend, par dé
 Les métadonnées d'une image peuvent forcer la création d'un volume
 
 ```bash
-docker image inspect rok4/data-bdortho-d075                                            
-[{...
-    "Config": {...
+docker inspect docker.io/rok4/dataset:bdortho5m-martinique                                            
+[{
+  //...
+    "Config": {
+        //...
         "Volumes": {
-            "/rok4/config/pyramids/ORTHO_JPG_PM_D075": {}
-        }
+          "/pyramids/BDORTHO": {}
+        },
+        //...
     },
-...]
+  //...
+]
 ```
 
 ## Volume docker ##
@@ -643,13 +681,17 @@ Un volume hôte est un `--mount` particulier.
 
 `docker run -it -v /chemin/sur/mon/ordi:/data alpine sh`
 
-`docker run -it --mount type=bind,source=/chemin/sur/mon/ordi,target=/data alpine sh`
+` docker run -it --mount \
+  type=bind,source=/chemin/sur/mon/ordi,target=/data \
+  alpine sh`
 
 ## A vous de jouer  maintenant ##
 
 Lors de l'installation , nous avons créé un conteneur pour vérifier que Docker était bien installé
 
 * Observez que le conteneur est bien existant et à l'arrêt
+* Si vous avez déjà testé les manipulations d'exemple, vous pouvez recréer un nouveau conteneur hello-world.
+
 
 ## Correction ##
 
@@ -686,7 +728,7 @@ On pourrait aussi utiliser l'identifiant du conteneur à la place du nom.
 
 ```bash
 docker image ls
-docker image rm <IMAGE-NAME>
+docker image rm hello-world:latest
 docker run hello-world
 docker ls -a
 docker rm <CONTAINER-NAME>
@@ -730,16 +772,20 @@ docker tag bce5g99azq58 registry.ul.geoportail.rie.gouv.fr/rok4/rok4-builder
 
 ## Gérer les entrées/sorties ##
 
-* Démarrez un conteneur avec un shell interactif basé sur l'image "alpine
+* Démarrez un conteneur avec un shell interactif basé sur l'image **alpine**
 * Dans un second terminal, observez les conteneurs en cours d’exécution
 * Stoppez le conteneur (sans le détruire)
-* Relancez le conteneur et se rattacher à son terminal
+* [Relancez](https://docs.docker.com/reference/cli/docker/container/start/) le conteneur et se [rattacher](https://docs.docker.com/reference/cli/docker/container/attach/) à son terminal
 * Faire le ménage
 
 ## Correction ##
 
 ```bash
-docker run --rm -i -t alpine sh
+docker run --rm -i -t alpine /bin/sh
+/# cat /etc/hostname
+```
+
+```bash
 docker run --rm -i -t alpine cat /etc/hostname
 ```
 
@@ -757,7 +803,7 @@ On peut voir le conteneur en état `Exited`. Dans le premier terminal, on peut v
 ## Correction ##
 
 ```bash
-docker  start NAME
+docker start NAME
 docker attach NAME
 ```
 
@@ -775,7 +821,8 @@ docker container run --help
 ## Gérer les volumes "host" ##
 
 * Démarrez un conteneur **alpine** avec un TTY en montant la racine de la machine hôte sur `/host` en mode *volume hote* et en lecture seule dans le conteneur
-* Observez le contenu de `/host`, par exemple, ajouter un nouveau fichier dans votre `~/`
+* Observez le contenu de `/host`
+* Depuis un terminal sur votre machine host , ajouter un nouveau fichier dans votre `~/` et observez ce dossier dans votre conteneur *Alpine*
 
 ## Correction ##
 
@@ -783,11 +830,11 @@ docker container run --help
 docker  run -i -t -v /:/host:ro alpine sh
 ```
 
-Le fichier `/etc/hostname` contient bien le nom d'hôte du conteneur. Le fichier `/host/etc/hostname` contient le nom d'hôte de la machine hôte.
+Le fichier `/etc/hostname` contient bien le nom d'hôte du conteneur. Le fichier `/host/etc/hostname` contient le nom d'hôte de la machine hôte. Le dossier `/host/home/ubuntu/` contient votre home (si votre user est bien ubuntu...)
 
 ## Gérer les volumes docker ##
 
-* Démarrez un conteneur **alpine** avec un TTY et un volume docker sur `/data`
+* Démarrez un conteneur **alpine** avec un TTY et un **volume docker** sur `/data`
 * Créez un fichier dans `/data/` puis supprimez le conteneur
 * Démarrez un nouveau conteneur **alpine** avec un TTY et un volume docker avec le même nom sur `/data`
 * Observez le contenu de `/data/`
@@ -858,17 +905,21 @@ curl -s http://127.0.0.1
 curl -s http://<IP_HOST>
 ```
 
-On peut toujours accéder au port 80 de l'IP du conteneur. On peut maintenant également accéder au port 8080 de la machine grâce à l'option `-p`.
+On peut toujours accéder au port 80 de l'IP du conteneur. On peut maintenant également accéder au port 8080 de la machine grâce à l'option `-p` y compris depuis l'exterieur de la machine (ici le LAN ENSG).
 
 ## Création de réseaux ##
 
 * Créez un nouveau réseau **test-nginx**
 * Utilisez `docker inspect` pour voir ce qui a été créé
-* Créez un premier conteneur basé sur l'image `nginx` nommé (`--name`) *nginx* , attachée au réseau **test-ningx** et qui tourne en daemon.
+* Créez un premier conteneur basé sur l'image `nginx` nommé (`--name`) **nginx** , attaché au réseau **test-ningx** et qui tourne en **daemon**.
 * Créer un conteneur basé sur l'image `alpine/curl` sans préciser de réseau , avec un terminal interactif (`/bin/sh`)
   * Essayez d'atteindre le serveur *nginx* précédemment créé
 * Créez un nouveau conteneur basé sur `alpine/curl` attaché au réseau **test-nginx** avec un terminal interactif
   * Réessayez de joindre le server *nginx*
+
+```
+curl -v "http://[IP|hostname][:PORT]/"
+```
 
 ## Correction ##
 
@@ -877,7 +928,7 @@ docker network create test-nginx
 docker inspect test-nginx
 docker run --network test-nginx --name nginx -d nginx
 docker run --rm -ti alpine/curl /bin/sh
-#  / # curl nginx
+# / # curl nginx
 #  curl: (6) Could not resolve host: nginx
 docker run --rm -ti --network test-nginx alpine/curl /bin/sh
 # / # curl nginx
@@ -895,22 +946,48 @@ docker system prune
 docker volume prune
 ```
 
-## Docker Context ##
+## Docker context ##
 
 Il est possible de décorréler la CLI du Daemon Docker de votre Machine et ainsi de "piloter" un autre host avec votre CLI.
-Les Contexte Docker sont fait pour cela.
+Les **Contextes** Docker sont fait pour cela.
 
 ```bash
-#TODO : conf docker context
+docker context create distant --docker "host=ssh://ubuntu@autreStationLinuxavecDocker"
+docker contexte use distant
+docker ps -a
 ```
 
-## Docker Exec ##
+## Docker exec ##
 
-La commande `Docker Exec` permet de lancer un nouveau processus dans un conteneur actif existant, cette commande est pratique pour lancer un *Shell* d'observation ou de debug par exemple.
+La commande `docker exec` permet de lancer un nouveau processus dans un conteneur actif existant, cette commande est pratique pour lancer un *Shell* d'observation ou de debug par exemple.
 
 ```bash
 docker exec -ti existingContainer /bin/bash
 ```
+
+## Docker cp ##
+
+La commande `docker cp`  permet d'échanger des fichiers/dossiers entre le user-space d'un conteneur et celui de votre host.
+
+```
+docker run --name alpineContainer -d alpine tail -f /dev/null
+docker cp /etc/hostname alpineContainer:/local.hostname
+docker exec alpineContainer cat /local.hostname
+docker stop alpineContainer
+docker cp alpineContainer:/etc/hostname ./alpine.hostname
+#  Successfully copied 2.05kB to /home/CEsnault/alpine.hostname
+cat alpine.hostname
+# 4583aca170a9
+docker rm alpineContainer
+```
+
+Cette commande fonctionne également lors de l'utilisation d'un contexte distant.
+
+<aside class="notes">
+
+tail -f /dev/null permet au processus principal de perdurer en arrière plan
+
+</aside>
 
 ## Autres commandes docker ##
 
@@ -929,53 +1006,59 @@ Le but de ce TP est de mettre en place les éléments nécessaires d'un serveur 
 > - **M**ySql
 > - **P**HP
 
-Les fichiers nécessaires sont disponibles dans le dépôt GIT de ce cours, dans le dossier `ressources`
+Les fichiers nécessaires sont disponibles dans le dépôt GIT de ce cours, dans le dossier `ressources` <https://github.com/cedric-esnault-ign/cours_docker.git> . Utilisez git pour récuperer ce dépot et travaillez dans le dossier `ressouces` .  
 
-<https://github.com/cedric-esnault-ign/cours_docker.git>
+```
+git clone https://github.com/cedric-esnault-ign/cours_docker.git 
+cd cours_docker/ressources
+```
+
+
 
 ## Apache ##
 
 L'image à utiliser ici est `httpd`. Les options `--name -d -p -v ` peuvent être utiles. La racine du serveur web dans l'image est `/usr/local/apache2/htdocs/`
-
-* Lancez un conteneur exposant le port *80* du conteneur sur le port *8080* de la machine.
+* créez un dossier `apache-racine` pour le montage **host**
+* Lancez un conteneur avec un montage de la racine du serveur sur votre dossier `apache-racine` et exposant le port *80* du conteneur sur le port *8080* de la machine host.
 * Qu'affiche la page <http://127.0.0.1:8080> ?
-* Utilisez le fichier `index-lamp.html` pour remplacer la page d’accueil
+* Utilisez le fichier `index-lamp.html` présent dans le dossier **cartopoint** pour remplacer la page d’accueil
+
 
 ## Correction ##
 
 ```bash
-docker run --name web -d -p 8080:80 -v "$(pwd):/usr/local/apache2/htdocs/" httpd:latest
+docker run --name web -d -p 8080:80 -v "$(pwd)/apache-racine/:/usr/local/apache2/htdocs/" httpd:latest
 
+cp cartopoint/index-lamp.html apache-racine/index.html
 ```
 
 ## Un peu de php ##
 
-* Remplacez le fichier html par `index-lamp.php` (pensez à le renommer). qu'observez vous?
+* Remplacez le fichier html par `index-lamp.php` (pensez à le renommer en index.php). qu'observez vous?
 
 ## Un peu de php ##
 
 `httpd` est de base un simple serveur web sans fonctionnalité php. Il faudrait ajouter php dans cette image et configurer httpd pour interpréter les fichiers php. Sans cela, httpd cherche uniquement les fichiers `index.html` si aucun fichier n'est précisé dans l'URL.
 
-Même en ajoutant `index.php` à l'URL, le résultat n'est pas satisfaisant, il n'y a qu'une page verte alors qu'elle devrait afficher l'heure.
+Même en essayant  `http://127.0.0.1:8080/index.php`, le résultat n'est pas satisfaisant, il n'y a qu'une page verte alors qu'elle devrait afficher l'heure.
 
-* Recréez votre conteneur en utilisant l'image **php:7.4-apache** qui contient l'interpréteur PHP. Attention, dans cette image, la racine du serveur Web est maintenant `/var/www/html`
+* Recréez votre conteneur en utilisant l'image **php:7.4-apache** qui contient l'interpréteur PHP. Attention, au niveau du montage, dans cette image, la racine du serveur Web est maintenant `/var/www/html` et plus `/usr/local/apache2/htdocs/` !
 
 Note : On déroge ici un peu à la règle 1 processus par conteneur. On pourrait séparer apache et PHP, mais la liaison serait plus complexe.
 
-* Utilisez le site et profitez en pour regarder les logs `docker logs <NAME>`
+* Rafraichissez plusieurs fois la page et profitez en pour regarder les logs `docker logs <NAME>`
 
 <aside class="notes">
-
-tester plutôt : php:7.2-apache
-
-docker  run -d --name web -p 8080:80 -v $PWD/mondossier:/var/www/html/ php:7.4-apache
 
 </aside>
 
 ## Correction ##
 
 ```bash
-docker run --name web -d -p 8080:80 -v "$(pwd):/var/www/html/" php:7.4-apache
+docker rm -f web
+docker run --name web -d -p 8080:80 -v "$(pwd)/apache-racine/:/var/www/html/" php:7.4-apache
+
+cp cartopoint/index-lamp.php apache-racine/index.php
 
 ```
 
@@ -1006,19 +1089,14 @@ Avec la commande `docker exec ...`, lancez le client mariadb en ligne de command
 
 Le fait de définir les paramètres de connexion à la base de données dans un code source est une mauvaise pratique. Il faudrait que le code PHP détermine ces informations à partir de variable d'environnement.
 
-docker network create lamp
-docker run --net lamp -d --name web -p 8080:80 -v $PWD/mondossier:/var/www/html/ cedricici/php:7.4-apache-mysql
-docker run --net lamp -d --name database -e MARIADB_RANDOM_ROOT_PASSWORD=yes -e MARIADB_DATABASE=mymap -e MARIADB_USER=user -e MARIADB_PASSWORD=s3cr3t  mariadb
-docker exec -it database mariadb -u user -D mymap --password="s3cr3t"
-
 </aside>
 
 ## Correction ##
 
 ```bash
-
+docker rm -f web
 docker network create lamp
-docker run --net lamp -d --name web -p 8080:80 -v $PWD/mondossier:/var/www/html/ cedricici/php:7.4-apache-mysql
+docker run --net lamp -d --name web -p 8080:80 -v $(pwd)/apache-racine/:/var/www/html/ cedricici/php:7.4-apache-mysql
 docker run --net lamp -d --name database -e MARIADB_RANDOM_ROOT_PASSWORD=yes -e MARIADB_DATABASE=mymap -e MARIADB_USER=user -e MARIADB_PASSWORD=s3cr3t  mariadb
 docker exec -it database mariadb -u user -D mymap --password="s3cr3t"
 
@@ -1026,13 +1104,12 @@ docker exec -it database mariadb -u user -D mymap --password="s3cr3t"
 
 ## Persistence de la Base De Données ##
 
-Détruisez les conteneurs, puis reconstruisez l'ensemble. Les points sont perdus :-(
+Détruisez les conteneurs, puis reconstruisez l'ensemble. Les points sont perdus **:-(**
   
 * Résolvez ce problème
 
 <aside class="notes">
 
-docker run -v databasedata:/var/lib/mysql --net lamp -d --name database -e MARIADB_RANDOM_ROOT_PASSWORD=yes -e MARIADB_DATABASE=mymap -e MARIADB_USER=user -e MARIADB_PASSWORD=s3cr3t  mariadb
 
 </aside>
 
@@ -1043,6 +1120,7 @@ docker rm -f database
 docker volume prune
 docker run -v databasedata:/var/lib/mysql --net lamp -d --name database -e MARIADB_RANDOM_ROOT_PASSWORD=yes -e MARIADB_DATABASE=mymap -e MARIADB_USER=user -e MARIADB_PASSWORD=s3cr3t  mariadb
 ```
+
 
 # TP NextCloud #
 
@@ -1055,6 +1133,7 @@ L'image à utiliser est **nextcloud**, disponible sur [https://hub.docker.com/_/
 
 un serveur simple avec une base de données SQLite (un fichier)
 
+* Stoppez les éventuels conteneurs en cours (web) (ne détruisez pas les réseaux)
 * Lancez un conteneur exposant sur le port 8080 de la machine hôte le serveur nextcloud et rendez-vous sur [http://127.0.0.1:8080](http://127.0.0.1:8080) pour accéder à l'interface d'initialisation du serveur.
 * Suivez les étapes d'installation. (base SQLite)
 * Utiliser l'application pour générer du contenu (uploadez des fichiers)
@@ -1116,7 +1195,7 @@ Le **Dockerfile** est constitué d'une suite d'instructions, chaque ligne résul
 
 [Architecture des images](#/architecture-des-images)
 
-Un Dockerfile commence généralement par l'identification de l'image de base. (la seule exception est le passage d'un argument `ARG` permettant de définir l'image de `FROM`)
+Un Dockerfile commence généralement par l'identification de l'image de base. (la seule exception est le passage d'un argument `ARG` permettant de définir dynamiquement l'image de `FROM`)
 
 ```dockerfile
 FROM debian:jessie
@@ -1178,6 +1257,12 @@ WORKDIR #Changement du dossier de travail
 
 Il est fortement conseillé de ne pas utiliser le user root pour des raisons de sécurité.
 
+<aside class="notes" >
+
+USER root interdit dans un environnement kubernetes sécurisé
+
+</aside>
+
 ## Instructions Dockerfile ##
 
 Modifier l’exécution
@@ -1211,7 +1296,7 @@ Certaines variables sont automatiquement ajouté (Les réglages de Proxy)
 
 ## Multistage build ##
 
-Le conteneur doit contenir ce qui est nécessaire pour le run, rien en rapport avec le dev/build.
+Le conteneur de production ne doit contenir que ce qui est nécessaire pour le run, il ne doit rien rester dasn l'image en rapport avec le dev/build.
 Pour optimiser le poids de l'image de RUN, on sépare la création de l'image en plusieurs phases.
 Un conteneur de *build* génère un package à copier sur le conteneur de *run*
 
@@ -1229,6 +1314,8 @@ COPY --from=builder /master/monBinaire /opt/bin/
 CMD /opt/bin/monBinaire
 ```
 
+Seul le dernier **FROM** sera contenu dans l'image finale
+
 [Documentation multistage build](https://docs.docker.com/develop/develop-images/multistage-build/)
 
 ## Bonnes pratiques de conceptions ##
@@ -1236,6 +1323,12 @@ CMD /opt/bin/monBinaire
 * un conteneur est éphémère : **utilisation de volumes**
 * un conteneur doit être léger : **juste ce qu'il faut**
 * un seul processus par conteneur
+
+<aside class="notes" >
+
+En mode cloud natif, on évitera l'utilisation de volume en favorisant les applications stateless.
+
+</aside>
 
 ## Bonnes pratiques de conceptions ##
 
@@ -1250,8 +1343,8 @@ CMD /opt/bin/monBinaire
 
 Nous allons ici simplement créer une nouvelle image pour avoir une moyen de livrer notre application.
 
-* Cette image sera basée sur l'image déjà référencé : `php:7.4-apache` (mais pas `cedricici/php:7.4-apache-mysql`)
-* Installer les drivers mysql pour cette image avec la commande : `docker-php-ext-install mysqli pdo_mysql`
+* Cette image sera basée sur l'image déjà référencé : `php:7.4-apache` avec le mot clé **FROM** (mais pas `cedricici/php:7.4-apache-mysql` qui est déjà un *build* d'image)
+* Installer les drivers mysql pour cette image avec le mot clé **RUN** , l'image `php:7.4-apache` contient une commade pour cela : `docker-php-ext-install mysqli pdo_mysql`
 * Copiez le fichier `index-bdd.php` en `index.php` dans le dossier par défaut du serveur web.
 * Et c'est tout :D
 * Construisez une image nommée **cartopoint:1.0** à partir de ce Dockerfile avec la commande `docker build`
@@ -1272,7 +1365,7 @@ docker rm -f web
 docker run -d --name web --net lamp -p 8080:80 cartopoint:1.0
 ```
 
-Si vous n'avez pas détruit la stack LAMP! Sinon, il faudra recréer réseau et base de donnée.
+Cela devrait fonctionner si vous n'avez pas détruit la stack LAMP! Sinon, il faudra recréer réseau et base de donnée.
 
 ## Une application node.js ##
 
@@ -1316,13 +1409,13 @@ CMD ["npm", "start"]
 
 ```bash
 docker build -t findmefast .
-docker run -d --name findmefast -p 80:1111 findmefast
+docker run -d --name findmefast -p 1111:1111 findmefast
 ```
 
 ## Une compilation C ##
 
 Nous allons maintenant créer une petite image **multistage** pour compiler puis exécuter un petit programme qui calcul **n** n nombre premier (le seul intérêt de ce programme est de solliciter le CPU).
-Nous profiterons de ce programme pour bien comprendre la notion de *Kernel* et de *Userspace* dans les conteneurs. DAns un premier temps , nous allons compiler le programme sur notre host.
+Nous profiterons de ce programme pour bien comprendre la notion de *Kernel* et de *Userspace* dans les conteneurs. Dans un premier temps , nous allons compiler le programme sur notre host.
 
 * Placez vous dans le dossier `ressources/prime`
 * Installez `gcc` : `sudo apt-get update && sudo apt-get install gcc`
@@ -1403,7 +1496,7 @@ CMD [ "./prime","1" ]
 
 ## Correction ##
 
-On peut même aller plus loin et utiliser une image plus petite et se basant sur l'image **scratch** qui ne contient rien. Cela pose tout de même quelqueslimitation, l'image ne contenanat même pas de shell, il n'est pas possible de passer des paramètres.
+On peut même aller plus loin et utiliser une image plus petite et se basant sur l'image **scratch** qui ne contient rien. Cela pose tout de même quelques limitation, l'image ne contenant même pas de shell, il n'est pas possible de passer des paramètres.
 
 ```Dockerfile
 FROM debian as builder
@@ -1472,7 +1565,6 @@ docker container run -p 8080:80 -e LIBREQR_CUSTOM_TEXT="Générateur de QR code 
 
 Nous pouvons voir ensemble les étapes nécessaires à la **Dockerisation** de vos applications.
 
-
 # Docker-compose #
 
 ## Bilan docker ##
@@ -1521,14 +1613,16 @@ Le modèle du docker-compose.yml a plusieurs versions possibles.
 
 | Compose file format | Docker Engine |
 | :-----------------: | :------------ |
+| specification       | 19.03.0+      |
 | 3.8                 | 19.03.0+      |
 | 3.7                 | 18.06.0+      |
-| 3.6                 | 18.02.0+      |
 | ...                 | ...           |
 | 2.0                 | 1.10.0+       |
 | 1.0                 | 1.9.1.+       |
 
 <https://docs.docker.com/compose/compose-file/compose-versioning/>
+
+La dernière version **specification** est devenue un "standard" de manière à ne plus être propre à l'utilisation avec le daemon docker.
 
 ## Les services ##
 
@@ -1762,10 +1856,12 @@ networks:
 
 ## Orchestration de conteneurs ##
 
-Le but de ce cours n'est pas d'aborder Kubernetes **K8S** mais on ne peut décemment pas parler de **Docker** en 2023 sans parler de Kubernetes.
-**K8S** est une solution d'orchestration de conteneur mis au point par Google et devenue la référence en la matière. Kubernetest a permis d'amener les conteneurs **Docker** en production en apportant le contrôle et la sécurité qui n'était pas au niveau d'un outils créé avant tout pour les développeurs.
+Quand on parle de **Docker** en 2023, on peut difficillement ne pas évoquer Kubernetes (**K8S**).
+**K8S** est une solution d'orchestration de conteneur mis au point par Google et devenue la référence en la matière. On peut résuler **K8S** à un **super compose**, même si il permet beaucoup plus de chose.
+Kubernetest a permis d'amener les conteneurs **Docker** en production en apportant le contrôle et la sécurité qui n'était pas au niveau d'un outils créé avant tout pour les développeurs.
 
-**Docker** propose lui aussi son orchestrateur **SWARM**, dont a CLI est intégré au client `docker`. Celui -ci n'étant pas au niveau de kubernetes, nous n'en parlerons pas, même si il a eu l'avantage d'êtr plus simple que K8S il y a quelques années.
+**Docker** propose lui aussi son orchestrateur ; **SWARM**, dont a CLI est intégré au client `docker`. Celui -ci n'étant pas au niveau de kubernetes, nous n'en parlerons pas, même si il a eu l'avantage d'être plus simple que K8S il y a quelques années.
+
 
 <aside class="notes">
 
@@ -1775,3 +1871,31 @@ export KUBECONFIG="/etc/rancher/k3s/k3s.yaml"
 kompose pour convertire une application docker-compose en manifests K8S
 
 </aside>
+
+## principe de Kubernetes ##
+
+Une solution d'orchestration de conteneur va permettre de déployer et de maintenir en fonctionnement des conteneurs. Du point de vue de l'utilisateur déveoppeur, **k8s** c'est surtout :
+
+- une API pour contrôler les objets **k8s** (listing, création, suppression etc...)
+- un client CLI (kubectl) pour interragir avec cette API
+
+L'API de **k8s** est extensible, c'est à dire qu'il est possible de créer de nouveaux types d'objets kubernetes et ainsi d'ajouter de nouvelles fonctionalitées à vos cluster.
+
+## Concepts de k8s ##
+
+- Les **[manifest](https://kubernetes.io/docs/concepts/overview/working-with-objects/#describing-a-kubernetes-object)** permettent de représenter un objet **k8s** sous la forme d'un fichier *yaml* ou *json*
+- Les **[Namespaces](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/)** permettent une certaine isolation au sein d'un même cluster kubernetes (~projets).
+- Les **[Noeuds](https://kubernetes.io/docs/concepts/architecture/nodes/)** sont les "machines" qui supportent les conteneurs (**pods**)
+- Les **[pods](https://kubernetes.io/docs/concepts/workloads/pods/)** sont les plus simples objets **k8s**, ils peuvent contenir un ou plusieurs conteneurs
+- Les **[services](https://kubernetes.io/docs/concepts/services-networking/service/)** représentent l'élement réseau de base dans **k8s**, ils permetent d'exposer un service sur un port par exemple. Ils réalisent la répartition sur les **pods** qui leur sont ratachés.
+- Les **[volumes](https://kubernetes.io/docs/concepts/storage/volumes/)** permettent la persistance des données. C'est un élément à manier avec précaution car la persistence des données en volume est un élément complexe à gérer dans les architectures cloud-natives, on lui préférera du stockage Objet.
+- Les **[workload management](https://kubernetes.io/docs/concepts/workloads/controllers/)"** : Ils permettent d'organiser les **pods** , il en existe de plusieurs types, **deployment**,**statefullset**,**daemonset**,**Jobs**,**Cronjobs** etc...
+- Les **[configMaps](https://kubernetes.io/docs/concepts/configuration/configmap/)** : les configmaps permettent de stocker des configurations pour les pods. Il existe aussi la notion de **secret** pour stocker des données plus sensibles (bien qu'ils ne soient pas chiffrés par défaut)
+
+Il y a bien d'autres types d'aobjets Kubernetes !
+
+
+
+
+
+
