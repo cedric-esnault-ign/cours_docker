@@ -114,7 +114,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
                     <h1>Docker par la pratique</h1>
                     <h2>IGN</h2>
                     <h3>Cédric Esnault</h3>
-                    <h4>04/07/2023 - IGN/ENSG</h4>
+                    <h4>12/03/2024 - IGN/ENSG</h4>
                     <aside class="notes">
 
                     </aside>
@@ -145,7 +145,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="fragment">Utilisation</li>
 <li class="fragment">Tps</li>
 </ul></li>
-<li class="fragment">Swarm / Kubernetes
+<li class="fragment">Kubernetes
 <ul>
 <li class="fragment">Utilisation</li>
 <li class="fragment">Demo</li>
@@ -210,6 +210,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="fragment">2015 Google sort de Kubernetes</li>
 <li class="fragment">2018 Kubernetes est certifié Docker et devient la solution incontournable du marché</li>
 </ul>
+<aside class="notes">
+</aside>
 </section><section id="pourquoi-docker" class="slide level2">
 <h2>Pourquoi Docker</h2>
 <ul>
@@ -274,7 +276,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="fragment">Un <strong>Daemon</strong> avec une API qui va s’occuper des interaction avec les conteneurs , les images, les réseaux …</li>
 <li class="fragment">Un client <strong>CLI</strong> pour parler à cette API</li>
 </ul>
-<p>l’<a href="https://opencontainers.org">OCI</a> est Un organisme qui à pour but de normaliser les éléments constitutifs de la virtualisation et des conteneurs.</p>
+<p>l’<a href="https://opencontainers.org">OCI</a> est Un organisme qui à pour but de normaliser les éléments constitutifs de la virtualisation et des conteneurs. C’est important car il existe également des alternatives/concurrents à Docker.</p>
 <aside class=notes>
 <p>Il existe des alternatives/concurrents à Docker.</p>
 <p>OCI : Open Container Initiative CNCF : Cloud Native Computing Foundation https://www.cncf.io/ Docker : runc : CLI containerd : démon rkt : coreOS rocket Buildah : build images Kaniko : build images podman : deamonles docker</p>
@@ -331,8 +333,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb5-4" title="4">    <span class="dt">&quot;default-address-pools&quot;</span> <span class="fu">:</span> <span class="ot">[</span></a>
 <a class="sourceLine" id="cb5-5" title="5">        <span class="fu">{</span><span class="dt">&quot;base&quot;</span> <span class="fu">:</span> <span class="st">&quot;192.168.200.0/23&quot;</span><span class="fu">,</span><span class="dt">&quot;size&quot;</span> <span class="fu">:</span> <span class="dv">28</span><span class="fu">}</span></a>
 <a class="sourceLine" id="cb5-6" title="6">    <span class="ot">]</span></a>
-<a class="sourceLine" id="cb5-7" title="7"><span class="fu">}</span></a></code></pre></div>
-<p>Au niveau du réseau, cette configuration permet de ne pas avoir de collision avec les réseaux IGN/ENSG</p>
+<a class="sourceLine" id="cb5-7" title="7">    <span class="er">//...</span></a>
+<a class="sourceLine" id="cb5-8" title="8"><span class="fu">}</span></a></code></pre></div>
+<p>Au niveau du réseau, cette configuration permet de ne pas avoir de collision avec les réseaux IGN/ENSG, particulièrement lors de l’utilisation du VPN.</p>
 </section><section id="installation-particularités-ign-3" class="slide level2">
 <h2>Installation : particularités IGN 3</h2>
 <p>Si on souhaite interagir avec les environnements interne à l’IGN, il faut également préciser :</p>
@@ -340,16 +343,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="fragment">Les serveurs DNS</li>
 <li class="fragment">les registres Docker non sécurisés</li>
 </ul>
-<div class="sourceCode" id="cb6"><pre class="sourceCode json"><code class="sourceCode json"><a class="sourceLine" id="cb6-1" title="1">    <span class="er">&quot;dns&quot;:</span> <span class="ot">[</span></a>
-<a class="sourceLine" id="cb6-2" title="2">        <span class="st">&quot;172.21.2.14&quot;</span><span class="ot">,</span></a>
-<a class="sourceLine" id="cb6-3" title="3">        <span class="st">&quot;172.16.2.91&quot;</span></a>
-<a class="sourceLine" id="cb6-4" title="4">    <span class="ot">]</span><span class="er">,</span></a>
-<a class="sourceLine" id="cb6-5" title="5">    <span class="er">&quot;dns-search&quot;:</span> <span class="ot">[</span><span class="st">&quot;ign.fr&quot;</span><span class="ot">]</span><span class="er">,</span></a>
-<a class="sourceLine" id="cb6-6" title="6">    <span class="er">&quot;insecure-registries&quot;:</span> <span class="ot">[</span></a>
-<a class="sourceLine" id="cb6-7" title="7">        <span class="st">&quot;http://registry.localhost&quot;</span><span class="ot">,</span></a>
-<a class="sourceLine" id="cb6-8" title="8">        <span class="st">&quot;http://localhost:5000&quot;</span><span class="ot">,</span></a>
-<a class="sourceLine" id="cb6-9" title="9">        <span class="st">&quot;http://dockerforge.ign.fr:5000&quot;</span></a>
-<a class="sourceLine" id="cb6-10" title="10">    <span class="ot">]</span></a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode json"><code class="sourceCode json"><a class="sourceLine" id="cb6-1" title="1"><span class="fu">{</span></a>
+<a class="sourceLine" id="cb6-2" title="2"><span class="er">//...</span></a>
+<a class="sourceLine" id="cb6-3" title="3">    <span class="dt">&quot;dns&quot;</span><span class="fu">:</span> <span class="ot">[</span></a>
+<a class="sourceLine" id="cb6-4" title="4">        <span class="st">&quot;172.21.2.14&quot;</span><span class="ot">,</span></a>
+<a class="sourceLine" id="cb6-5" title="5">        <span class="st">&quot;172.16.2.91&quot;</span></a>
+<a class="sourceLine" id="cb6-6" title="6">    <span class="ot">]</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb6-7" title="7">    <span class="dt">&quot;dns-search&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;ign.fr&quot;</span><span class="ot">]</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb6-8" title="8">    <span class="dt">&quot;insecure-registries&quot;</span><span class="fu">:</span> <span class="ot">[</span></a>
+<a class="sourceLine" id="cb6-9" title="9">        <span class="st">&quot;http://registry.localhost&quot;</span><span class="ot">,</span></a>
+<a class="sourceLine" id="cb6-10" title="10">        <span class="st">&quot;http://localhost:5000&quot;</span><span class="ot">,</span></a>
+<a class="sourceLine" id="cb6-11" title="11">        <span class="st">&quot;http://dockerforge.ign.fr:5000&quot;</span></a>
+<a class="sourceLine" id="cb6-12" title="12">    <span class="ot">]</span></a>
+<a class="sourceLine" id="cb6-13" title="13"><span class="er">//...</span></a>
+<a class="sourceLine" id="cb6-14" title="14"><span class="fu">}</span></a></code></pre></div>
 </section><section id="installation-droits" class="slide level2">
 <h2>Installation : Droits</h2>
 <p>Pour éviter d’avoir à faire sudo docker, on peut ajouter un utilisateur au groupe docker :</p>
@@ -364,11 +371,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb8-1" title="1"><span class="ex">docker</span> run --rm hello-world</a></code></pre></div>
 <p>Nous venons de lancer notre premier conteneur</p>
 <p>note : Le projet <a href="http://play-with-docker.com">PWD</a> permet également de tester Docker sans l’installer au travers d’une interface web. Les sessions de travail durent 4h et la vitesse de l’interface dépend souvent de l’activité des autres utilisateurs…</p>
+<aside class="notes">
+<p>Attention : alerte sur les problèmes de sécurité avec Docker et les images ROOT.</p>
+</aside>
 </section><section id="testons-votre-installation" class="slide level2">
 <h2>Testons votre installation</h2>
 <pre class="shell"><code>docker container run hello-world
 # Alias : docker run hello-world</code></pre>
 <p>La commande par défaut de cette image affiche un message confirmant la bonne installation de <em>Docker Engine</em>. Si l’image n’est pas disponible en local, elle sera téléchargée sans avoir à faire un <code>docker image pull hello-world</code></p>
+<figure>
+<img data-src="/img/Hello-world.png" alt="HELLO WORLD" /><figcaption>HELLO WORLD</figcaption>
+</figure>
 </section></section>
 <section><section id="docker-utilisation" class="title-slide slide level1"><h1>Docker : utilisation</h1></section><section id="les-images-docker" class="slide level2">
 <h2>Les images Docker</h2>
@@ -399,11 +412,21 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul>
 </section><section id="architecture-des-images" class="slide level2 figcenter">
 <h2>Architecture des Images</h2>
-<p><img data-src="https://docs.docker.com/storage/storagedriver/images/container-layers.jpg" /></p>
+<figure>
+<img data-src="/img/container-layers.jpg" alt="IMAGE DOCKER" /><figcaption>IMAGE DOCKER</figcaption>
+</figure>
 </section><section id="commandes-relatives-aux-images" class="slide level2">
 <h2>Commandes relatives aux images</h2>
-<p>Nous verrons plus tard comment travailler avec les images</p>
-<p><a href="#//les-images-docker">Les images Docker</a></p>
+<p>Dans un premier temps, nous allons juste les utiliser afin de construire <a href="#//les-conteneurs">des Conteneurs Docker</a></p>
+<p>Nous verrons plus tard comment travailler avec les images :</p>
+<ul>
+<li class="fragment"><code>docker image ls</code></li>
+<li class="fragment"><code>docker image pull</code></li>
+<li class="fragment"><code>docker image inspect</code></li>
+<li class="fragment"><code>docker image rm</code></li>
+<li class="fragment"><code>docker image build</code></li>
+<li class="fragment">…</li>
+</ul>
 </section><section id="les-conteneurs" class="slide level2">
 <h2>Les conteneurs</h2>
 <ul>
@@ -424,7 +447,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </section><section id="démarrer-un-conteneur-1" class="slide level2">
 <h2>Démarrer un conteneur</h2>
 <p>Exemple :</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb12-1" title="1"><span class="ex">docker</span> container run alpine cat /etc/hostname</a></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb12-1" title="1"><span class="ex">docker</span> container run --rm alpine cat /etc/hostname</a></code></pre></div>
 <ul>
 <li class="fragment">On utilise l’image <code>alpine</code></li>
 <li class="fragment">On exécute la commande <code>cat /etc/hostname</code></li>
@@ -436,16 +459,18 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb13"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb13-1" title="1"><span class="ex">docker</span> container run -it alpine /bin/sh</a></code></pre></div>
 <p>Démarre un shell dans le conteneur.</p>
 <p><em>Comme si on était dans une VM.</em></p>
+<p>Vous pouvez explorez le système de fichier pour voir ce qui s’y trouve.</p>
 </section><section id="lister-les-conteneurs" class="slide level2">
 <h2>Lister les conteneurs</h2>
 <div class="sourceCode" id="cb14"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb14-1" title="1"><span class="ex">docker</span> container ls</a>
 <a class="sourceLine" id="cb14-2" title="2"><span class="ex">CONTAINER</span> ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES</a></code></pre></div>
 <p>Mais pourquoi on ne voit pas les conteneurs d’avant ?</p>
-</section><section id="lister-les-conteneurs-1" class="slide level2">
-<h2>Lister les conteneurs</h2>
+</section><section id="lister-tous-les-conteneurs" class="slide level2">
+<h2>Lister tous les conteneurs</h2>
 <div class="sourceCode" id="cb15"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb15-1" title="1"><span class="ex">docker</span> container ls -a</a>
 <a class="sourceLine" id="cb15-2" title="2"><span class="ex">CONTAINER</span> ID    IMAGE       COMMAND              CREATED        STATUS                     PORTS       NAMES</a>
 <a class="sourceLine" id="cb15-3" title="3"><span class="ex">a5b74e24da65</span>    alpine      <span class="st">&quot;cat /etc/hostname&quot;</span>  9 seconds ago  Exited (0) <span class="ex">6</span> seconds ago               happy_cori</a></code></pre></div>
+<p>L’option <code>--rm</code> permet de détruire le conteneur une fois la commande terminé (Sinon, le conteneur reste présent dans l’état “Exited” )</p>
 </section><section id="lactivité-des-conteneurs" class="slide level2">
 <h2>L’activité des conteneurs</h2>
 <div class="sourceCode" id="cb16"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb16-1" title="1"><span class="ex">docker</span> container stats [NOM]</a></code></pre></div>
@@ -473,30 +498,30 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <table>
 <thead>
 <tr class="header">
-<th style="text-align: center;">Options</th>
-<th style="text-align: center;"> Description</th>
+<th style="text-align: right;">Options</th>
+<th style="text-align: left;"> Description</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: center;"><code>--name</code></td>
-<td style="text-align: center;">donner un nom au conteneur</td>
+<td style="text-align: right;"><code>--name</code></td>
+<td style="text-align: left;">donner un nom au conteneur</td>
 </tr>
 <tr class="even">
-<td style="text-align: center;"><code>-i</code></td>
-<td style="text-align: center;">interactif</td>
+<td style="text-align: right;"><code>-i</code></td>
+<td style="text-align: left;">interactif</td>
 </tr>
 <tr class="odd">
-<td style="text-align: center;"><code>-t</code></td>
-<td style="text-align: center;">forcer l’allocation d’un TTY</td>
+<td style="text-align: right;"><code>-t</code></td>
+<td style="text-align: left;">forcer l’allocation d’un TTY</td>
 </tr>
 <tr class="even">
-<td style="text-align: center;"><code>--rm</code></td>
-<td style="text-align: center;">supprimer le conteneur à la fin de son exécution</td>
+<td style="text-align: right;"><code>--rm</code></td>
+<td style="text-align: left;">supprimer le conteneur à la fin de son exécution</td>
 </tr>
 <tr class="odd">
-<td style="text-align: center;"><code>-d</code></td>
-<td style="text-align: center;">démarrer le conteneur en arrière-plan</td>
+<td style="text-align: right;"><code>-d</code></td>
+<td style="text-align: left;">démarrer le conteneur en arrière-plan</td>
 </tr>
 </tbody>
 </table>
@@ -546,6 +571,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb20-7" title="7">    <span class="ex">link/ether</span> e6:bd:09:a3:dc:84 brd ff:ff:ff:ff:ff:ff</a>
 <a class="sourceLine" id="cb20-8" title="8">    <span class="ex">inet</span> 192.168.0.8/23 scope global eth0</a>
 <a class="sourceLine" id="cb20-9" title="9">       <span class="ex">valid_lft</span> forever preferred_lft forever</a></code></pre></div>
+<p>Ce mode est peu utilisé, il peut parfois entrer en collisions avec des réglages réseaux d’entreprise (VPN,…). Il pose aussi des problèmes de sécurité ( suppression de l’isolation réseau).</p>
 </section><section id="réseau-bridge-par-défaut" class="slide level2">
 <h2>Réseau bridge par défaut</h2>
 <ul>
@@ -563,7 +589,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2>Exposer un port sur l’hôte</h2>
 <div class="sourceCode" id="cb21"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb21-1" title="1"><span class="ex">docker</span> container run --rm -p 8080:80 httpd:alpine</a></code></pre></div>
 <p>-&gt; <a href="http://127.0.0.1:8080">http://127.0.0.1:8080</a></p>
-<p>Le port 8080 de la machine hôte est redirigé vers le port 80 du conteneur.</p>
+<p>Le port 8080 de la machine hôte est redirigé vers le port 80 du conteneur apache (httpd basé sur un OS alpine).</p>
 </section><section id="les-volumes" class="slide level2">
 <h2>Les volumes</h2>
 <p>Un conteneur est “jetable”</p>
@@ -613,14 +639,18 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </section><section id="volume-anonyme" class="slide level2">
 <h2>Volume anonyme</h2>
 <p>Les métadonnées d’une image peuvent forcer la création d’un volume</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb25-1" title="1"><span class="ex">docker</span> image inspect rok4/data-bdortho-d075                                            </a>
-<a class="sourceLine" id="cb25-2" title="2">[{<span class="ex">...</span></a>
-<a class="sourceLine" id="cb25-3" title="3">    <span class="st">&quot;Config&quot;</span>: {<span class="ex">...</span></a>
-<a class="sourceLine" id="cb25-4" title="4">        <span class="st">&quot;Volumes&quot;</span>: <span class="kw">{</span></a>
-<a class="sourceLine" id="cb25-5" title="5">            <span class="st">&quot;/rok4/config/pyramids/ORTHO_JPG_PM_D075&quot;</span>: {<span class="kw">}</span></a>
-<a class="sourceLine" id="cb25-6" title="6">        }</a>
-<a class="sourceLine" id="cb25-7" title="7">    },</a>
-<a class="sourceLine" id="cb25-8" title="8"><span class="ex">...</span>]</a></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb25-1" title="1"><span class="ex">docker</span> inspect docker.io/rok4/dataset:bdortho5m-martinique                                            </a>
+<a class="sourceLine" id="cb25-2" title="2">[<span class="kw">{</span></a>
+<a class="sourceLine" id="cb25-3" title="3">  <span class="ex">//...</span></a>
+<a class="sourceLine" id="cb25-4" title="4">    <span class="st">&quot;Config&quot;</span>: <span class="kw">{</span></a>
+<a class="sourceLine" id="cb25-5" title="5">        <span class="ex">//...</span></a>
+<a class="sourceLine" id="cb25-6" title="6">        <span class="st">&quot;Volumes&quot;</span>: <span class="kw">{</span></a>
+<a class="sourceLine" id="cb25-7" title="7">          <span class="st">&quot;/pyramids/BDORTHO&quot;</span>: {<span class="kw">}</span></a>
+<a class="sourceLine" id="cb25-8" title="8">        <span class="kw">}</span>,</a>
+<a class="sourceLine" id="cb25-9" title="9">        <span class="ex">//...</span></a>
+<a class="sourceLine" id="cb25-10" title="10">    <span class="kw">}</span>,</a>
+<a class="sourceLine" id="cb25-11" title="11">  <span class="ex">//...</span></a>
+<a class="sourceLine" id="cb25-12" title="12">]</a></code></pre></div>
 </section><section id="volume-docker-1" class="slide level2">
 <h2>Volume docker</h2>
 <p>Lister les volumes</p>
@@ -656,12 +686,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2>Volumes avancés</h2>
 <p>Un volume hôte est un <code>--mount</code> particulier.</p>
 <p><code>docker run -it -v /chemin/sur/mon/ordi:/data alpine sh</code></p>
-<p><code>docker run -it --mount type=bind,source=/chemin/sur/mon/ordi,target=/data alpine sh</code></p>
+<p><code>docker run -it --mount \   type=bind,source=/chemin/sur/mon/ordi,target=/data \   alpine sh</code></p>
 </section><section id="a-vous-de-jouer-maintenant" class="slide level2">
 <h2>A vous de jouer maintenant</h2>
 <p>Lors de l’installation , nous avons créé un conteneur pour vérifier que Docker était bien installé</p>
 <ul>
 <li class="fragment">Observez que le conteneur est bien existant et à l’arrêt</li>
+<li class="fragment">Si vous avez déjà testé les manipulations d’exemple, vous pouvez recréer un nouveau conteneur hello-world.</li>
 </ul>
 </section><section id="correction" class="slide level2">
 <h2>Correction</h2>
@@ -689,7 +720,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </section><section id="correction-2" class="slide level2">
 <h2>Correction</h2>
 <div class="sourceCode" id="cb31"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb31-1" title="1"><span class="ex">docker</span> image ls</a>
-<a class="sourceLine" id="cb31-2" title="2"><span class="ex">docker</span> image rm <span class="op">&lt;</span>IMAGE-NAME<span class="op">&gt;</span></a>
+<a class="sourceLine" id="cb31-2" title="2"><span class="ex">docker</span> image rm hello-world:latest</a>
 <a class="sourceLine" id="cb31-3" title="3"><span class="ex">docker</span> run hello-world</a>
 <a class="sourceLine" id="cb31-4" title="4"><span class="ex">docker</span> ls -a</a>
 <a class="sourceLine" id="cb31-5" title="5"><span class="ex">docker</span> rm <span class="op">&lt;</span>CONTAINER-NAME<span class="op">&gt;</span></a>
@@ -719,43 +750,45 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </section><section id="gérer-les-entréessorties" class="slide level2">
 <h2>Gérer les entrées/sorties</h2>
 <ul>
-<li class="fragment">Démarrez un conteneur avec un shell interactif basé sur l’image "alpine</li>
+<li class="fragment">Démarrez un conteneur avec un shell interactif basé sur l’image <strong>alpine</strong></li>
 <li class="fragment">Dans un second terminal, observez les conteneurs en cours d’exécution</li>
 <li class="fragment">Stoppez le conteneur (sans le détruire)</li>
-<li class="fragment">Relancez le conteneur et se rattacher à son terminal</li>
+<li class="fragment"><a href="https://docs.docker.com/reference/cli/docker/container/start/">Relancez</a> le conteneur et se <a href="https://docs.docker.com/reference/cli/docker/container/attach/">rattacher</a> à son terminal</li>
 <li class="fragment">Faire le ménage</li>
 </ul>
 </section><section id="correction-4" class="slide level2">
 <h2>Correction</h2>
-<div class="sourceCode" id="cb34"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb34-1" title="1"><span class="ex">docker</span> run --rm -i -t alpine sh</a>
-<a class="sourceLine" id="cb34-2" title="2"><span class="ex">docker</span> run --rm -i -t alpine cat /etc/hostname</a></code></pre></div>
+<div class="sourceCode" id="cb34"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb34-1" title="1"><span class="ex">docker</span> run --rm -i -t alpine /bin/sh</a>
+<a class="sourceLine" id="cb34-2" title="2">/# <span class="fu">cat</span> /etc/hostname</a></code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb35-1" title="1"><span class="ex">docker</span> run --rm -i -t alpine cat /etc/hostname</a></code></pre></div>
 <p>Une fois dans le conteneur, on peut afficher le nom d’hôte du conteneur avec la commande <code>cat /etc/hostname</code>. On peut également modifier la commande (unique) lancée dans un conteneur.</p>
-<div class="sourceCode" id="cb35"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb35-1" title="1"><span class="ex">docker</span> ls</a>
-<a class="sourceLine" id="cb35-2" title="2"><span class="ex">docker</span> stop NAME</a>
-<a class="sourceLine" id="cb35-3" title="3"><span class="ex">docker</span> ls</a></code></pre></div>
+<div class="sourceCode" id="cb36"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb36-1" title="1"><span class="ex">docker</span> ls</a>
+<a class="sourceLine" id="cb36-2" title="2"><span class="ex">docker</span> stop NAME</a>
+<a class="sourceLine" id="cb36-3" title="3"><span class="ex">docker</span> ls</a></code></pre></div>
 <p>On peut voir le conteneur en état <code>Exited</code>. Dans le premier terminal, on peut voir que le shell est arrêté.</p>
 </section><section id="correction-5" class="slide level2">
 <h2>Correction</h2>
-<div class="sourceCode" id="cb36"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb36-1" title="1"><span class="ex">docker</span>  start NAME</a>
-<a class="sourceLine" id="cb36-2" title="2"><span class="ex">docker</span> attach NAME</a></code></pre></div>
-<div class="sourceCode" id="cb37"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb37-1" title="1"><span class="ex">docker</span> stop NAME </a>
-<a class="sourceLine" id="cb37-2" title="2"><span class="ex">docker</span> rm NAME </a></code></pre></div>
+<div class="sourceCode" id="cb37"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb37-1" title="1"><span class="ex">docker</span> start NAME</a>
+<a class="sourceLine" id="cb37-2" title="2"><span class="ex">docker</span> attach NAME</a></code></pre></div>
+<div class="sourceCode" id="cb38"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb38-1" title="1"><span class="ex">docker</span> stop NAME </a>
+<a class="sourceLine" id="cb38-2" title="2"><span class="ex">docker</span> rm NAME </a></code></pre></div>
 <p>Pour aller plus loin, cherchez des informations sur les options <code>-d</code>, <code>-w</code>, <code>-h</code>, <code>--rm</code> et <code>--name</code> de la commande <code>docker container run</code> et testez ces options.</p>
-<div class="sourceCode" id="cb38"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb38-1" title="1"><span class="ex">docker</span> container run --help</a></code></pre></div>
+<div class="sourceCode" id="cb39"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb39-1" title="1"><span class="ex">docker</span> container run --help</a></code></pre></div>
 </section><section id="gérer-les-volumes-host" class="slide level2">
 <h2>Gérer les volumes “host”</h2>
 <ul>
 <li class="fragment">Démarrez un conteneur <strong>alpine</strong> avec un TTY en montant la racine de la machine hôte sur <code>/host</code> en mode <em>volume hote</em> et en lecture seule dans le conteneur</li>
-<li class="fragment">Observez le contenu de <code>/host</code>, par exemple, ajouter un nouveau fichier dans votre <code>~/</code></li>
+<li class="fragment">Observez le contenu de <code>/host</code></li>
+<li class="fragment">Depuis un terminal sur votre machine host , ajouter un nouveau fichier dans votre <code>~/</code> et observez ce dossier dans votre conteneur <em>Alpine</em></li>
 </ul>
 </section><section id="correction-6" class="slide level2">
 <h2>Correction</h2>
-<div class="sourceCode" id="cb39"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb39-1" title="1"><span class="ex">docker</span>  run -i -t -v /:/host:ro alpine sh</a></code></pre></div>
-<p>Le fichier <code>/etc/hostname</code> contient bien le nom d’hôte du conteneur. Le fichier <code>/host/etc/hostname</code> contient le nom d’hôte de la machine hôte.</p>
+<div class="sourceCode" id="cb40"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb40-1" title="1"><span class="ex">docker</span>  run -i -t -v /:/host:ro alpine sh</a></code></pre></div>
+<p>Le fichier <code>/etc/hostname</code> contient bien le nom d’hôte du conteneur. Le fichier <code>/host/etc/hostname</code> contient le nom d’hôte de la machine hôte. Le dossier <code>/host/home/ubuntu/</code> contient votre home (si votre user est bien ubuntu…)</p>
 </section><section id="gérer-les-volumes-docker" class="slide level2">
 <h2>Gérer les volumes docker</h2>
 <ul>
-<li class="fragment">Démarrez un conteneur <strong>alpine</strong> avec un TTY et un volume docker sur <code>/data</code></li>
+<li class="fragment">Démarrez un conteneur <strong>alpine</strong> avec un TTY et un <strong>volume docker</strong> sur <code>/data</code></li>
 <li class="fragment">Créez un fichier dans <code>/data/</code> puis supprimez le conteneur</li>
 <li class="fragment">Démarrez un nouveau conteneur <strong>alpine</strong> avec un TTY et un volume docker avec le même nom sur <code>/data</code></li>
 <li class="fragment">Observez le contenu de <code>/data/</code></li>
@@ -763,15 +796,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul>
 </section><section id="correction-7" class="slide level2">
 <h2>Correction</h2>
-<div class="sourceCode" id="cb40"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb40-1" title="1"><span class="ex">docker</span> run --rm -i -t -v NAME:/data:rw alpine sh</a>
-<a class="sourceLine" id="cb40-2" title="2"></a>
-<a class="sourceLine" id="cb40-3" title="3"><span class="ex">docker</span> run -i -t -v NAME:/data:rw alpine sh</a>
-<a class="sourceLine" id="cb40-4" title="4"></a>
-<a class="sourceLine" id="cb40-5" title="5"><span class="ex">docker</span> volume ls</a>
-<a class="sourceLine" id="cb40-6" title="6"><span class="ex">docker</span> volume rm NAME</a></code></pre></div>
+<div class="sourceCode" id="cb41"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb41-1" title="1"><span class="ex">docker</span> run --rm -i -t -v NAME:/data:rw alpine sh</a>
+<a class="sourceLine" id="cb41-2" title="2"></a>
+<a class="sourceLine" id="cb41-3" title="3"><span class="ex">docker</span> run -i -t -v NAME:/data:rw alpine sh</a>
+<a class="sourceLine" id="cb41-4" title="4"></a>
+<a class="sourceLine" id="cb41-5" title="5"><span class="ex">docker</span> volume ls</a>
+<a class="sourceLine" id="cb41-6" title="6"><span class="ex">docker</span> volume rm NAME</a></code></pre></div>
 <p>On ne peut supprimer un volume que si aucun conteneur ne l’utilise. Le message d’erreur indique l’identifiant du conteneur utilisant ce volume :</p>
-<div class="sourceCode" id="cb41"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb41-1" title="1">$ <span class="ex">docker</span> volume rm Data</a>
-<a class="sourceLine" id="cb41-2" title="2"><span class="ex">Error</span> response from daemon: remove Data: volume is in use - [a1bf0b7f7cb74abd283b3190af6efee0a9cc4d12bede45fe698b71c368b2f57a]</a></code></pre></div>
+<div class="sourceCode" id="cb42"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb42-1" title="1">$ <span class="ex">docker</span> volume rm Data</a>
+<a class="sourceLine" id="cb42-2" title="2"><span class="ex">Error</span> response from daemon: remove Data: volume is in use - [a1bf0b7f7cb74abd283b3190af6efee0a9cc4d12bede45fe698b71c368b2f57a]</a></code></pre></div>
 </section><section id="gérer-le-réseau" class="slide level2">
 <h2>Gérer le Réseau</h2>
 <ul>
@@ -780,9 +813,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul>
 </section><section id="correction-8" class="slide level2">
 <h2>Correction</h2>
-<div class="sourceCode" id="cb42"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb42-1" title="1"><span class="ex">ip</span> a</a>
-<a class="sourceLine" id="cb42-2" title="2"><span class="ex">docker</span> run --rm -it alpine ip a</a>
-<a class="sourceLine" id="cb42-3" title="3"><span class="ex">docker</span> run --rm -it --net host alpine sh</a></code></pre></div>
+<div class="sourceCode" id="cb43"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb43-1" title="1"><span class="ex">ip</span> a</a>
+<a class="sourceLine" id="cb43-2" title="2"><span class="ex">docker</span> run --rm -it alpine ip a</a>
+<a class="sourceLine" id="cb43-3" title="3"><span class="ex">docker</span> run --rm -it --net host alpine sh</a></code></pre></div>
 <p>L’option <code>--net host</code> branche le conteneur sur les interfaces réseaux de la machine hôte. <strong>Il n’y a donc pas d’isolation réseau.</strong>, c’est une option à éviter dans la plupart des cas.</p>
 </section><section id="exposition-de-ports" class="slide level2">
 <h2>Exposition de ports</h2>
@@ -792,9 +825,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul>
 </section><section id="correction-9" class="slide level2">
 <h2>Correction</h2>
-<div class="sourceCode" id="cb43"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb43-1" title="1"><span class="ex">docker</span> container run containous/whoami</a>
-<a class="sourceLine" id="cb43-2" title="2"><span class="ex">docker</span> container inspect NAME</a>
-<a class="sourceLine" id="cb43-3" title="3"><span class="ex">curl</span> -s http://<span class="op">&lt;</span>IP_CONTENEUR<span class="op">&gt;</span></a></code></pre></div>
+<div class="sourceCode" id="cb44"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb44-1" title="1"><span class="ex">docker</span> container run containous/whoami</a>
+<a class="sourceLine" id="cb44-2" title="2"><span class="ex">docker</span> container inspect NAME</a>
+<a class="sourceLine" id="cb44-3" title="3"><span class="ex">curl</span> -s http://<span class="op">&lt;</span>IP_CONTENEUR<span class="op">&gt;</span></a></code></pre></div>
 <p>L’IP du conteneur n’est accessible que depuis la machine hébergeant le conteneur. On ne peut pas y accéder depuis l’extérieur de la machine hôte avec son adresse IP car c’est un réseau privé, interne à notre hôte.</p>
 <aside class="notes">
 NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
@@ -806,16 +839,16 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 </ul>
 </section><section id="correction-10" class="slide level2">
 <h2>Correction</h2>
-<div class="sourceCode" id="cb44"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb44-1" title="1"><span class="ex">docker</span> container run -p 8080:80 containous/whoami</a>
-<a class="sourceLine" id="cb44-2" title="2"><span class="ex">curl</span> -s http://127.0.0.1</a>
-<a class="sourceLine" id="cb44-3" title="3"><span class="ex">curl</span> -s http://<span class="op">&lt;</span>IP_HOST<span class="op">&gt;</span></a></code></pre></div>
-<p>On peut toujours accéder au port 80 de l’IP du conteneur. On peut maintenant également accéder au port 8080 de la machine grâce à l’option <code>-p</code>.</p>
+<div class="sourceCode" id="cb45"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb45-1" title="1"><span class="ex">docker</span> container run -p 8080:80 containous/whoami</a>
+<a class="sourceLine" id="cb45-2" title="2"><span class="ex">curl</span> -s http://127.0.0.1</a>
+<a class="sourceLine" id="cb45-3" title="3"><span class="ex">curl</span> -s http://<span class="op">&lt;</span>IP_HOST<span class="op">&gt;</span></a></code></pre></div>
+<p>On peut toujours accéder au port 80 de l’IP du conteneur. On peut maintenant également accéder au port 8080 de la machine grâce à l’option <code>-p</code> y compris depuis l’exterieur de la machine (ici le LAN ENSG).</p>
 </section><section id="création-de-réseaux-1" class="slide level2">
 <h2>Création de réseaux</h2>
 <ul>
 <li class="fragment">Créez un nouveau réseau <strong>test-nginx</strong></li>
 <li class="fragment">Utilisez <code>docker inspect</code> pour voir ce qui a été créé</li>
-<li class="fragment">Créez un premier conteneur basé sur l’image <code>nginx</code> nommé (<code>--name</code>) <em>nginx</em> , attachée au réseau <strong>test-ningx</strong> et qui tourne en daemon.</li>
+<li class="fragment">Créez un premier conteneur basé sur l’image <code>nginx</code> nommé (<code>--name</code>) <strong>nginx</strong> , attaché au réseau <strong>test-ningx</strong> et qui tourne en <strong>daemon</strong>.</li>
 <li class="fragment">Créer un conteneur basé sur l’image <code>alpine/curl</code> sans préciser de réseau , avec un terminal interactif (<code>/bin/sh</code>)
 <ul>
 <li class="fragment">Essayez d’atteindre le serveur <em>nginx</em> précédemment créé</li>
@@ -825,31 +858,50 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 <li class="fragment">Réessayez de joindre le server <em>nginx</em></li>
 </ul></li>
 </ul>
+<pre><code>curl -v &quot;http://[IP|hostname][:PORT]/&quot;</code></pre>
 </section><section id="correction-11" class="slide level2">
 <h2>Correction</h2>
-<div class="sourceCode" id="cb45"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb45-1" title="1"><span class="ex">docker</span> network create test-nginx</a>
-<a class="sourceLine" id="cb45-2" title="2"><span class="ex">docker</span> inspect test-nginx</a>
-<a class="sourceLine" id="cb45-3" title="3"><span class="ex">docker</span> run --network test-nginx --name nginx -d nginx</a>
-<a class="sourceLine" id="cb45-4" title="4"><span class="ex">docker</span> run --rm -ti alpine/curl /bin/sh</a>
-<a class="sourceLine" id="cb45-5" title="5"><span class="co">#  / # curl nginx</span></a>
-<a class="sourceLine" id="cb45-6" title="6"><span class="co">#  curl: (6) Could not resolve host: nginx</span></a>
-<a class="sourceLine" id="cb45-7" title="7"><span class="ex">docker</span> run --rm -ti --network test-nginx alpine/curl /bin/sh</a>
-<a class="sourceLine" id="cb45-8" title="8"><span class="co"># / # curl nginx</span></a>
-<a class="sourceLine" id="cb45-9" title="9"><span class="co"># &lt;!DOCTYPE html&gt;</span></a>
-<a class="sourceLine" id="cb45-10" title="10"><span class="co"># ...</span></a></code></pre></div>
+<div class="sourceCode" id="cb47"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb47-1" title="1"><span class="ex">docker</span> network create test-nginx</a>
+<a class="sourceLine" id="cb47-2" title="2"><span class="ex">docker</span> inspect test-nginx</a>
+<a class="sourceLine" id="cb47-3" title="3"><span class="ex">docker</span> run --network test-nginx --name nginx -d nginx</a>
+<a class="sourceLine" id="cb47-4" title="4"><span class="ex">docker</span> run --rm -ti alpine/curl /bin/sh</a>
+<a class="sourceLine" id="cb47-5" title="5"><span class="co"># / # curl nginx</span></a>
+<a class="sourceLine" id="cb47-6" title="6"><span class="co">#  curl: (6) Could not resolve host: nginx</span></a>
+<a class="sourceLine" id="cb47-7" title="7"><span class="ex">docker</span> run --rm -ti --network test-nginx alpine/curl /bin/sh</a>
+<a class="sourceLine" id="cb47-8" title="8"><span class="co"># / # curl nginx</span></a>
+<a class="sourceLine" id="cb47-9" title="9"><span class="co"># &lt;!DOCTYPE html&gt;</span></a>
+<a class="sourceLine" id="cb47-10" title="10"><span class="co"># ...</span></a></code></pre></div>
 </section><section id="docker-le-grand-nettoyage" class="slide level2">
 <h2>Docker : le grand nettoyage</h2>
 <p>Les commandes suivantes vont tenter de nettoyer tout ce qui n’est pas utilisé. A utiliser avec tact, mais peut être salvateur !</p>
-<div class="sourceCode" id="cb46"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb46-1" title="1"><span class="ex">docker</span> system prune</a>
-<a class="sourceLine" id="cb46-2" title="2"><span class="ex">docker</span> volume prune</a></code></pre></div>
+<div class="sourceCode" id="cb48"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb48-1" title="1"><span class="ex">docker</span> system prune</a>
+<a class="sourceLine" id="cb48-2" title="2"><span class="ex">docker</span> volume prune</a></code></pre></div>
 </section><section id="docker-context" class="slide level2">
-<h2>Docker Context</h2>
-<p>Il est possible de décorréler la CLI du Daemon Docker de votre Machine et ainsi de “piloter” un autre host avec votre CLI. Les Contexte Docker sont fait pour cela.</p>
-<div class="sourceCode" id="cb47"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb47-1" title="1"><span class="co">#TODO : conf docker context</span></a></code></pre></div>
+<h2>Docker context</h2>
+<p>Il est possible de décorréler la CLI du Daemon Docker de votre Machine et ainsi de “piloter” un autre host avec votre CLI. Les <strong>Contextes</strong> Docker sont fait pour cela.</p>
+<div class="sourceCode" id="cb49"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb49-1" title="1"><span class="ex">docker</span> context create distant --docker <span class="st">&quot;host=ssh://ubuntu@autreStationLinuxavecDocker&quot;</span></a>
+<a class="sourceLine" id="cb49-2" title="2"><span class="ex">docker</span> contexte use distant</a>
+<a class="sourceLine" id="cb49-3" title="3"><span class="ex">docker</span> ps -a</a></code></pre></div>
 </section><section id="docker-exec" class="slide level2">
-<h2>Docker Exec</h2>
-<p>La commande <code>Docker Exec</code> permet de lancer un nouveau processus dans un conteneur actif existant, cette commande est pratique pour lancer un <em>Shell</em> d’observation ou de debug par exemple.</p>
-<div class="sourceCode" id="cb48"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb48-1" title="1"><span class="ex">docker</span> exec -ti existingContainer /bin/bash</a></code></pre></div>
+<h2>Docker exec</h2>
+<p>La commande <code>docker exec</code> permet de lancer un nouveau processus dans un conteneur actif existant, cette commande est pratique pour lancer un <em>Shell</em> d’observation ou de debug par exemple.</p>
+<div class="sourceCode" id="cb50"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb50-1" title="1"><span class="ex">docker</span> exec -ti existingContainer /bin/bash</a></code></pre></div>
+</section><section id="docker-cp" class="slide level2">
+<h2>Docker cp</h2>
+<p>La commande <code>docker cp</code> permet d’échanger des fichiers/dossiers entre le user-space d’un conteneur et celui de votre host.</p>
+<pre><code>docker run --name alpineContainer -d alpine tail -f /dev/null
+docker cp /etc/hostname alpineContainer:/local.hostname
+docker exec alpineContainer cat /local.hostname
+docker stop alpineContainer
+docker cp alpineContainer:/etc/hostname ./alpine.hostname
+#  Successfully copied 2.05kB to /home/CEsnault/alpine.hostname
+cat alpine.hostname
+# 4583aca170a9
+docker rm alpineContainer</code></pre>
+<p>Cette commande fonctionne également lors de l’utilisation d’un contexte distant.</p>
+<aside class="notes">
+<p>tail -f /dev/null permet au processus principal de perdurer en arrière plan</p>
+</aside>
 </section><section id="autres-commandes-docker" class="slide level2">
 <h2>Autres commandes docker</h2>
 <p>Il existe d’autres commandes docker dont la documentation est disponible sur <a href="https://docs.docker.com/engine/reference/commandline/docker/" class="uri">https://docs.docker.com/engine/reference/commandline/docker/</a></p>
@@ -864,42 +916,41 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 <li><strong>M</strong>ySql</li>
 <li><strong>P</strong>HP</li>
 </ul>
-<p>Les fichiers nécessaires sont disponibles dans le dépôt GIT de ce cours, dans le dossier <code>ressources</code></p>
-<p><a href="https://github.com/cedric-esnault-ign/cours_docker.git" class="uri">https://github.com/cedric-esnault-ign/cours_docker.git</a></p>
+<p>Les fichiers nécessaires sont disponibles dans le dépôt GIT de ce cours, dans le dossier <code>ressources</code> <a href="https://github.com/cedric-esnault-ign/cours_docker.git" class="uri">https://github.com/cedric-esnault-ign/cours_docker.git</a> . Utilisez git pour récuperer ce dépot et travaillez dans le dossier <code>ressouces</code> .</p>
+<pre><code>git clone https://github.com/cedric-esnault-ign/cours_docker.git 
+cd cours_docker/ressources</code></pre>
 </section><section id="apache" class="slide level2">
 <h2>Apache</h2>
-<p>L’image à utiliser ici est <code>httpd</code>. Les options <code>--name -d -p -v</code> peuvent être utiles. La racine du serveur web dans l’image est <code>/usr/local/apache2/htdocs/</code></p>
-<ul>
-<li class="fragment">Lancez un conteneur exposant le port <em>80</em> du conteneur sur le port <em>8080</em> de la machine.</li>
-<li class="fragment">Qu’affiche la page <a href="http://127.0.0.1:8080" class="uri">http://127.0.0.1:8080</a> ?</li>
-<li class="fragment">Utilisez le fichier <code>index-lamp.html</code> pour remplacer la page d’accueil</li>
-</ul>
+<p>L’image à utiliser ici est <code>httpd</code>. Les options <code>--name -d -p -v</code> peuvent être utiles. La racine du serveur web dans l’image est <code>/usr/local/apache2/htdocs/</code> * créez un dossier <code>apache-racine</code> pour le montage <strong>host</strong> * Lancez un conteneur avec un montage de la racine du serveur sur votre dossier <code>apache-racine</code> et exposant le port <em>80</em> du conteneur sur le port <em>8080</em> de la machine host. * Qu’affiche la page <a href="http://127.0.0.1:8080" class="uri">http://127.0.0.1:8080</a> ? * Utilisez le fichier <code>index-lamp.html</code> présent dans le dossier <strong>cartopoint</strong> pour remplacer la page d’accueil</p>
 </section><section id="correction-12" class="slide level2">
 <h2>Correction</h2>
-<div class="sourceCode" id="cb49"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb49-1" title="1"><span class="ex">docker</span> run --name web -d -p 8080:80 -v <span class="st">&quot;</span><span class="va">$(</span><span class="bu">pwd</span><span class="va">)</span><span class="st">:/usr/local/apache2/htdocs/&quot;</span> httpd:latest</a></code></pre></div>
+<div class="sourceCode" id="cb53"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb53-1" title="1"><span class="ex">docker</span> run --name web -d -p 8080:80 -v <span class="st">&quot;</span><span class="va">$(</span><span class="bu">pwd</span><span class="va">)</span><span class="st">/apache-racine/:/usr/local/apache2/htdocs/&quot;</span> httpd:latest</a>
+<a class="sourceLine" id="cb53-2" title="2"></a>
+<a class="sourceLine" id="cb53-3" title="3"><span class="fu">cp</span> cartopoint/index-lamp.html apache-racine/index.html</a></code></pre></div>
 </section><section id="un-peu-de-php" class="slide level2">
 <h2>Un peu de php</h2>
 <ul>
-<li class="fragment">Remplacez le fichier html par <code>index-lamp.php</code> (pensez à le renommer). qu’observez vous?</li>
+<li class="fragment">Remplacez le fichier html par <code>index-lamp.php</code> (pensez à le renommer en index.php). qu’observez vous?</li>
 </ul>
 </section><section id="un-peu-de-php-1" class="slide level2">
 <h2>Un peu de php</h2>
 <p><code>httpd</code> est de base un simple serveur web sans fonctionnalité php. Il faudrait ajouter php dans cette image et configurer httpd pour interpréter les fichiers php. Sans cela, httpd cherche uniquement les fichiers <code>index.html</code> si aucun fichier n’est précisé dans l’URL.</p>
-<p>Même en ajoutant <code>index.php</code> à l’URL, le résultat n’est pas satisfaisant, il n’y a qu’une page verte alors qu’elle devrait afficher l’heure.</p>
+<p>Même en essayant <code>http://127.0.0.1:8080/index.php</code>, le résultat n’est pas satisfaisant, il n’y a qu’une page verte alors qu’elle devrait afficher l’heure.</p>
 <ul>
-<li class="fragment">Recréez votre conteneur en utilisant l’image <strong>php:7.4-apache</strong> qui contient l’interpréteur PHP. Attention, dans cette image, la racine du serveur Web est maintenant <code>/var/www/html</code></li>
+<li class="fragment">Recréez votre conteneur en utilisant l’image <strong>php:7.4-apache</strong> qui contient l’interpréteur PHP. Attention, au niveau du montage, dans cette image, la racine du serveur Web est maintenant <code>/var/www/html</code> et plus <code>/usr/local/apache2/htdocs/</code> !</li>
 </ul>
 <p>Note : On déroge ici un peu à la règle 1 processus par conteneur. On pourrait séparer apache et PHP, mais la liaison serait plus complexe.</p>
 <ul>
-<li class="fragment">Utilisez le site et profitez en pour regarder les logs <code>docker logs &lt;NAME&gt;</code></li>
+<li class="fragment">Rafraichissez plusieurs fois la page et profitez en pour regarder les logs <code>docker logs &lt;NAME&gt;</code></li>
 </ul>
 <aside class="notes">
-<p>tester plutôt : php:7.2-apache</p>
-<p>docker run -d –name web -p 8080:80 -v $PWD/mondossier:/var/www/html/ php:7.4-apache</p>
 </aside>
 </section><section id="correction-13" class="slide level2">
 <h2>Correction</h2>
-<div class="sourceCode" id="cb50"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb50-1" title="1"><span class="ex">docker</span> run --name web -d -p 8080:80 -v <span class="st">&quot;</span><span class="va">$(</span><span class="bu">pwd</span><span class="va">)</span><span class="st">:/var/www/html/&quot;</span> php:7.4-apache</a></code></pre></div>
+<div class="sourceCode" id="cb54"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb54-1" title="1"><span class="ex">docker</span> rm -f web</a>
+<a class="sourceLine" id="cb54-2" title="2"><span class="ex">docker</span> run --name web -d -p 8080:80 -v <span class="st">&quot;</span><span class="va">$(</span><span class="bu">pwd</span><span class="va">)</span><span class="st">/apache-racine/:/var/www/html/&quot;</span> php:7.4-apache</a>
+<a class="sourceLine" id="cb54-3" title="3"></a>
+<a class="sourceLine" id="cb54-4" title="4"><span class="fu">cp</span> cartopoint/index-lamp.php apache-racine/index.php</a></code></pre></div>
 </section><section id="ajout-dune-base-de-données" class="slide level2">
 <h2>Ajout d’une Base De Données</h2>
 <p>Notre site web évolue ! Il va maintenant afficher une carte. Un clic permet de créer un point, sauvegardé en base de données. Un clic sur un point le supprime. Au chargement de la page, on affiche tous les points de la base de données.</p>
@@ -952,29 +1003,27 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 <p>Avec la commande <code>docker exec ...</code>, lancez le client mariadb en ligne de commande pour explorer la base de données et observez le contenu de la table point au fur et à mesure des interactions avec la carte. (<code>select * from point;</code> sur la table <em>mymap</em> )</p>
 <aside class="notes">
 <p>Le fait de définir les paramètres de connexion à la base de données dans un code source est une mauvaise pratique. Il faudrait que le code PHP détermine ces informations à partir de variable d’environnement.</p>
-<p>docker network create lamp docker run –net lamp -d –name web -p 8080:80 -v $PWD/mondossier:/var/www/html/ cedricici/php:7.4-apache-mysql docker run –net lamp -d –name database -e MARIADB_RANDOM_ROOT_PASSWORD=yes -e MARIADB_DATABASE=mymap -e MARIADB_USER=user -e MARIADB_PASSWORD=s3cr3t mariadb docker exec -it database mariadb -u user -D mymap –password=“s3cr3t”</p>
 </aside>
 </section><section id="correction-15" class="slide level2">
 <h2>Correction</h2>
-<div class="sourceCode" id="cb51"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb51-1" title="1"></a>
-<a class="sourceLine" id="cb51-2" title="2"><span class="ex">docker</span> network create lamp</a>
-<a class="sourceLine" id="cb51-3" title="3"><span class="ex">docker</span> run --net lamp -d --name web -p 8080:80 -v <span class="va">$PWD</span>/mondossier:/var/www/html/ cedricici/php:7.4-apache-mysql</a>
-<a class="sourceLine" id="cb51-4" title="4"><span class="ex">docker</span> run --net lamp -d --name database -e MARIADB_RANDOM_ROOT_PASSWORD=yes -e MARIADB_DATABASE=mymap -e MARIADB_USER=user -e MARIADB_PASSWORD=s3cr3t  mariadb</a>
-<a class="sourceLine" id="cb51-5" title="5"><span class="ex">docker</span> exec -it database mariadb -u user -D mymap --password=<span class="st">&quot;s3cr3t&quot;</span></a></code></pre></div>
+<div class="sourceCode" id="cb55"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb55-1" title="1"><span class="ex">docker</span> rm -f web</a>
+<a class="sourceLine" id="cb55-2" title="2"><span class="ex">docker</span> network create lamp</a>
+<a class="sourceLine" id="cb55-3" title="3"><span class="ex">docker</span> run --net lamp -d --name web -p 8080:80 -v <span class="va">$(</span><span class="bu">pwd</span><span class="va">)</span>/apache-racine/:/var/www/html/ cedricici/php:7.4-apache-mysql</a>
+<a class="sourceLine" id="cb55-4" title="4"><span class="ex">docker</span> run --net lamp -d --name database -e MARIADB_RANDOM_ROOT_PASSWORD=yes -e MARIADB_DATABASE=mymap -e MARIADB_USER=user -e MARIADB_PASSWORD=s3cr3t  mariadb</a>
+<a class="sourceLine" id="cb55-5" title="5"><span class="ex">docker</span> exec -it database mariadb -u user -D mymap --password=<span class="st">&quot;s3cr3t&quot;</span></a></code></pre></div>
 </section><section id="persistence-de-la-base-de-données" class="slide level2">
 <h2>Persistence de la Base De Données</h2>
-<p>Détruisez les conteneurs, puis reconstruisez l’ensemble. Les points sont perdus :-(</p>
+<p>Détruisez les conteneurs, puis reconstruisez l’ensemble. Les points sont perdus <strong>:-(</strong></p>
 <ul>
 <li class="fragment">Résolvez ce problème</li>
 </ul>
 <aside class="notes">
-<p>docker run -v databasedata:/var/lib/mysql –net lamp -d –name database -e MARIADB_RANDOM_ROOT_PASSWORD=yes -e MARIADB_DATABASE=mymap -e MARIADB_USER=user -e MARIADB_PASSWORD=s3cr3t mariadb</p>
 </aside>
 </section><section id="correction-16" class="slide level2">
 <h2>Correction</h2>
-<div class="sourceCode" id="cb52"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb52-1" title="1"><span class="ex">docker</span> rm -f database</a>
-<a class="sourceLine" id="cb52-2" title="2"><span class="ex">docker</span> volume prune</a>
-<a class="sourceLine" id="cb52-3" title="3"><span class="ex">docker</span> run -v databasedata:/var/lib/mysql --net lamp -d --name database -e MARIADB_RANDOM_ROOT_PASSWORD=yes -e MARIADB_DATABASE=mymap -e MARIADB_USER=user -e MARIADB_PASSWORD=s3cr3t  mariadb</a></code></pre></div>
+<div class="sourceCode" id="cb56"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb56-1" title="1"><span class="ex">docker</span> rm -f database</a>
+<a class="sourceLine" id="cb56-2" title="2"><span class="ex">docker</span> volume prune</a>
+<a class="sourceLine" id="cb56-3" title="3"><span class="ex">docker</span> run -v databasedata:/var/lib/mysql --net lamp -d --name database -e MARIADB_RANDOM_ROOT_PASSWORD=yes -e MARIADB_DATABASE=mymap -e MARIADB_USER=user -e MARIADB_PASSWORD=s3cr3t  mariadb</a></code></pre></div>
 </section></section>
 <section><section id="tp-nextcloud" class="title-slide slide level1"><h1>TP NextCloud</h1></section><section id="déployer-un-nextcloud" class="slide level2">
 <h2>Déployer un nextCloud</h2>
@@ -983,6 +1032,7 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 <h2>Première étape</h2>
 <p>un serveur simple avec une base de données SQLite (un fichier)</p>
 <ul>
+<li class="fragment">Stoppez les éventuels conteneurs en cours (web) (ne détruisez pas les réseaux)</li>
 <li class="fragment">Lancez un conteneur exposant sur le port 8080 de la machine hôte le serveur nextcloud et rendez-vous sur <a href="http://127.0.0.1:8080">http://127.0.0.1:8080</a> pour accéder à l’interface d’initialisation du serveur.</li>
 <li class="fragment">Suivez les étapes d’installation. (base SQLite)</li>
 <li class="fragment">Utiliser l’application pour générer du contenu (uploadez des fichiers)</li>
@@ -1000,9 +1050,9 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 </aside>
 </section><section id="correction-17" class="slide level2">
 <h2>Correction</h2>
-<div class="sourceCode" id="cb53"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb53-1" title="1"><span class="ex">docker</span> network create nextcloud</a>
-<a class="sourceLine" id="cb53-2" title="2"><span class="ex">docker</span> run -d --name nextcloud -v nextcloud-data:/var/www/html/data/ --net nextcloud -p 8080:80  nextcloud</a>
-<a class="sourceLine" id="cb53-3" title="3"><span class="ex">docker</span> run -d --name nextcloud-database -v databasedata:/var/lib/mysql --net nextcloud -e MARIADB_RANDOM_ROOT_PASSWORD=yes -e MARIADB_DATABASE=nextcloud -e MARIADB_USER=nextcloud -e MARIADB_PASSWORD=s3cr3t  mariadb</a></code></pre></div>
+<div class="sourceCode" id="cb57"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb57-1" title="1"><span class="ex">docker</span> network create nextcloud</a>
+<a class="sourceLine" id="cb57-2" title="2"><span class="ex">docker</span> run -d --name nextcloud -v nextcloud-data:/var/www/html/data/ --net nextcloud -p 8080:80  nextcloud</a>
+<a class="sourceLine" id="cb57-3" title="3"><span class="ex">docker</span> run -d --name nextcloud-database -v databasedata:/var/lib/mysql --net nextcloud -e MARIADB_RANDOM_ROOT_PASSWORD=yes -e MARIADB_DATABASE=nextcloud -e MARIADB_USER=nextcloud -e MARIADB_PASSWORD=s3cr3t  mariadb</a></code></pre></div>
 </section></section>
 <section><section id="dockerfile" class="title-slide slide level1"><h1>Dockerfile</h1></section><section id="construire-ses-propres-images" class="slide level2">
 <h2>Construire ses propres images</h2>
@@ -1023,7 +1073,7 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 </section><section id="construction-dune-image" class="slide level2">
 <h2>Construction d’une image</h2>
 <p>On construit une image avec un Dockerfile</p>
-<div class="sourceCode" id="cb54"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb54-1" title="1"><span class="ex">docker</span> image build DOCKERFILE_PATH</a></code></pre></div>
+<div class="sourceCode" id="cb58"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb58-1" title="1"><span class="ex">docker</span> image build DOCKERFILE_PATH</a></code></pre></div>
 <p><code>DOCKERFILE_PATH</code> est le chemin du dossier contenant le Dockerfile.</p>
 <p>La documentation de référence du docker file est présente ici :</p>
 <p><a href="https://docs.docker.com/engine/reference/builder/" class="uri">https://docs.docker.com/engine/reference/builder/</a></p>
@@ -1031,12 +1081,12 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 <h2>Instructions Dockerfile</h2>
 <p>Le <strong>Dockerfile</strong> est constitué d’une suite d’instructions, chaque ligne résultant en une nouvelle <strong>couche</strong> dans l’image.</p>
 <p><a href="#//architecture-des-images">Architecture des images</a></p>
-<p>Un Dockerfile commence généralement par l’identification de l’image de base. (la seule exception est le passage d’un argument <code>ARG</code> permettant de définir l’image de <code>FROM</code>)</p>
-<div class="sourceCode" id="cb55"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><a class="sourceLine" id="cb55-1" title="1"><span class="kw">FROM</span> debian:jessie</a></code></pre></div>
+<p>Un Dockerfile commence généralement par l’identification de l’image de base. (la seule exception est le passage d’un argument <code>ARG</code> permettant de définir dynamiquement l’image de <code>FROM</code>)</p>
+<div class="sourceCode" id="cb59"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><a class="sourceLine" id="cb59-1" title="1"><span class="kw">FROM</span> debian:jessie</a></code></pre></div>
 </section><section id="instructions-dockerfile-1" class="slide level2">
 <h2>Instructions Dockerfile</h2>
 <p>Modifier les métadonnées</p>
-<div class="sourceCode" id="cb56"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><a class="sourceLine" id="cb56-1" title="1"><span class="kw">LABEL</span> ma_cle=<span class="st">&quot;ma valeur&quot;</span></a></code></pre></div>
+<div class="sourceCode" id="cb60"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><a class="sourceLine" id="cb60-1" title="1"><span class="kw">LABEL</span> ma_cle=<span class="st">&quot;ma valeur&quot;</span></a></code></pre></div>
 <p>Le consortium OpenContainers a défini une <a href="https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys">liste de clés</a> :</p>
 <ul>
 <li class="fragment">org.opencontainers.image.authors</li>
@@ -1046,7 +1096,7 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 </section><section id="instructions-dockerfile-2" class="slide level2">
 <h2>Instructions Dockerfile</h2>
 <p>Lancer une commande</p>
-<div class="sourceCode" id="cb57"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><a class="sourceLine" id="cb57-1" title="1"><span class="kw">RUN</span> commande</a></code></pre></div>
+<div class="sourceCode" id="cb61"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><a class="sourceLine" id="cb61-1" title="1"><span class="kw">RUN</span> commande</a></code></pre></div>
 <ul>
 <li class="fragment">installer des dépendances</li>
 <li class="fragment">déplacer des fichiers</li>
@@ -1056,8 +1106,8 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 </section><section id="instructions-dockerfile-3" class="slide level2">
 <h2>Instructions Dockerfile</h2>
 <p>Ajouter des fichiers locaux ou distants</p>
-<div class="sourceCode" id="cb58"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><a class="sourceLine" id="cb58-1" title="1"><span class="kw">ADD</span> &lt;src&gt; &lt;dest&gt;</a>
-<a class="sourceLine" id="cb58-2" title="2"><span class="kw">COPY</span> &lt;src&gt; &lt;dest&gt;</a></code></pre></div>
+<div class="sourceCode" id="cb62"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><a class="sourceLine" id="cb62-1" title="1"><span class="kw">ADD</span> &lt;src&gt; &lt;dest&gt;</a>
+<a class="sourceLine" id="cb62-2" title="2"><span class="kw">COPY</span> &lt;src&gt; &lt;dest&gt;</a></code></pre></div>
 <p>Globalement identiques mais :</p>
 <ul>
 <li class="fragment"><code>ADD</code> supporte les URL</li>
@@ -1069,40 +1119,44 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 </section><section id="instructions-dockerfile-4" class="slide level2">
 <h2>Instructions Dockerfile</h2>
 <p>Modifier l’environnement d’exécution</p>
-<div class="sourceCode" id="cb59"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><a class="sourceLine" id="cb59-1" title="1"><span class="kw">ENV</span>     <span class="co">#Variable d environnement</span></a>
-<a class="sourceLine" id="cb59-2" title="2"><span class="kw">USER</span>    <span class="co">#Changement d utilisateur</span></a>
-<a class="sourceLine" id="cb59-3" title="3"><span class="kw">WORKDIR</span> <span class="co">#Changement du dossier de travail</span></a></code></pre></div>
+<div class="sourceCode" id="cb63"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><a class="sourceLine" id="cb63-1" title="1"><span class="kw">ENV</span>     <span class="co">#Variable d environnement</span></a>
+<a class="sourceLine" id="cb63-2" title="2"><span class="kw">USER</span>    <span class="co">#Changement d utilisateur</span></a>
+<a class="sourceLine" id="cb63-3" title="3"><span class="kw">WORKDIR</span> <span class="co">#Changement du dossier de travail</span></a></code></pre></div>
 <p>Il est fortement conseillé de ne pas utiliser le user root pour des raisons de sécurité.</p>
+<aside class="notes">
+<p>USER root interdit dans un environnement kubernetes sécurisé</p>
+</aside>
 </section><section id="instructions-dockerfile-5" class="slide level2">
 <h2>Instructions Dockerfile</h2>
 <p>Modifier l’exécution</p>
-<div class="sourceCode" id="cb60"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><a class="sourceLine" id="cb60-1" title="1"><span class="kw">CMD</span>    <span class="co">#Commande par défaut</span></a>
-<a class="sourceLine" id="cb60-2" title="2"><span class="kw">EXPOSE</span> <span class="co">#Déclarer un port réseau</span></a>
-<a class="sourceLine" id="cb60-3" title="3"><span class="kw">VOLUME</span> <span class="co">#Déclarer un volume</span></a>
-<a class="sourceLine" id="cb60-4" title="4"><span class="kw">HEALTHCHECK</span>  <span class="co">#Définit une sonde de vie</span></a></code></pre></div>
+<div class="sourceCode" id="cb64"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><a class="sourceLine" id="cb64-1" title="1"><span class="kw">CMD</span>    <span class="co">#Commande par défaut</span></a>
+<a class="sourceLine" id="cb64-2" title="2"><span class="kw">EXPOSE</span> <span class="co">#Déclarer un port réseau</span></a>
+<a class="sourceLine" id="cb64-3" title="3"><span class="kw">VOLUME</span> <span class="co">#Déclarer un volume</span></a>
+<a class="sourceLine" id="cb64-4" title="4"><span class="kw">HEALTHCHECK</span>  <span class="co">#Définit une sonde de vie</span></a></code></pre></div>
 <p>D’autres instructions son disponible sur <a href="https://docs.docker.com/engine/reference/builder/" class="uri">https://docs.docker.com/engine/reference/builder/</a></p>
 </section><section id="avancé-paramétriser-le-dockerfile" class="slide level2">
 <h2>Avancé : paramétriser le Dockerfile</h2>
 <p>Il est possible de passer des paramètres lors du <em>build</em> de l’image.</p>
-<div class="sourceCode" id="cb61"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><a class="sourceLine" id="cb61-1" title="1"><span class="kw">ARG</span> &lt;name&gt;[=&lt;default value&gt;]</a></code></pre></div>
+<div class="sourceCode" id="cb65"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><a class="sourceLine" id="cb65-1" title="1"><span class="kw">ARG</span> &lt;name&gt;[=&lt;default value&gt;]</a></code></pre></div>
 <p>Dans le reste du fichier, on fait référence à cette variable avec <code>${name:-default_value}</code></p>
 <p>Pour définir la valeur lors de la construction :</p>
-<div class="sourceCode" id="cb62"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb62-1" title="1"><span class="ex">docker</span> image build --build-arg name=value .</a></code></pre></div>
+<div class="sourceCode" id="cb66"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb66-1" title="1"><span class="ex">docker</span> image build --build-arg name=value .</a></code></pre></div>
 <p>Certaines variables sont automatiquement ajouté (Les réglages de Proxy)</p>
 </section><section id="multistage-build" class="slide level2">
 <h2>Multistage build</h2>
-<p>Le conteneur doit contenir ce qui est nécessaire pour le run, rien en rapport avec le dev/build. Pour optimiser le poids de l’image de RUN, on sépare la création de l’image en plusieurs phases. Un conteneur de <em>build</em> génère un package à copier sur le conteneur de <em>run</em></p>
+<p>Le conteneur de production ne doit contenir que ce qui est nécessaire pour le run, il ne doit rien rester dasn l’image en rapport avec le dev/build. Pour optimiser le poids de l’image de RUN, on sépare la création de l’image en plusieurs phases. Un conteneur de <em>build</em> génère un package à copier sur le conteneur de <em>run</em></p>
 </section><section id="multistage-build-1" class="slide level2">
 <h2>Multistage build</h2>
-<div class="sourceCode" id="cb63"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><a class="sourceLine" id="cb63-1" title="1"><span class="kw">FROM</span> debian:jessie as builder</a>
-<a class="sourceLine" id="cb63-2" title="2"><span class="kw">RUN</span> apt-get update &amp;&amp; apt-get install -y  build-essential BUILD_DEPENDENCIES</a>
-<a class="sourceLine" id="cb63-3" title="3"><span class="kw">ADD</span> https://github.com/...../master.zip /master</a>
-<a class="sourceLine" id="cb63-4" title="4"><span class="kw">RUN</span> make <span class="co"># Cette commande génère le fichier /master/monBinaire</span></a>
-<a class="sourceLine" id="cb63-5" title="5"></a>
-<a class="sourceLine" id="cb63-6" title="6"><span class="kw">FROM</span> debian:jessie</a>
-<a class="sourceLine" id="cb63-7" title="7"><span class="kw">RUN</span> apt-get update &amp;&amp; apt-get install RUN_DEPENDENCIES</a>
-<a class="sourceLine" id="cb63-8" title="8"><span class="kw">COPY</span> --from=builder /master/monBinaire /opt/bin/</a>
-<a class="sourceLine" id="cb63-9" title="9"><span class="kw">CMD</span> /opt/bin/monBinaire</a></code></pre></div>
+<div class="sourceCode" id="cb67"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><a class="sourceLine" id="cb67-1" title="1"><span class="kw">FROM</span> debian:jessie as builder</a>
+<a class="sourceLine" id="cb67-2" title="2"><span class="kw">RUN</span> apt-get update &amp;&amp; apt-get install -y  build-essential BUILD_DEPENDENCIES</a>
+<a class="sourceLine" id="cb67-3" title="3"><span class="kw">ADD</span> https://github.com/...../master.zip /master</a>
+<a class="sourceLine" id="cb67-4" title="4"><span class="kw">RUN</span> make <span class="co"># Cette commande génère le fichier /master/monBinaire</span></a>
+<a class="sourceLine" id="cb67-5" title="5"></a>
+<a class="sourceLine" id="cb67-6" title="6"><span class="kw">FROM</span> debian:jessie</a>
+<a class="sourceLine" id="cb67-7" title="7"><span class="kw">RUN</span> apt-get update &amp;&amp; apt-get install RUN_DEPENDENCIES</a>
+<a class="sourceLine" id="cb67-8" title="8"><span class="kw">COPY</span> --from=builder /master/monBinaire /opt/bin/</a>
+<a class="sourceLine" id="cb67-9" title="9"><span class="kw">CMD</span> /opt/bin/monBinaire</a></code></pre></div>
+<p>Seul le dernier <strong>FROM</strong> sera contenu dans l’image finale</p>
 <p><a href="https://docs.docker.com/develop/develop-images/multistage-build/">Documentation multistage build</a></p>
 </section><section id="bonnes-pratiques-de-conceptions" class="slide level2">
 <h2>Bonnes pratiques de conceptions</h2>
@@ -1111,6 +1165,9 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 <li class="fragment">un conteneur doit être léger : <strong>juste ce qu’il faut</strong></li>
 <li class="fragment">un seul processus par conteneur</li>
 </ul>
+<aside class="notes">
+<p>En mode cloud natif, on évitera l’utilisation de volume en favorisant les applications stateless.</p>
+</aside>
 </section><section id="bonnes-pratiques-de-conceptions-1" class="slide level2">
 <h2>Bonnes pratiques de conceptions</h2>
 <ul>
@@ -1126,8 +1183,8 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 <h2>reprise de notre application de cartopoint</h2>
 <p>Nous allons ici simplement créer une nouvelle image pour avoir une moyen de livrer notre application.</p>
 <ul>
-<li class="fragment">Cette image sera basée sur l’image déjà référencé : <code>php:7.4-apache</code> (mais pas <code>cedricici/php:7.4-apache-mysql</code>)</li>
-<li class="fragment">Installer les drivers mysql pour cette image avec la commande : <code>docker-php-ext-install mysqli pdo_mysql</code></li>
+<li class="fragment">Cette image sera basée sur l’image déjà référencé : <code>php:7.4-apache</code> avec le mot clé <strong>FROM</strong> (mais pas <code>cedricici/php:7.4-apache-mysql</code> qui est déjà un <em>build</em> d’image)</li>
+<li class="fragment">Installer les drivers mysql pour cette image avec le mot clé <strong>RUN</strong> , l’image <code>php:7.4-apache</code> contient une commade pour cela : <code>docker-php-ext-install mysqli pdo_mysql</code></li>
 <li class="fragment">Copiez le fichier <code>index-bdd.php</code> en <code>index.php</code> dans le dossier par défaut du serveur web.</li>
 <li class="fragment">Et c’est tout :D</li>
 <li class="fragment">Construisez une image nommée <strong>cartopoint:1.0</strong> à partir de ce Dockerfile avec la commande <code>docker build</code></li>
@@ -1136,13 +1193,13 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 </ul>
 </section><section id="correction-18" class="slide level2">
 <h2>Correction</h2>
-<div class="sourceCode" id="cb64"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><a class="sourceLine" id="cb64-1" title="1"><span class="kw">FROM</span> php:7.4-apache</a>
-<a class="sourceLine" id="cb64-2" title="2"><span class="kw">RUN</span> docker-php-ext-install mysqli pdo_mysql</a>
-<a class="sourceLine" id="cb64-3" title="3"><span class="kw">COPY</span> index-bdd.php /var/www/html/index.php</a></code></pre></div>
-<div class="sourceCode" id="cb65"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb65-1" title="1"><span class="ex">docker</span> build -t cartopoint:1.0 .</a>
-<a class="sourceLine" id="cb65-2" title="2"><span class="ex">docker</span> rm -f web</a>
-<a class="sourceLine" id="cb65-3" title="3"><span class="ex">docker</span> run -d --name web --net lamp -p 8080:80 cartopoint:1.0</a></code></pre></div>
-<p>Si vous n’avez pas détruit la stack LAMP! Sinon, il faudra recréer réseau et base de donnée.</p>
+<div class="sourceCode" id="cb68"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><a class="sourceLine" id="cb68-1" title="1"><span class="kw">FROM</span> php:7.4-apache</a>
+<a class="sourceLine" id="cb68-2" title="2"><span class="kw">RUN</span> docker-php-ext-install mysqli pdo_mysql</a>
+<a class="sourceLine" id="cb68-3" title="3"><span class="kw">COPY</span> index-bdd.php /var/www/html/index.php</a></code></pre></div>
+<div class="sourceCode" id="cb69"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb69-1" title="1"><span class="ex">docker</span> build -t cartopoint:1.0 .</a>
+<a class="sourceLine" id="cb69-2" title="2"><span class="ex">docker</span> rm -f web</a>
+<a class="sourceLine" id="cb69-3" title="3"><span class="ex">docker</span> run -d --name web --net lamp -p 8080:80 cartopoint:1.0</a></code></pre></div>
+<p>Cela devrait fonctionner si vous n’avez pas détruit la stack LAMP! Sinon, il faudra recréer réseau et base de donnée.</p>
 </section><section id="une-application-node.js" class="slide level2">
 <h2>Une application node.js</h2>
 <p>Cette fois ci, nous allons créer pas à pas une image Docker pour une application <strong>node.js</strong> dont le code de l’application est disponible dans le dossier <code>ressources\findmefast\</code></p>
@@ -1168,20 +1225,20 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 <p>=&gt; Pour pouvoir tester l’application <strong>entre vous</strong> il faudra faire une petite manipulation pour <a href="https://www.it-connect.fr/configurer-le-port-forwarding-sur-une-vm-virtualbox%EF%BB%BF/">mapper ce port dans la VM Virtualbox</a></p>
 </section><section id="correction-19" class="slide level2">
 <h2>Correction</h2>
-<div class="sourceCode" id="cb66"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><a class="sourceLine" id="cb66-1" title="1"><span class="kw">FROM</span> node:18-alpine</a>
-<a class="sourceLine" id="cb66-2" title="2"><span class="kw">EXPOSE</span> 1111</a>
-<a class="sourceLine" id="cb66-3" title="3"><span class="kw">RUN</span> mkdir -p /app</a>
-<a class="sourceLine" id="cb66-4" title="4"><span class="kw">WORKDIR</span> /app</a>
-<a class="sourceLine" id="cb66-5" title="5"><span class="kw">COPY</span> package.json /app/</a>
-<a class="sourceLine" id="cb66-6" title="6"><span class="kw">RUN</span> npm install --production</a>
-<a class="sourceLine" id="cb66-7" title="7"><span class="kw">COPY</span> public /app/public</a>
-<a class="sourceLine" id="cb66-8" title="8"><span class="kw">COPY</span> server.js /app/</a>
-<a class="sourceLine" id="cb66-9" title="9"><span class="kw">CMD</span> [<span class="st">&quot;npm&quot;</span>, <span class="st">&quot;start&quot;</span>]</a></code></pre></div>
-<div class="sourceCode" id="cb67"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb67-1" title="1"><span class="ex">docker</span> build -t findmefast .</a>
-<a class="sourceLine" id="cb67-2" title="2"><span class="ex">docker</span> run -d --name findmefast -p 80:1111 findmefast</a></code></pre></div>
+<div class="sourceCode" id="cb70"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><a class="sourceLine" id="cb70-1" title="1"><span class="kw">FROM</span> node:18-alpine</a>
+<a class="sourceLine" id="cb70-2" title="2"><span class="kw">EXPOSE</span> 1111</a>
+<a class="sourceLine" id="cb70-3" title="3"><span class="kw">RUN</span> mkdir -p /app</a>
+<a class="sourceLine" id="cb70-4" title="4"><span class="kw">WORKDIR</span> /app</a>
+<a class="sourceLine" id="cb70-5" title="5"><span class="kw">COPY</span> package.json /app/</a>
+<a class="sourceLine" id="cb70-6" title="6"><span class="kw">RUN</span> npm install --production</a>
+<a class="sourceLine" id="cb70-7" title="7"><span class="kw">COPY</span> public /app/public</a>
+<a class="sourceLine" id="cb70-8" title="8"><span class="kw">COPY</span> server.js /app/</a>
+<a class="sourceLine" id="cb70-9" title="9"><span class="kw">CMD</span> [<span class="st">&quot;npm&quot;</span>, <span class="st">&quot;start&quot;</span>]</a></code></pre></div>
+<div class="sourceCode" id="cb71"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb71-1" title="1"><span class="ex">docker</span> build -t findmefast .</a>
+<a class="sourceLine" id="cb71-2" title="2"><span class="ex">docker</span> run -d --name findmefast -p 1111:1111 findmefast</a></code></pre></div>
 </section><section id="une-compilation-c" class="slide level2">
 <h2>Une compilation C</h2>
-<p>Nous allons maintenant créer une petite image <strong>multistage</strong> pour compiler puis exécuter un petit programme qui calcul <strong>n</strong> n nombre premier (le seul intérêt de ce programme est de solliciter le CPU). Nous profiterons de ce programme pour bien comprendre la notion de <em>Kernel</em> et de <em>Userspace</em> dans les conteneurs. DAns un premier temps , nous allons compiler le programme sur notre host.</p>
+<p>Nous allons maintenant créer une petite image <strong>multistage</strong> pour compiler puis exécuter un petit programme qui calcul <strong>n</strong> n nombre premier (le seul intérêt de ce programme est de solliciter le CPU). Nous profiterons de ce programme pour bien comprendre la notion de <em>Kernel</em> et de <em>Userspace</em> dans les conteneurs. Dans un premier temps , nous allons compiler le programme sur notre host.</p>
 <ul>
 <li class="fragment">Placez vous dans le dossier <code>ressources/prime</code></li>
 <li class="fragment">Installez <code>gcc</code> : <code>sudo apt-get update &amp;&amp; sudo apt-get install gcc</code></li>
@@ -1190,11 +1247,11 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 </ul>
 </section><section id="correction-20" class="slide level2">
 <h2>Correction</h2>
-<div class="sourceCode" id="cb68"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb68-1" title="1">$ <span class="bu">time</span> ./prime 10000</a>
-<a class="sourceLine" id="cb68-2" title="2"><span class="ex">Calcul</span> des 10000 premiers nombres premiers</a>
-<a class="sourceLine" id="cb68-3" title="3"><span class="ex">real</span>    0m1,821s</a>
-<a class="sourceLine" id="cb68-4" title="4"><span class="ex">user</span>    0m1,818s</a>
-<a class="sourceLine" id="cb68-5" title="5"><span class="ex">sys</span>     0m0,002s</a></code></pre></div>
+<div class="sourceCode" id="cb72"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb72-1" title="1">$ <span class="bu">time</span> ./prime 10000</a>
+<a class="sourceLine" id="cb72-2" title="2"><span class="ex">Calcul</span> des 10000 premiers nombres premiers</a>
+<a class="sourceLine" id="cb72-3" title="3"><span class="ex">real</span>    0m1,821s</a>
+<a class="sourceLine" id="cb72-4" title="4"><span class="ex">user</span>    0m1,818s</a>
+<a class="sourceLine" id="cb72-5" title="5"><span class="ex">sys</span>     0m0,002s</a></code></pre></div>
 </section><section id="compilation-dans-un-conteneur" class="slide level2">
 <h2>Compilation dans un conteneur</h2>
 <p>Créez une nouvelle image que vous nommerez <strong>prime:debian</strong></p>
@@ -1209,17 +1266,17 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 <p>Que pensez vous des résultats obtenus, est-ce normal d’après vous?</p>
 </section><section id="correction-21" class="slide level2">
 <h2>Correction</h2>
-<div class="sourceCode" id="cb69"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><a class="sourceLine" id="cb69-1" title="1"><span class="kw">FROM</span> debian </a>
-<a class="sourceLine" id="cb69-2" title="2"><span class="kw">RUN</span> apt-get update &amp;&amp; apt-get install -y gcc</a>
-<a class="sourceLine" id="cb69-3" title="3"><span class="kw">COPY</span> prime.c prime.c</a>
-<a class="sourceLine" id="cb69-4" title="4"><span class="kw">RUN</span> gcc prime.c -o prime</a>
-<a class="sourceLine" id="cb69-5" title="5"><span class="kw">CMD</span> [ <span class="st">&quot;./prime&quot;</span>,<span class="st">&quot;1&quot;</span> ]</a></code></pre></div>
-<div class="sourceCode" id="cb70"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb70-1" title="1">$ <span class="ex">docker</span> build -t prime:debian .</a>
-<a class="sourceLine" id="cb70-2" title="2">$ <span class="bu">time</span> docker run prime:debian ./prime 10000 </a>
-<a class="sourceLine" id="cb70-3" title="3"><span class="ex">Calcul</span> des 10000 premiers nombres premiers</a>
-<a class="sourceLine" id="cb70-4" title="4"><span class="ex">real</span>    0m2,624s</a>
-<a class="sourceLine" id="cb70-5" title="5"><span class="ex">user</span>    0m0,022s</a>
-<a class="sourceLine" id="cb70-6" title="6"><span class="ex">sys</span>     0m0,018s</a></code></pre></div>
+<div class="sourceCode" id="cb73"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><a class="sourceLine" id="cb73-1" title="1"><span class="kw">FROM</span> debian </a>
+<a class="sourceLine" id="cb73-2" title="2"><span class="kw">RUN</span> apt-get update &amp;&amp; apt-get install -y gcc</a>
+<a class="sourceLine" id="cb73-3" title="3"><span class="kw">COPY</span> prime.c prime.c</a>
+<a class="sourceLine" id="cb73-4" title="4"><span class="kw">RUN</span> gcc prime.c -o prime</a>
+<a class="sourceLine" id="cb73-5" title="5"><span class="kw">CMD</span> [ <span class="st">&quot;./prime&quot;</span>,<span class="st">&quot;1&quot;</span> ]</a></code></pre></div>
+<div class="sourceCode" id="cb74"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb74-1" title="1">$ <span class="ex">docker</span> build -t prime:debian .</a>
+<a class="sourceLine" id="cb74-2" title="2">$ <span class="bu">time</span> docker run prime:debian ./prime 10000 </a>
+<a class="sourceLine" id="cb74-3" title="3"><span class="ex">Calcul</span> des 10000 premiers nombres premiers</a>
+<a class="sourceLine" id="cb74-4" title="4"><span class="ex">real</span>    0m2,624s</a>
+<a class="sourceLine" id="cb74-5" title="5"><span class="ex">user</span>    0m0,022s</a>
+<a class="sourceLine" id="cb74-6" title="6"><span class="ex">sys</span>     0m0,018s</a></code></pre></div>
 <p>Le temps dans l’espace utilisateur de notre Hote est nul car toute l’opération se déroule dans l’espace utilisateur du conteneur.</p>
 </section><section id="amélioration-multistage" class="slide level2">
 <h2>Amélioration multistage</h2>
@@ -1238,28 +1295,28 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 </ul>
 </section><section id="correction-22" class="slide level2">
 <h2>Correction</h2>
-<div class="sourceCode" id="cb71"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><a class="sourceLine" id="cb71-1" title="1"><span class="kw">FROM</span> debian as builder</a>
-<a class="sourceLine" id="cb71-2" title="2"><span class="kw">RUN</span> apt-get update &amp;&amp; apt-get install -y gcc</a>
-<a class="sourceLine" id="cb71-3" title="3"><span class="kw">COPY</span> prime.c prime.c</a>
-<a class="sourceLine" id="cb71-4" title="4"><span class="kw">RUN</span> gcc prime.c -o prime</a>
-<a class="sourceLine" id="cb71-5" title="5"><span class="kw">FROM</span> debian:stable-slim as runner</a>
-<a class="sourceLine" id="cb71-6" title="6"><span class="kw">COPY</span> --from=builder prime prime</a>
-<a class="sourceLine" id="cb71-7" title="7"><span class="kw">CMD</span> [ <span class="st">&quot;./prime&quot;</span>,<span class="st">&quot;1&quot;</span> ]</a></code></pre></div>
+<div class="sourceCode" id="cb75"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><a class="sourceLine" id="cb75-1" title="1"><span class="kw">FROM</span> debian as builder</a>
+<a class="sourceLine" id="cb75-2" title="2"><span class="kw">RUN</span> apt-get update &amp;&amp; apt-get install -y gcc</a>
+<a class="sourceLine" id="cb75-3" title="3"><span class="kw">COPY</span> prime.c prime.c</a>
+<a class="sourceLine" id="cb75-4" title="4"><span class="kw">RUN</span> gcc prime.c -o prime</a>
+<a class="sourceLine" id="cb75-5" title="5"><span class="kw">FROM</span> debian:stable-slim as runner</a>
+<a class="sourceLine" id="cb75-6" title="6"><span class="kw">COPY</span> --from=builder prime prime</a>
+<a class="sourceLine" id="cb75-7" title="7"><span class="kw">CMD</span> [ <span class="st">&quot;./prime&quot;</span>,<span class="st">&quot;1&quot;</span> ]</a></code></pre></div>
 </section><section id="correction-23" class="slide level2">
 <h2>Correction</h2>
-<p>On peut même aller plus loin et utiliser une image plus petite et se basant sur l’image <strong>scratch</strong> qui ne contient rien. Cela pose tout de même quelqueslimitation, l’image ne contenanat même pas de shell, il n’est pas possible de passer des paramètres.</p>
-<div class="sourceCode" id="cb72"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><a class="sourceLine" id="cb72-1" title="1"><span class="kw">FROM</span> debian as builder</a>
-<a class="sourceLine" id="cb72-2" title="2"><span class="kw">RUN</span> apt-get update &amp;&amp; apt-get install -y gcc</a>
-<a class="sourceLine" id="cb72-3" title="3"><span class="kw">COPY</span> prime.c prime.c</a>
-<a class="sourceLine" id="cb72-4" title="4"><span class="kw">RUN</span> gcc prime.c -o prime -static </a>
-<a class="sourceLine" id="cb72-5" title="5"><span class="kw">FROM</span> scratch as runner</a>
-<a class="sourceLine" id="cb72-6" title="6"><span class="kw">COPY</span> --from=builder prime /prime</a>
-<a class="sourceLine" id="cb72-7" title="7"><span class="kw">CMD</span> [<span class="st">&quot;/prime&quot;</span>,<span class="st">&quot;10000&quot;</span>]</a></code></pre></div>
-<div class="sourceCode" id="cb73"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb73-1" title="1">$ <span class="ex">docker</span> build -t prime:scratch  .</a>
-<a class="sourceLine" id="cb73-2" title="2">$ <span class="ex">docker</span> image ls <span class="kw">|</span> <span class="fu">grep</span> prime</a>
-<a class="sourceLine" id="cb73-3" title="3"><span class="ex">prime</span>  scratch  5759381e4528   2 minutes ago    810kB</a>
-<a class="sourceLine" id="cb73-4" title="4"><span class="ex">prime</span>  multi    f36f1d448847   14 minutes ago   74.8MB</a>
-<a class="sourceLine" id="cb73-5" title="5"><span class="ex">prime</span>  debian   a3c10b1c84ef   33 minutes ago   347MB</a></code></pre></div>
+<p>On peut même aller plus loin et utiliser une image plus petite et se basant sur l’image <strong>scratch</strong> qui ne contient rien. Cela pose tout de même quelques limitation, l’image ne contenant même pas de shell, il n’est pas possible de passer des paramètres.</p>
+<div class="sourceCode" id="cb76"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><a class="sourceLine" id="cb76-1" title="1"><span class="kw">FROM</span> debian as builder</a>
+<a class="sourceLine" id="cb76-2" title="2"><span class="kw">RUN</span> apt-get update &amp;&amp; apt-get install -y gcc</a>
+<a class="sourceLine" id="cb76-3" title="3"><span class="kw">COPY</span> prime.c prime.c</a>
+<a class="sourceLine" id="cb76-4" title="4"><span class="kw">RUN</span> gcc prime.c -o prime -static </a>
+<a class="sourceLine" id="cb76-5" title="5"><span class="kw">FROM</span> scratch as runner</a>
+<a class="sourceLine" id="cb76-6" title="6"><span class="kw">COPY</span> --from=builder prime /prime</a>
+<a class="sourceLine" id="cb76-7" title="7"><span class="kw">CMD</span> [<span class="st">&quot;/prime&quot;</span>,<span class="st">&quot;10000&quot;</span>]</a></code></pre></div>
+<div class="sourceCode" id="cb77"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb77-1" title="1">$ <span class="ex">docker</span> build -t prime:scratch  .</a>
+<a class="sourceLine" id="cb77-2" title="2">$ <span class="ex">docker</span> image ls <span class="kw">|</span> <span class="fu">grep</span> prime</a>
+<a class="sourceLine" id="cb77-3" title="3"><span class="ex">prime</span>  scratch  5759381e4528   2 minutes ago    810kB</a>
+<a class="sourceLine" id="cb77-4" title="4"><span class="ex">prime</span>  multi    f36f1d448847   14 minutes ago   74.8MB</a>
+<a class="sourceLine" id="cb77-5" title="5"><span class="ex">prime</span>  debian   a3c10b1c84ef   33 minutes ago   347MB</a></code></pre></div>
 </section></section>
 <section><section id="tp-libreqr" class="title-slide slide level1"><h1>TP LibreQR</h1></section><section id="création-du-dockerfile" class="slide level2">
 <h2>Création du Dockerfile</h2>
@@ -1275,27 +1332,27 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 </ul>
 </section><section id="correction-24" class="slide level2">
 <h2>Correction</h2>
-<div class="sourceCode" id="cb74"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><a class="sourceLine" id="cb74-1" title="1"><span class="kw">FROM</span> php:7.4-apache</a>
-<a class="sourceLine" id="cb74-2" title="2"><span class="kw">RUN</span> apt-get update &amp;&amp; \</a>
-<a class="sourceLine" id="cb74-3" title="3">    apt-get install -y unzip libpng-dev </a>
-<a class="sourceLine" id="cb74-4" title="4"><span class="kw">RUN</span> docker-php-ext-install gd</a>
-<a class="sourceLine" id="cb74-5" title="5"><span class="kw">ADD</span> main.zip /main.zip</a>
-<a class="sourceLine" id="cb74-6" title="6"><span class="kw">ADD</span> config.inc.php /var/www/html/</a>
-<a class="sourceLine" id="cb74-7" title="7"><span class="kw">WORKDIR</span> /var/www/html</a>
-<a class="sourceLine" id="cb74-8" title="8"><span class="kw">RUN</span> unzip /main.zip &amp;&amp; \</a>
-<a class="sourceLine" id="cb74-9" title="9">    mv libreqr/* . &amp;&amp; \</a>
-<a class="sourceLine" id="cb74-10" title="10">    chown -R www-data:www-data /var/www/html/</a>
-<a class="sourceLine" id="cb74-11" title="11"><span class="kw">ENV</span> LIBREQR_THEME=libreqr \</a>
-<a class="sourceLine" id="cb74-12" title="12">    LIBREQR_DEFAULT_LOCALE=fr \</a>
-<a class="sourceLine" id="cb74-13" title="13">    LIBREQR_CUSTOM_TEXT_ENABLED=true \</a>
-<a class="sourceLine" id="cb74-14" title="14">    LIBREQR_CUSTOM_TEXT=<span class="st">&quot;LibreQR on docker&quot;</span> \</a>
-<a class="sourceLine" id="cb74-15" title="15">    LIBREQR_DEFAULT_REDUNDANCY=high \</a>
-<a class="sourceLine" id="cb74-16" title="16">    LIBREQR_DEFAULT_MARGIN=20 \</a>
-<a class="sourceLine" id="cb74-17" title="17">    LIBREQR_DEFAULT_SIZE=300 \</a>
-<a class="sourceLine" id="cb74-18" title="18">    LIBREQR_DEFAULT_BGCOLOR=FFFFFF \</a>
-<a class="sourceLine" id="cb74-19" title="19">    LIBREQR_DEFAULT_FGCOLOR=000000</a></code></pre></div>
-<div class="sourceCode" id="cb75"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb75-1" title="1"><span class="ex">docker</span> image build -t qr .</a>
-<a class="sourceLine" id="cb75-2" title="2"><span class="ex">docker</span> container run -p 8080:80 -e LIBREQR_CUSTOM_TEXT=<span class="st">&quot;Générateur de QR code dans docker&quot;</span> qr</a></code></pre></div>
+<div class="sourceCode" id="cb78"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><a class="sourceLine" id="cb78-1" title="1"><span class="kw">FROM</span> php:7.4-apache</a>
+<a class="sourceLine" id="cb78-2" title="2"><span class="kw">RUN</span> apt-get update &amp;&amp; \</a>
+<a class="sourceLine" id="cb78-3" title="3">    apt-get install -y unzip libpng-dev </a>
+<a class="sourceLine" id="cb78-4" title="4"><span class="kw">RUN</span> docker-php-ext-install gd</a>
+<a class="sourceLine" id="cb78-5" title="5"><span class="kw">ADD</span> main.zip /main.zip</a>
+<a class="sourceLine" id="cb78-6" title="6"><span class="kw">ADD</span> config.inc.php /var/www/html/</a>
+<a class="sourceLine" id="cb78-7" title="7"><span class="kw">WORKDIR</span> /var/www/html</a>
+<a class="sourceLine" id="cb78-8" title="8"><span class="kw">RUN</span> unzip /main.zip &amp;&amp; \</a>
+<a class="sourceLine" id="cb78-9" title="9">    mv libreqr/* . &amp;&amp; \</a>
+<a class="sourceLine" id="cb78-10" title="10">    chown -R www-data:www-data /var/www/html/</a>
+<a class="sourceLine" id="cb78-11" title="11"><span class="kw">ENV</span> LIBREQR_THEME=libreqr \</a>
+<a class="sourceLine" id="cb78-12" title="12">    LIBREQR_DEFAULT_LOCALE=fr \</a>
+<a class="sourceLine" id="cb78-13" title="13">    LIBREQR_CUSTOM_TEXT_ENABLED=true \</a>
+<a class="sourceLine" id="cb78-14" title="14">    LIBREQR_CUSTOM_TEXT=<span class="st">&quot;LibreQR on docker&quot;</span> \</a>
+<a class="sourceLine" id="cb78-15" title="15">    LIBREQR_DEFAULT_REDUNDANCY=high \</a>
+<a class="sourceLine" id="cb78-16" title="16">    LIBREQR_DEFAULT_MARGIN=20 \</a>
+<a class="sourceLine" id="cb78-17" title="17">    LIBREQR_DEFAULT_SIZE=300 \</a>
+<a class="sourceLine" id="cb78-18" title="18">    LIBREQR_DEFAULT_BGCOLOR=FFFFFF \</a>
+<a class="sourceLine" id="cb78-19" title="19">    LIBREQR_DEFAULT_FGCOLOR=000000</a></code></pre></div>
+<div class="sourceCode" id="cb79"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb79-1" title="1"><span class="ex">docker</span> image build -t qr .</a>
+<a class="sourceLine" id="cb79-2" title="2"><span class="ex">docker</span> container run -p 8080:80 -e LIBREQR_CUSTOM_TEXT=<span class="st">&quot;Générateur de QR code dans docker&quot;</span> qr</a></code></pre></div>
 </section><section id="proposez-vos-projets" class="slide level2">
 <h2>Proposez vos projets</h2>
 <p>Nous pouvons voir ensemble les étapes nécessaires à la <strong>Dockerisation</strong> de vos applications.</p>
@@ -1355,16 +1412,16 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: center;">3.8</td>
+<td style="text-align: center;">specification</td>
 <td style="text-align: left;">19.03.0+</td>
 </tr>
 <tr class="even">
-<td style="text-align: center;">3.7</td>
-<td style="text-align: left;">18.06.0+</td>
+<td style="text-align: center;">3.8</td>
+<td style="text-align: left;">19.03.0+</td>
 </tr>
 <tr class="odd">
-<td style="text-align: center;">3.6</td>
-<td style="text-align: left;">18.02.0+</td>
+<td style="text-align: center;">3.7</td>
+<td style="text-align: left;">18.06.0+</td>
 </tr>
 <tr class="even">
 <td style="text-align: center;">…</td>
@@ -1381,6 +1438,7 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 </tbody>
 </table>
 <p><a href="https://docs.docker.com/compose/compose-file/compose-versioning/" class="uri">https://docs.docker.com/compose/compose-file/compose-versioning/</a></p>
+<p>La dernière version <strong>specification</strong> est devenue un “standard” de manière à ne plus être propre à l’utilisation avec le daemon docker.</p>
 </section><section id="les-services" class="slide level2">
 <h2>Les services</h2>
 <p>Permet de définir les éléments composant l’application :</p>
@@ -1398,47 +1456,47 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 <ul>
 <li class="fragment">une image</li>
 </ul>
-<div class="sourceCode" id="cb76"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb76-1" title="1"><span class="fu">image:</span><span class="at"> httpd:alpine</span></a></code></pre></div>
+<div class="sourceCode" id="cb80"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb80-1" title="1"><span class="fu">image:</span><span class="at"> httpd:alpine</span></a></code></pre></div>
 <ul>
 <li class="fragment">un <em>DockerFile</em></li>
 </ul>
-<div class="sourceCode" id="cb77"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb77-1" title="1"><span class="fu">build:</span><span class="at"> ./path</span></a>
-<a class="sourceLine" id="cb77-2" title="2"><span class="co"># ou</span></a>
-<a class="sourceLine" id="cb77-3" title="3"><span class="fu">build:</span></a>
-<a class="sourceLine" id="cb77-4" title="4">  <span class="fu">context:</span><span class="at"> ./path</span></a>
-<a class="sourceLine" id="cb77-5" title="5">  <span class="fu">dockerfile:</span><span class="at"> monDockerFile</span></a>
-<a class="sourceLine" id="cb77-6" title="6">  <span class="fu">args:</span></a>
-<a class="sourceLine" id="cb77-7" title="7">    ...</a></code></pre></div>
+<div class="sourceCode" id="cb81"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb81-1" title="1"><span class="fu">build:</span><span class="at"> ./path</span></a>
+<a class="sourceLine" id="cb81-2" title="2"><span class="co"># ou</span></a>
+<a class="sourceLine" id="cb81-3" title="3"><span class="fu">build:</span></a>
+<a class="sourceLine" id="cb81-4" title="4">  <span class="fu">context:</span><span class="at"> ./path</span></a>
+<a class="sourceLine" id="cb81-5" title="5">  <span class="fu">dockerfile:</span><span class="at"> monDockerFile</span></a>
+<a class="sourceLine" id="cb81-6" title="6">  <span class="fu">args:</span></a>
+<a class="sourceLine" id="cb81-7" title="7">    ...</a></code></pre></div>
 <p>Utiliser une image est plus sûr. Un pipeline de CI est chargé de construire les images avec une gestion des <em>Tags</em> permettant d’avoir des releases connues. La création de l’image “à la volée” dans le docker-compose est une option viable en mode de développement.</p>
 </section><section id="services-volumes" class="slide level2">
 <h2>Services : volumes</h2>
 <p>Montage des volumes Docker ou host</p>
-<div class="sourceCode" id="cb78"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb78-1" title="1"><span class="fu">volumes:</span></a>
-<a class="sourceLine" id="cb78-2" title="2">  <span class="co"># sans précision, Docker créé un volume nommé (sans nom...)</span></a>
-<a class="sourceLine" id="cb78-3" title="3">  <span class="kw">-</span> /var/lib/mysql</a>
-<a class="sourceLine" id="cb78-4" title="4"></a>
-<a class="sourceLine" id="cb78-5" title="5">  <span class="co"># Un volume Docker nommé</span></a>
-<a class="sourceLine" id="cb78-6" title="6">  <span class="kw">-</span> datavolume:/var/lib/mysql</a>
-<a class="sourceLine" id="cb78-7" title="7">  </a>
-<a class="sourceLine" id="cb78-8" title="8">  <span class="co"># Un volume &quot;host&quot; en chemin absolu</span></a>
-<a class="sourceLine" id="cb78-9" title="9">  <span class="kw">-</span> /opt/data:/var/lib/mysql</a>
-<a class="sourceLine" id="cb78-10" title="10">  </a>
-<a class="sourceLine" id="cb78-11" title="11">  <span class="co"># Un volume &quot;host&quot; en chemin relatif au fichier docker-compose</span></a>
-<a class="sourceLine" id="cb78-12" title="12">  <span class="kw">-</span> ./cache:/tmp/cache</a>
-<a class="sourceLine" id="cb78-13" title="13">  </a>
-<a class="sourceLine" id="cb78-14" title="14">  <span class="co"># Un volume &quot;host&quot; en chemin relatif au home de l&#39;utilisateur</span></a>
-<a class="sourceLine" id="cb78-15" title="15">  <span class="kw">-</span> ~/configs:/etc/configs/:ro</a>
-<a class="sourceLine" id="cb78-16" title="16">  </a></code></pre></div>
+<div class="sourceCode" id="cb82"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb82-1" title="1"><span class="fu">volumes:</span></a>
+<a class="sourceLine" id="cb82-2" title="2">  <span class="co"># sans précision, Docker créé un volume nommé (sans nom...)</span></a>
+<a class="sourceLine" id="cb82-3" title="3">  <span class="kw">-</span> /var/lib/mysql</a>
+<a class="sourceLine" id="cb82-4" title="4"></a>
+<a class="sourceLine" id="cb82-5" title="5">  <span class="co"># Un volume Docker nommé</span></a>
+<a class="sourceLine" id="cb82-6" title="6">  <span class="kw">-</span> datavolume:/var/lib/mysql</a>
+<a class="sourceLine" id="cb82-7" title="7">  </a>
+<a class="sourceLine" id="cb82-8" title="8">  <span class="co"># Un volume &quot;host&quot; en chemin absolu</span></a>
+<a class="sourceLine" id="cb82-9" title="9">  <span class="kw">-</span> /opt/data:/var/lib/mysql</a>
+<a class="sourceLine" id="cb82-10" title="10">  </a>
+<a class="sourceLine" id="cb82-11" title="11">  <span class="co"># Un volume &quot;host&quot; en chemin relatif au fichier docker-compose</span></a>
+<a class="sourceLine" id="cb82-12" title="12">  <span class="kw">-</span> ./cache:/tmp/cache</a>
+<a class="sourceLine" id="cb82-13" title="13">  </a>
+<a class="sourceLine" id="cb82-14" title="14">  <span class="co"># Un volume &quot;host&quot; en chemin relatif au home de l&#39;utilisateur</span></a>
+<a class="sourceLine" id="cb82-15" title="15">  <span class="kw">-</span> ~/configs:/etc/configs/:ro</a>
+<a class="sourceLine" id="cb82-16" title="16">  </a></code></pre></div>
 </section><section id="services-réseau" class="slide level2">
 <h2>Services : réseau</h2>
 <p>Branchement des réseaux et exposition de ports sur la machine hôte</p>
-<div class="sourceCode" id="cb79"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb79-1" title="1"><span class="fu">services:</span></a>
-<a class="sourceLine" id="cb79-2" title="2">  <span class="fu">some-service:</span></a>
-<a class="sourceLine" id="cb79-3" title="3">    <span class="fu">networks:</span></a>
-<a class="sourceLine" id="cb79-4" title="4">     <span class="kw">-</span> some-network</a>
-<a class="sourceLine" id="cb79-5" title="5">     <span class="kw">-</span> other-network</a>
-<a class="sourceLine" id="cb79-6" title="6">    <span class="fu">ports:</span></a>
-<a class="sourceLine" id="cb79-7" title="7">     <span class="kw">-</span> <span class="st">&quot;80:80&quot;</span> <span class="co"># Bien mettre les guillemets</span></a></code></pre></div>
+<div class="sourceCode" id="cb83"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb83-1" title="1"><span class="fu">services:</span></a>
+<a class="sourceLine" id="cb83-2" title="2">  <span class="fu">some-service:</span></a>
+<a class="sourceLine" id="cb83-3" title="3">    <span class="fu">networks:</span></a>
+<a class="sourceLine" id="cb83-4" title="4">     <span class="kw">-</span> some-network</a>
+<a class="sourceLine" id="cb83-5" title="5">     <span class="kw">-</span> other-network</a>
+<a class="sourceLine" id="cb83-6" title="6">    <span class="fu">ports:</span></a>
+<a class="sourceLine" id="cb83-7" title="7">     <span class="kw">-</span> <span class="st">&quot;80:80&quot;</span> <span class="co"># Bien mettre les guillemets</span></a></code></pre></div>
 <p>Seuls les services qui seront exposés doivent être connecté au réseau “externe” , les autres services doivent être connectés au même réseau interne pour pouvoir communiquer entres eux. Il n’est nécéssaire de déclarer que les ports ouvert sur le host. Les conteneurs d’un même réseau ont un accès total aux autre conteneurs de ce réseau.</p>
 </section><section id="services-dépendances-inter-conteneurs" class="slide level2">
 <h2>Services : dépendances inter-conteneurs</h2>
@@ -1446,13 +1504,13 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 <ul>
 <li class="fragment">on peut déclarer des dépendances avec <strong>depends_on</strong></li>
 </ul>
-<div class="sourceCode" id="cb80"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb80-1" title="1"><span class="fu">depends_on:</span></a>
-<a class="sourceLine" id="cb80-2" title="2">  <span class="kw">-</span> service1</a>
-<a class="sourceLine" id="cb80-3" title="3">  <span class="kw">-</span> service2</a></code></pre></div>
+<div class="sourceCode" id="cb84"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb84-1" title="1"><span class="fu">depends_on:</span></a>
+<a class="sourceLine" id="cb84-2" title="2">  <span class="kw">-</span> service1</a>
+<a class="sourceLine" id="cb84-3" title="3">  <span class="kw">-</span> service2</a></code></pre></div>
 </section><section id="services-command" class="slide level2">
 <h2>Services : command</h2>
 <p>Pour surcharger la commande par défaut, on utilise le paramètre <strong>command</strong></p>
-<div class="sourceCode" id="cb81"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb81-1" title="1"><span class="fu">command:</span><span class="at"> some command &amp;&amp; some other</span></a></code></pre></div>
+<div class="sourceCode" id="cb85"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb85-1" title="1"><span class="fu">command:</span><span class="at"> some command &amp;&amp; some other</span></a></code></pre></div>
 </section><section id="les-volumes-1" class="slide level2">
 <h2>Les volumes</h2>
 <ul>
@@ -1461,10 +1519,10 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 <li class="fragment">Les montages host-&gt;container ne sont pas concernés</li>
 </ul>
 <p>Tous les détails sur la <a href="https://docs.docker.com/compose/compose-file/#volume-configuration-reference">doc</a>.</p>
-<div class="sourceCode" id="cb82"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb82-1" title="1"><span class="fu">volumes:</span></a>
-<a class="sourceLine" id="cb82-2" title="2">  <span class="fu">monvolume:</span></a>
-<a class="sourceLine" id="cb82-3" title="3">  <span class="fu">monsecondvolume:</span></a>
-<a class="sourceLine" id="cb82-4" title="4">    <span class="fu">driver:</span><span class="at"> toto</span></a></code></pre></div>
+<div class="sourceCode" id="cb86"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb86-1" title="1"><span class="fu">volumes:</span></a>
+<a class="sourceLine" id="cb86-2" title="2">  <span class="fu">monvolume:</span></a>
+<a class="sourceLine" id="cb86-3" title="3">  <span class="fu">monsecondvolume:</span></a>
+<a class="sourceLine" id="cb86-4" title="4">    <span class="fu">driver:</span><span class="at"> toto</span></a></code></pre></div>
 </section><section id="les-réseaux" class="slide level2">
 <h2>Les réseaux</h2>
 <ul>
@@ -1476,31 +1534,31 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 <p>Tous les détails sur la <a href="https://docs.docker.com/compose/compose-file/#/network-configuration-reference">doc</a>.</p>
 </section><section id="réseaux-driver-par-défaut-bridge" class="slide level2">
 <h2>Réseaux : driver par défaut (bridge)</h2>
-<div class="sourceCode" id="cb83"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb83-1" title="1"><span class="fu">networks:</span></a>
-<a class="sourceLine" id="cb83-2" title="2">  <span class="fu">monreseau:</span></a>
-<a class="sourceLine" id="cb83-3" title="3">    <span class="fu">ipam:</span></a>
-<a class="sourceLine" id="cb83-4" title="4">      <span class="fu">config:</span></a>
-<a class="sourceLine" id="cb83-5" title="5">        <span class="kw">-</span> <span class="fu">subnet:</span><span class="at"> 192.168.91.1/24</span></a>
-<a class="sourceLine" id="cb83-6" title="6">          <span class="fu">ip_range:</span><span class="at"> 192.168.91.0/25</span></a>
-<a class="sourceLine" id="cb83-7" title="7">          <span class="fu">gateway:</span><span class="at"> </span><span class="fl">192.168.91.1</span></a></code></pre></div>
+<div class="sourceCode" id="cb87"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb87-1" title="1"><span class="fu">networks:</span></a>
+<a class="sourceLine" id="cb87-2" title="2">  <span class="fu">monreseau:</span></a>
+<a class="sourceLine" id="cb87-3" title="3">    <span class="fu">ipam:</span></a>
+<a class="sourceLine" id="cb87-4" title="4">      <span class="fu">config:</span></a>
+<a class="sourceLine" id="cb87-5" title="5">        <span class="kw">-</span> <span class="fu">subnet:</span><span class="at"> 192.168.91.1/24</span></a>
+<a class="sourceLine" id="cb87-6" title="6">          <span class="fu">ip_range:</span><span class="at"> 192.168.91.0/25</span></a>
+<a class="sourceLine" id="cb87-7" title="7">          <span class="fu">gateway:</span><span class="at"> </span><span class="fl">192.168.91.1</span></a></code></pre></div>
 </section><section id="cli" class="slide level2">
 <h2>CLI</h2>
 <p>Depuis la version2 de docker compose, la commande <code>docker-compose</code> est intégré à la commande <code>docker</code> et devient donc une sous-commande de la commande <code>docker</code>.</p>
 <p>On lance l’application avec la commande</p>
-<div class="sourceCode" id="cb84"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb84-1" title="1"><span class="ex">docker</span> compose up [SERVICE]</a></code></pre></div>
+<div class="sourceCode" id="cb88"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb88-1" title="1"><span class="ex">docker</span> compose up [SERVICE]</a></code></pre></div>
 <p>L’option <code>-d</code> permet de lancer les conteneurs en arrière-plan. L’option <code>-f</code> permet de spécifier un fichier compose différent (par défaut <code>docker-compose.yaml</code>)</p>
 </section><section id="commandes" class="slide level2">
 <h2>Commandes</h2>
 <p>Gestion des conteneurs</p>
-<div class="sourceCode" id="cb85"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb85-1" title="1"><span class="ex">docker</span> compose stop [SERVICE]</a>
-<a class="sourceLine" id="cb85-2" title="2"><span class="ex">docker</span> compose kill [SERVICE]</a>
-<a class="sourceLine" id="cb85-3" title="3"><span class="ex">docker</span> compose logs -f </a></code></pre></div>
+<div class="sourceCode" id="cb89"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb89-1" title="1"><span class="ex">docker</span> compose stop [SERVICE]</a>
+<a class="sourceLine" id="cb89-2" title="2"><span class="ex">docker</span> compose kill [SERVICE]</a>
+<a class="sourceLine" id="cb89-3" title="3"><span class="ex">docker</span> compose logs -f </a></code></pre></div>
 </section><section id="commandes-1" class="slide level2">
 <h2>Commandes</h2>
 <p>Nettoyage des conteneurs stoppés</p>
-<div class="sourceCode" id="cb86"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb86-1" title="1"><span class="ex">docker-compose</span> rm</a></code></pre></div>
+<div class="sourceCode" id="cb90"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb90-1" title="1"><span class="ex">docker-compose</span> rm</a></code></pre></div>
 <p>Nettoyage des éléments</p>
-<div class="sourceCode" id="cb87"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb87-1" title="1"><span class="ex">docker-compose</span> down</a></code></pre></div>
+<div class="sourceCode" id="cb91"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb91-1" title="1"><span class="ex">docker-compose</span> down</a></code></pre></div>
 </section><section id="documentation" class="slide level2">
 <h2>Documentation</h2>
 <p><code>docker-compose help</code></p>
@@ -1525,42 +1583,63 @@ NO_PROXY=10.201.0.3 curl -s http://10.201.0.3
 <p>note : Il existe des solutions plus “sûr” pour passer des variables d’environnement sensibles (mot de passe)</p>
 </section><section id="correction-25" class="slide level2">
 <h2>Correction</h2>
-<div class="sourceCode" id="cb88"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb88-1" title="1"><span class="fu">version:</span><span class="at"> </span><span class="st">&quot;3&quot;</span></a>
-<a class="sourceLine" id="cb88-2" title="2"><span class="fu">services:</span></a>
-<a class="sourceLine" id="cb88-3" title="3">  <span class="fu">web:</span></a>
-<a class="sourceLine" id="cb88-4" title="4">    <span class="fu">image:</span><span class="at"> cartopoint:1.0</span></a>
-<a class="sourceLine" id="cb88-5" title="5">    <span class="fu">ports:</span></a>
-<a class="sourceLine" id="cb88-6" title="6">      <span class="kw">-</span> <span class="st">&quot;8080:80&quot;</span></a>
-<a class="sourceLine" id="cb88-7" title="7">    <span class="fu">networks:</span></a>
-<a class="sourceLine" id="cb88-8" title="8">      <span class="kw">-</span> lamp</a>
-<a class="sourceLine" id="cb88-9" title="9">    <span class="fu">depends_on:</span></a>
-<a class="sourceLine" id="cb88-10" title="10">      <span class="kw">-</span> database</a>
-<a class="sourceLine" id="cb88-11" title="11">  <span class="fu">database:</span></a>
-<a class="sourceLine" id="cb88-12" title="12">    <span class="fu">image:</span><span class="at"> mariadb</span></a>
-<a class="sourceLine" id="cb88-13" title="13">    <span class="fu">environment:</span></a>
-<a class="sourceLine" id="cb88-14" title="14">      <span class="kw">-</span> MARIADB_RANDOM_ROOT_PASSWORD=yes</a>
-<a class="sourceLine" id="cb88-15" title="15">      <span class="kw">-</span> MARIADB_DATABASE=mymap</a>
-<a class="sourceLine" id="cb88-16" title="16">      <span class="kw">-</span> MARIADB_USER=user</a>
-<a class="sourceLine" id="cb88-17" title="17">      <span class="kw">-</span> MARIADB_PASSWORD=s3cr3t</a>
-<a class="sourceLine" id="cb88-18" title="18">    <span class="fu">volumes:</span></a>
-<a class="sourceLine" id="cb88-19" title="19">      <span class="kw">-</span> databasedata:/var/lib/mysql</a>
-<a class="sourceLine" id="cb88-20" title="20">    <span class="fu">networks:</span></a>
-<a class="sourceLine" id="cb88-21" title="21">      <span class="kw">-</span> lamp</a>
-<a class="sourceLine" id="cb88-22" title="22"></a>
-<a class="sourceLine" id="cb88-23" title="23"><span class="fu">volumes:</span></a>
-<a class="sourceLine" id="cb88-24" title="24">  <span class="fu">databasedata:</span></a>
-<a class="sourceLine" id="cb88-25" title="25"></a>
-<a class="sourceLine" id="cb88-26" title="26"><span class="fu">networks:</span></a>
-<a class="sourceLine" id="cb88-27" title="27">  <span class="fu">lamp:</span></a></code></pre></div>
+<div class="sourceCode" id="cb92"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb92-1" title="1"><span class="fu">version:</span><span class="at"> </span><span class="st">&quot;3&quot;</span></a>
+<a class="sourceLine" id="cb92-2" title="2"><span class="fu">services:</span></a>
+<a class="sourceLine" id="cb92-3" title="3">  <span class="fu">web:</span></a>
+<a class="sourceLine" id="cb92-4" title="4">    <span class="fu">image:</span><span class="at"> cartopoint:1.0</span></a>
+<a class="sourceLine" id="cb92-5" title="5">    <span class="fu">ports:</span></a>
+<a class="sourceLine" id="cb92-6" title="6">      <span class="kw">-</span> <span class="st">&quot;8080:80&quot;</span></a>
+<a class="sourceLine" id="cb92-7" title="7">    <span class="fu">networks:</span></a>
+<a class="sourceLine" id="cb92-8" title="8">      <span class="kw">-</span> lamp</a>
+<a class="sourceLine" id="cb92-9" title="9">    <span class="fu">depends_on:</span></a>
+<a class="sourceLine" id="cb92-10" title="10">      <span class="kw">-</span> database</a>
+<a class="sourceLine" id="cb92-11" title="11">  <span class="fu">database:</span></a>
+<a class="sourceLine" id="cb92-12" title="12">    <span class="fu">image:</span><span class="at"> mariadb</span></a>
+<a class="sourceLine" id="cb92-13" title="13">    <span class="fu">environment:</span></a>
+<a class="sourceLine" id="cb92-14" title="14">      <span class="kw">-</span> MARIADB_RANDOM_ROOT_PASSWORD=yes</a>
+<a class="sourceLine" id="cb92-15" title="15">      <span class="kw">-</span> MARIADB_DATABASE=mymap</a>
+<a class="sourceLine" id="cb92-16" title="16">      <span class="kw">-</span> MARIADB_USER=user</a>
+<a class="sourceLine" id="cb92-17" title="17">      <span class="kw">-</span> MARIADB_PASSWORD=s3cr3t</a>
+<a class="sourceLine" id="cb92-18" title="18">    <span class="fu">volumes:</span></a>
+<a class="sourceLine" id="cb92-19" title="19">      <span class="kw">-</span> databasedata:/var/lib/mysql</a>
+<a class="sourceLine" id="cb92-20" title="20">    <span class="fu">networks:</span></a>
+<a class="sourceLine" id="cb92-21" title="21">      <span class="kw">-</span> lamp</a>
+<a class="sourceLine" id="cb92-22" title="22"></a>
+<a class="sourceLine" id="cb92-23" title="23"><span class="fu">volumes:</span></a>
+<a class="sourceLine" id="cb92-24" title="24">  <span class="fu">databasedata:</span></a>
+<a class="sourceLine" id="cb92-25" title="25"></a>
+<a class="sourceLine" id="cb92-26" title="26"><span class="fu">networks:</span></a>
+<a class="sourceLine" id="cb92-27" title="27">  <span class="fu">lamp:</span></a></code></pre></div>
 </section></section>
 <section><section id="kubernetes" class="title-slide slide level1"><h1>Kubernetes</h1></section><section id="orchestration-de-conteneurs" class="slide level2">
 <h2>Orchestration de conteneurs</h2>
-<p>Le but de ce cours n’est pas d’aborder Kubernetes <strong>K8S</strong> mais on ne peut décemment pas parler de <strong>Docker</strong> en 2023 sans parler de Kubernetes. <strong>K8S</strong> est une solution d’orchestration de conteneur mis au point par Google et devenue la référence en la matière. Kubernetest a permis d’amener les conteneurs <strong>Docker</strong> en production en apportant le contrôle et la sécurité qui n’était pas au niveau d’un outils créé avant tout pour les développeurs.</p>
-<p><strong>Docker</strong> propose lui aussi son orchestrateur <strong>SWARM</strong>, dont a CLI est intégré au client <code>docker</code>. Celui -ci n’étant pas au niveau de kubernetes, nous n’en parlerons pas, même si il a eu l’avantage d’êtr plus simple que K8S il y a quelques années.</p>
+<p>Quand on parle de <strong>Docker</strong> en 2023, on peut difficillement ne pas évoquer Kubernetes (<strong>K8S</strong>). <strong>K8S</strong> est une solution d’orchestration de conteneur mis au point par Google et devenue la référence en la matière. On peut résuler <strong>K8S</strong> à un <strong>super compose</strong>, même si il permet beaucoup plus de chose. Kubernetest a permis d’amener les conteneurs <strong>Docker</strong> en production en apportant le contrôle et la sécurité qui n’était pas au niveau d’un outils créé avant tout pour les développeurs.</p>
+<p><strong>Docker</strong> propose lui aussi son orchestrateur ; <strong>SWARM</strong>, dont a CLI est intégré au client <code>docker</code>. Celui -ci n’étant pas au niveau de kubernetes, nous n’en parlerons pas, même si il a eu l’avantage d’être plus simple que K8S il y a quelques années.</p>
 <aside class="notes">
 <p>curl -sfL https://get.k3s.io | sh - export KUBECONFIG=“/etc/rancher/k3s/k3s.yaml”</p>
 <p>kompose pour convertire une application docker-compose en manifests K8S</p>
 </aside>
+</section><section id="principe-de-kubernetes" class="slide level2">
+<h2>principe de Kubernetes</h2>
+<p>Une solution d’orchestration de conteneur va permettre de déployer et de maintenir en fonctionnement des conteneurs. Du point de vue de l’utilisateur déveoppeur, <strong>k8s</strong> c’est surtout :</p>
+<ul>
+<li class="fragment">une API pour contrôler les objets <strong>k8s</strong> (listing, création, suppression etc…)</li>
+<li class="fragment">un client CLI (kubectl) pour interragir avec cette API</li>
+</ul>
+<p>L’API de <strong>k8s</strong> est extensible, c’est à dire qu’il est possible de créer de nouveaux types d’objets kubernetes et ainsi d’ajouter de nouvelles fonctionalitées à vos cluster.</p>
+</section><section id="concepts-de-k8s" class="slide level2">
+<h2>Concepts de k8s</h2>
+<ul>
+<li class="fragment">Les <strong><a href="https://kubernetes.io/docs/concepts/overview/working-with-objects/#describing-a-kubernetes-object">manifest</a></strong> permettent de représenter un objet <strong>k8s</strong> sous la forme d’un fichier <em>yaml</em> ou <em>json</em></li>
+<li class="fragment">Les <strong><a href="https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/">Namespaces</a></strong> permettent une certaine isolation au sein d’un même cluster kubernetes (~projets).</li>
+<li class="fragment">Les <strong><a href="https://kubernetes.io/docs/concepts/architecture/nodes/">Noeuds</a></strong> sont les “machines” qui supportent les conteneurs (<strong>pods</strong>)</li>
+<li class="fragment">Les <strong><a href="https://kubernetes.io/docs/concepts/workloads/pods/">pods</a></strong> sont les plus simples objets <strong>k8s</strong>, ils peuvent contenir un ou plusieurs conteneurs</li>
+<li class="fragment">Les <strong><a href="https://kubernetes.io/docs/concepts/services-networking/service/">services</a></strong> représentent l’élement réseau de base dans <strong>k8s</strong>, ils permetent d’exposer un service sur un port par exemple. Ils réalisent la répartition sur les <strong>pods</strong> qui leur sont ratachés.</li>
+<li class="fragment">Les <strong><a href="https://kubernetes.io/docs/concepts/storage/volumes/">volumes</a></strong> permettent la persistance des données. C’est un élément à manier avec précaution car la persistence des données en volume est un élément complexe à gérer dans les architectures cloud-natives, on lui préférera du stockage Objet.</li>
+<li class="fragment">Les <strong><a href="https://kubernetes.io/docs/concepts/workloads/controllers/">workload management</a>"</strong> : Ils permettent d’organiser les <strong>pods</strong> , il en existe de plusieurs types, <strong>deployment</strong>,<strong>statefullset</strong>,<strong>daemonset</strong>,<strong>Jobs</strong>,<strong>Cronjobs</strong> etc…</li>
+<li class="fragment">Les <strong><a href="https://kubernetes.io/docs/concepts/configuration/configmap/">configMaps</a></strong> : les configmaps permettent de stocker des configurations pour les pods. Il existe aussi la notion de <strong>secret</strong> pour stocker des données plus sensibles (bien qu’ils ne soient pas chiffrés par défaut)</li>
+</ul>
+<p>Il y a bien d’autres types d’aobjets Kubernetes !</p>
 </section></section>
             </div>
         </div>
