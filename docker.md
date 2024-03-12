@@ -1816,7 +1816,7 @@ note : Il existe des solutions plus "sûr" pour passer des variables d'environne
 ## Correction ##
 
 ```yaml
-ersion: "3"
+version: "3"
 services:
   web:
     image: cartopoint:1.0
