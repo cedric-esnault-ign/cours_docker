@@ -1584,7 +1584,7 @@ cd cours_docker/ressources</code></pre>
 <p>note : Il existe des solutions plus “sûr” pour passer des variables d’environnement sensibles (mot de passe)</p>
 </section><section id="correction-25" class="slide level2">
 <h2>Correction</h2>
-<div class="sourceCode" id="cb92"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb92-1" title="1"><span class="fu">version:</span><span class="at"> </span><span class="st">&quot;3&quot;</span></a>
+<div class="sourceCode" id="cb92"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb92-1" title="1"><span class="fu">ersion:</span><span class="at"> </span><span class="st">&quot;3&quot;</span></a>
 <a class="sourceLine" id="cb92-2" title="2"><span class="fu">services:</span></a>
 <a class="sourceLine" id="cb92-3" title="3">  <span class="fu">web:</span></a>
 <a class="sourceLine" id="cb92-4" title="4">    <span class="fu">image:</span><span class="at"> cartopoint:1.0</span></a>
@@ -1615,11 +1615,11 @@ cd cours_docker/ressources</code></pre>
 <section><section id="kubernetes" class="title-slide slide level1"><h1>Kubernetes</h1></section><section id="orchestration-de-conteneurs" class="slide level2">
 <h2>Orchestration de conteneurs</h2>
 <p>Quand on parle de <strong>Docker</strong> en 2023, on peut difficillement ne pas évoquer Kubernetes (<strong>K8S</strong>).</p>
-<p><strong>K8S</strong> est une solution d’orchestration de conteneur mis au point par Google et devenue la référence en la matière. On peut résuler <strong>K8S</strong> à un <strong>super compose</strong>, même si il permet beaucoup plus de chose. Kubernetest a permis d’amener les conteneurs <strong>Docker</strong> en production en apportant le contrôle et la sécurité qui n’était pas au niveau d’un outils créé avant tout pour les développeurs.</p>
-<p><strong>Docker</strong> propose lui aussi son orchestrateur ; <strong>SWARM</strong>, dont la CLI est intégré au client <code>docker</code>. Celui -ci n’étant pas au niveau de kubernetes, nous n’en parlerons pas, même si il a eu l’avantage d’être plus simple que K8S il y a quelques années.</p>
+<p><strong>K8S</strong> est une solution d’orchestration de conteneur mise au point par Google et devenue la référence en la matière. On peut résumer <strong>K8S</strong> à un <strong>super compose</strong>, même si il permet beaucoup plus de chose. <strong>K8S</strong> a permis d’amener les conteneurs <strong>Docker</strong> (créé avant tout pour les développeurs) en production , en apportant le contrôle et la sécurité nécéssaire.</p>
+<p><strong>Docker</strong> propose lui aussi son orchestrateur, <strong>SWARM</strong>, dont la CLI est intégré au client <code>docker</code>. Celui -ci n’étant pas au niveau de kubernetes, nous n’en parlerons pas, même si il a eu l’avantage d’être plus simple que K8S il y a quelques années.</p>
 <aside class="notes">
 <p>curl -sfL https://get.k3s.io | sh - export KUBECONFIG=“/etc/rancher/k3s/k3s.yaml”</p>
-<p>kompose pour convertire une application docker-compose en manifests K8S</p>
+<p>kompose pour convertir une application docker-compose en manifests K8S</p>
 </aside>
 </section><section id="principe-de-kubernetes" class="slide level2">
 <h2>principe de Kubernetes</h2>
@@ -1655,11 +1655,111 @@ cd cours_docker/ressources</code></pre>
 <p><img data-src="img/k3s-ok.png" /></p>
 </section><section id="application" class="slide level2">
 <h2>Application</h2>
+<p>Nous allons essayer de déployer notre application cartopoint dans notre <strong>k3s</strong>, pour cela il faut définir les <em>Manifest</em> des différents objets nécéssaires.</p>
+<ul>
+<li class="fragment">un déploiement pour la partie web</li>
+<li class="fragment">un déploiement pour la partie base de donnée</li>
+<li class="fragment">un service pour la partie web</li>
+<li class="fragment">un service pour la partie base de donnée</li>
+<li class="fragment">une persistence pour la base de donnée</li>
+</ul>
+<p>Pour faire cela, nous allons utiliser l’outil <a href="https://kompose.io/">Kompose</a> qui permet de traduire un dockerfile en Manifests.</p>
+<div class="sourceCode" id="cb95"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb95-1" title="1"><span class="ex">curl</span> -L https://github.com/kubernetes/kompose/releases/download/v1.32.0/kompose-linux-amd64 -o kompose</a></code></pre></div>
+<p>Puis de lancer la conversion :</p>
+<div class="sourceCode" id="cb96"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb96-1" title="1"><span class="ex">kompose</span> convert -f docker-compose.yaml</a></code></pre></div>
+<p><img data-src="img/kompose-result.png" /></p>
+<p>Une alerte est levée car nous n’avons pas précisé l’exposition de la base de donnée, nous y reviendrons.</p>
+</section><section id="manifest" class="slide level2">
+<h2>Manifest</h2>
+<p><strong>Kompose</strong> à généré des fichiers <strong>Manifest</strong> :</p>
+<ul>
+<li class="fragment"><strong>lamp-networking.yaml</strong> : décris les <strong>network policy</strong> propre à notre réseau, il permettra de configurer la sécurité, celui ci n’est pas obligatoire</li>
+<li class="fragment"><strong>web-deployment.yaml</strong> : décris le déploiement de la stack <em>web</em></li>
+<li class="fragment"><strong>database-deploiement.yaml</strong> : décris le déploiement de la stack <em>database</em></li>
+<li class="fragment"><strong>database-persistentcolumeclaim.yaml</strong> : décris la persistence des données de la database</li>
+<li class="fragment"><strong>web-service.yaml</strong> : décris le service d’exposition <em>web</em></li>
+</ul>
+</section><section id="mise-au-point" class="slide level2">
+<h2>Mise au point</h2>
+<p>Observons en détail le fichier <strong>database-persistentcolumeclaim.yaml</strong></p>
+<div class="sourceCode" id="cb97"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb97-1" title="1"><span class="fu">apiVersion:</span><span class="at"> v1</span></a>
+<a class="sourceLine" id="cb97-2" title="2"><span class="fu">kind:</span><span class="at"> PersistentVolumeClaim</span></a>
+<a class="sourceLine" id="cb97-3" title="3"><span class="fu">metadata:</span></a>
+<a class="sourceLine" id="cb97-4" title="4">  <span class="fu">creationTimestamp:</span><span class="at"> </span><span class="ch">null</span></a>
+<a class="sourceLine" id="cb97-5" title="5">  <span class="fu">labels:</span></a>
+<a class="sourceLine" id="cb97-6" title="6">    <span class="fu">io.kompose.service:</span><span class="at"> databasedata</span></a>
+<a class="sourceLine" id="cb97-7" title="7">  <span class="fu">name:</span><span class="at"> databasedata</span></a>
+<a class="sourceLine" id="cb97-8" title="8"><span class="fu">spec:</span></a>
+<a class="sourceLine" id="cb97-9" title="9">  <span class="fu">accessModes:</span></a>
+<a class="sourceLine" id="cb97-10" title="10">    <span class="kw">-</span> ReadWriteOnce</a>
+<a class="sourceLine" id="cb97-11" title="11">  <span class="fu">resources:</span></a>
+<a class="sourceLine" id="cb97-12" title="12">    <span class="fu">requests:</span></a>
+<a class="sourceLine" id="cb97-13" title="13">      <span class="fu">storage:</span><span class="at"> 100Mi</span></a>
+<a class="sourceLine" id="cb97-14" title="14"><span class="fu">status:</span><span class="at"> </span><span class="kw">{}</span></a></code></pre></div>
+<p>Puis déployons le :</p>
+<div class="sourceCode" id="cb98"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb98-1" title="1"><span class="fu">sudo</span> k3s kubectl apply -f databasedata-persistentvolumeclaim.yaml</a></code></pre></div>
+</section><section id="deploiement" class="slide level2">
+<h2>Deploiement</h2>
+<p>Nous pouvons ensuite appliquer le reste des <strong>Manifests</strong></p>
+<div class="sourceCode" id="cb99"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb99-1" title="1"><span class="fu">sudo</span> k3s kubectl apply -f database-deployment.yaml</a>
+<a class="sourceLine" id="cb99-2" title="2"><span class="fu">sudo</span> k3s kubectl apply -f lamp-networkpolicy.yaml</a>
+<a class="sourceLine" id="cb99-3" title="3"><span class="fu">sudo</span> k3s kubectl apply -f web-deployment.yaml</a>
+<a class="sourceLine" id="cb99-4" title="4"><span class="fu">sudo</span> k3s kubectl apply -f web-service.yaml </a>
+<a class="sourceLine" id="cb99-5" title="5"><span class="fu">sudo</span> k3s kubectl apply -f web-deployment.yaml</a></code></pre></div>
+<div class="sourceCode" id="cb100"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb100-1" title="1"><span class="ex">...</span></a>
+<a class="sourceLine" id="cb100-2" title="2"><span class="ex">service/web</span> created</a></code></pre></div>
+<p>Si nous ré-appliquons les <strong>Manifests</strong> , <strong>k3s</strong> change de message :</p>
+<div class="sourceCode" id="cb101"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb101-1" title="1"><span class="ex">service/web</span> configured</a></code></pre></div>
+<p>Cela indique que le système est idempotent et qu’il prendra en compte toute modification mais uniquement celles ci.</p>
+</section><section id="vérification" class="slide level2">
+<h2>Vérification</h2>
+<p>On peut vérifier que les objets sont présents :</p>
+<div class="sourceCode" id="cb102"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb102-1" title="1"><span class="fu">sudo</span> k3s kubectl get pvc</a></code></pre></div>
+<div class="sourceCode" id="cb103"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb103-1" title="1"><span class="ex">NAME</span>           STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE</a>
+<a class="sourceLine" id="cb103-2" title="2"><span class="ex">databasedata</span>   Bound    pvc-d3705298-0b05-4c91-b9a1-7d9c5760685b   100Mi      RWO            local-path     11h</a></code></pre></div>
+<p>Puis, pour accéder à l’application, nous pouvons utiliser le proxy fourni par <strong>k3s</strong></p>
+<div class="sourceCode" id="cb104"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb104-1" title="1"><span class="fu">sudo</span> k3s kubectl port-forward service/web 9999:8080</a></code></pre></div>
+<p>Cette commande transfert le port 8080 du service <strong>web</strong> dans le <strong>k3s</strong>, vers le port 9999 de votre machine.</p>
+<p>Quelques soucis subsistents?</p>
+</section><section id="premier-soucis" class="slide level2">
+<h2>Premier soucis</h2>
+<div class="sourceCode" id="cb105"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb105-1" title="1"><span class="fu">sudo</span> k3s kubectl get pods</a></code></pre></div>
+<p>Il semblerait que le pod <strong>web</strong> ne soit pas correctement démmaré</p>
+<div class="sourceCode" id="cb106"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb106-1" title="1"><span class="fu">sudo</span> k3s kubectl describe pod database-7dc4c66fd4-g4xww</a></code></pre></div>
+<p>En effet l’image <strong>cartopoint:1.0</strong> n’est pas disponible! Modifions donc le <strong>Manifest</strong> <em>web-deployment.yaml</em> pour utiliser une image publique :</p>
+<div class="sourceCode" id="cb107"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb107-1" title="1">//...</a>
+<a class="sourceLine" id="cb107-2" title="2"><span class="fu">spec:</span></a>
+<a class="sourceLine" id="cb107-3" title="3">      <span class="fu">containers:</span></a>
+<a class="sourceLine" id="cb107-4" title="4">        <span class="kw">-</span> <span class="fu">image:</span><span class="at"> ghcr.io/cedric-esnault-ign/cartopoint:1.0</span></a>
+<a class="sourceLine" id="cb107-5" title="5">          <span class="fu">name:</span><span class="at"> web</span></a>
+<a class="sourceLine" id="cb107-6" title="6">//...</a></code></pre></div>
+<p>Appliquons la différence, et vérifions</p>
+<div class="sourceCode" id="cb108"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb108-1" title="1">sudo k3s kubectl apply -f web-deployment.yaml</a>
+<a class="sourceLine" id="cb108-2" title="2">sudo k3s kubectl get pods</a></code></pre></div>
+<p>Si tout se passe bien, nous devrions accéder maintenant au site https://127.0.0.1:9999</p>
+</section><section id="dautres-soucis" class="slide level2">
+<h2>D’autres soucis</h2>
+<p><img data-src="k3s-db-error.png" /></p>
+<p>Il semblerait que non…</p>
+<p>Le soucis ici vient du fait que notre application web ne trouve pas sa base de donnée. En effet, Kompose nous avait averti que celle ci n’était pas exposé dans le dockerfile. Corrigeons ceci et créons un <strong>Manifest</strong> <em>database-service.yaml</em> pour exposer la base de donnée, exposées sur le port 3306.</p>
+<div class="sourceCode" id="cb109"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb109-1" title="1"><span class="fu">apiVersion:</span><span class="at"> v1</span></a>
+<a class="sourceLine" id="cb109-2" title="2"><span class="fu">kind:</span><span class="at"> Service</span></a>
+<a class="sourceLine" id="cb109-3" title="3"><span class="fu">metadata:</span></a>
+<a class="sourceLine" id="cb109-4" title="4">  <span class="fu">name:</span><span class="at"> database</span></a>
+<a class="sourceLine" id="cb109-5" title="5">  <span class="fu">labels:</span></a>
+<a class="sourceLine" id="cb109-6" title="6">    <span class="fu">io.kompose.service:</span><span class="at"> database</span></a>
+<a class="sourceLine" id="cb109-7" title="7"><span class="fu">spec:</span></a>
+<a class="sourceLine" id="cb109-8" title="8">  <span class="fu">ports:</span></a>
+<a class="sourceLine" id="cb109-9" title="9">    <span class="kw">-</span> <span class="fu">name:</span><span class="at"> </span><span class="st">&quot;3306&quot;</span></a>
+<a class="sourceLine" id="cb109-10" title="10">      <span class="fu">port:</span><span class="at"> </span><span class="dv">3306</span></a>
+<a class="sourceLine" id="cb109-11" title="11">      <span class="fu">targetPort:</span><span class="at"> </span><span class="dv">3306</span></a>
+<a class="sourceLine" id="cb109-12" title="12">  <span class="fu">selector:</span></a>
+<a class="sourceLine" id="cb109-13" title="13">    <span class="fu">io.kompose.service:</span><span class="at"> database</span></a></code></pre></div>
+<p>Appliquons le <strong>Manifest</strong></p>
+<div class="sourceCode" id="cb110"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb110-1" title="1"><span class="fu">sudo</span> k3s kubectl apply -f database-service.yaml</a></code></pre></div>
 <aside class="notes">
-<p>cd kompose/ kompose convert -f docker-compose.yml</p>
 <p>docker tag cartopoint:1.0 ghcr.io/cedric-esnault-ign/cartopoint:1.0 docker login ghcr.io -u cedric-esnault-ign docker push ghcr.io/cedric-esnault-ign/cartopoint:1.0</p>
-<p>sudo k3s kubectl apply -f databasedata-persistentvolumeclaim.yaml sudo k3s kubectl apply -f database-deployment.yaml sudo k3s kubectl apply -f lamp-networkpolicy.yaml sudo k3s kubectl apply -f web-deployment.yaml sudo k3s kubectl apply -f web-service.yaml sudo k3s kubectl apply -f web-deployment.yaml</p>
-<p>sudo k3s kubectl inspect sudo k3s kubectl inspect pod sudo k3s kubectl pods ls sudo k3s kubectl pods sudo k3s kubectl get pod sudo k3s kubectl get pods sudo k3s kubectl get pod sudo k3s kubectl inspect pods sudo k3s kubectl describe pod/web-f9c8ff8db-kssc8 sudo k3s kubectl get deployments sudo k3s kubectl describe deployment/web sudo k3s kubectl get pods sudo k3s kubectl get services sudo k3s kubectl port-forward sudo k3s kubectl port-forward -h sudo k3s kubectl port-forward service/truc 9999:80 sudo k3s kubectl get service sudo k3s kubectl port-forward service/web 9999:8080 sudo k3s kubectl apply -f database-deployment.yaml sudo k3s kubectl apply -f web-service.yaml sudo k3s kubectl port-forward service/web 9999:8080 sudo k3s kubectl get pod sudo k3s kubectl exec –stdin –tty web-f9c8ff8db-kssc8 – /bin/bash sudo k3s kubectl get service sudo k3s kubectl apply -f web-service.yaml</p>
+<p>sudo k3s kubectl exec –stdin –tty web-f9c8ff8db-kssc8 – /bin/bash</p>
 <p>sudo k3s kubectl port-forward service/web 9999:8080</p>
 </aside>
 </section></section>

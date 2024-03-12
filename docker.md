@@ -1816,7 +1816,7 @@ note : Il existe des solutions plus "sûr" pour passer des variables d'environne
 ## Correction ##
 
 ```yaml
-version: "3"
+ersion: "3"
 services:
   web:
     image: cartopoint:1.0
@@ -1852,18 +1852,17 @@ networks:
 
 Quand on parle de **Docker** en 2023, on peut difficillement ne pas évoquer Kubernetes (**K8S**).
 
-**K8S** est une solution d'orchestration de conteneur mis au point par Google et devenue la référence en la matière. On peut résuler **K8S** à un **super compose**, même si il permet beaucoup plus de chose.
-Kubernetest a permis d'amener les conteneurs **Docker** en production en apportant le contrôle et la sécurité qui n'était pas au niveau d'un outils créé avant tout pour les développeurs.
+**K8S** est une solution d'orchestration de conteneur mise au point par Google et devenue la référence en la matière. On peut résumer **K8S** à un **super compose**, même si il permet beaucoup plus de chose.
+**K8S** a permis d'amener les conteneurs **Docker** (créé avant tout pour les développeurs) en production , en apportant le contrôle et la sécurité nécéssaire.
 
-**Docker** propose lui aussi son orchestrateur ; **SWARM**, dont la CLI est intégré au client `docker`. Celui -ci n'étant pas au niveau de kubernetes, nous n'en parlerons pas, même si il a eu l'avantage d'être plus simple que K8S il y a quelques années.
-
+**Docker** propose lui aussi son orchestrateur, **SWARM**, dont la CLI est intégré au client `docker`. Celui -ci n'étant pas au niveau de kubernetes, nous n'en parlerons pas, même si il a eu l'avantage d'être plus simple que K8S il y a quelques années.
 
 <aside class="notes">
 
 curl -sfL https://get.k3s.io | sh -
 export KUBECONFIG="/etc/rancher/k3s/k3s.yaml"
 
-kompose pour convertire une application docker-compose en manifests K8S
+kompose pour convertir une application docker-compose en manifests K8S
 
 </aside>
 
@@ -1911,53 +1910,184 @@ sudo k3s kubectl get node
 
 ## Application ##
 
+Nous allons essayer de déployer notre application cartopoint dans notre **k3s**, pour cela il faut définir les *Manifest* des différents objets nécéssaires.
 
+- un déploiement pour la partie web
+- un déploiement pour la partie base de donnée
+- un service pour la partie web
+- un service pour la partie base de donnée
+- une persistence pour la base de donnée
 
-<aside class="notes">
+Pour faire cela, nous allons utiliser l'outil [Kompose](https://kompose.io/) qui permet de traduire un dockerfile en Manifests.
 
+```bash
+curl -L https://github.com/kubernetes/kompose/releases/download/v1.32.0/kompose-linux-amd64 -o kompose
+```
 
-cd kompose/ 
-kompose convert -f docker-compose.yml 
+Puis de lancer la conversion :
 
-docker tag cartopoint:1.0 ghcr.io/cedric-esnault-ign/cartopoint:1.0
-docker login ghcr.io -u cedric-esnault-ign 
-docker push ghcr.io/cedric-esnault-ign/cartopoint:1.0
+```bash
+kompose convert -f docker-compose.yaml
+```
 
+![](img/kompose-result.png)
 
+Une alerte est levée car nous n'avons pas précisé l'exposition de la base de donnée, nous y reviendrons.
+
+## Manifest ##
+
+**Kompose** à généré des fichiers **Manifest** :
+
+- **lamp-networking.yaml** : décris les **network policy** propre à notre réseau, il permettra de configurer la sécurité, celui ci n'est pas obligatoire
+- **web-deployment.yaml** : décris le déploiement de la stack *web*
+- **database-deploiement.yaml** : décris le déploiement de la stack *database*
+- **database-persistentcolumeclaim.yaml** : décris la persistence des données de la database
+- **web-service.yaml** : décris le service d'exposition *web*
+
+## Mise au point ##
+
+Observons en détail le fichier **database-persistentcolumeclaim.yaml**
+
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: databasedata
+  name: databasedata
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+status: {}
+```
+
+Puis déployons le :
+
+```bash
 sudo k3s kubectl apply -f databasedata-persistentvolumeclaim.yaml
+```
+
+## Deploiement ##
+
+Nous pouvons ensuite appliquer le reste des **Manifests**
+
+```bash
 sudo k3s kubectl apply -f database-deployment.yaml
 sudo k3s kubectl apply -f lamp-networkpolicy.yaml
 sudo k3s kubectl apply -f web-deployment.yaml
 sudo k3s kubectl apply -f web-service.yaml 
 sudo k3s kubectl apply -f web-deployment.yaml
+```
 
+```bash
+...
+service/web created
+```
 
+Si nous ré-appliquons les **Manifests** , **k3s** change de message :
 
-sudo k3s kubectl inspect 
-sudo k3s kubectl inspect pod 
-sudo k3s kubectl pods ls
-sudo k3s kubectl pods
-sudo k3s kubectl get pod
-sudo k3s kubectl get pods
-sudo k3s kubectl get pod
-sudo k3s kubectl inspect  pods
-sudo k3s kubectl describe pod/web-f9c8ff8db-kssc8
-sudo k3s kubectl get deployments
-sudo k3s kubectl describe  deployment/web
-sudo k3s kubectl get pods
-sudo k3s kubectl get services
-sudo k3s kubectl port-forward
-sudo k3s kubectl port-forward -h
-sudo k3s kubectl port-forward service/truc 9999:80
-sudo k3s kubectl get service
+```bash
+service/web configured
+```
+
+Cela indique que le système est idempotent et qu'il prendra en compte toute modification mais uniquement celles ci.
+
+## Vérification ##
+
+On peut vérifier que les objets sont présents :
+```bash
+sudo k3s kubectl get pvc
+```
+
+```bash
+NAME           STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+databasedata   Bound    pvc-d3705298-0b05-4c91-b9a1-7d9c5760685b   100Mi      RWO            local-path     11h
+```
+Puis, pour accéder à l'application, nous pouvons utiliser le proxy fourni par **k3s**
+
+```bash
 sudo k3s kubectl port-forward service/web 9999:8080
-sudo k3s kubectl apply -f database-deployment.yaml
-sudo k3s kubectl apply -f web-service.yaml 
-sudo k3s kubectl port-forward service/web 9999:8080
-sudo k3s kubectl get pod
+```
+
+Cette commande transfert le port 8080 du service **web** dans le **k3s**, vers le port 9999 de votre machine.
+
+Quelques soucis subsistents?
+
+## Premier soucis ##
+
+```bash
+sudo k3s kubectl get pods
+```
+Il semblerait que le pod **web** ne soit pas correctement démmaré
+
+```bash
+sudo k3s kubectl describe pod database-7dc4c66fd4-g4xww
+```
+
+En effet l'image **cartopoint:1.0**  n'est pas disponible! Modifions donc le **Manifest** *web-deployment.yaml* pour utiliser une image publique :
+
+```yaml
+//...
+spec:
+      containers:
+        - image: ghcr.io/cedric-esnault-ign/cartopoint:1.0
+          name: web
+//...
+```
+
+Appliquons la différence, et vérifions
+
+```yaml
+sudo k3s kubectl apply -f web-deployment.yaml
+sudo k3s kubectl get pods
+```
+
+Si tout se passe bien, nous devrions accéder maintenant au site https://127.0.0.1:9999
+
+## D'autres soucis ##
+
+![](k3s-db-error.png)
+
+Il semblerait que non...
+
+Le soucis ici vient du fait que notre application web ne trouve pas sa base de donnée. En effet, Kompose nous avait averti que celle ci n'était pas exposé dans le dockerfile. Corrigeons ceci et créons un **Manifest** *database-service.yaml* pour exposer la base de donnée, exposées sur le port 3306.
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: database
+  labels:
+    io.kompose.service: database
+spec:
+  ports:
+    - name: "3306"
+      port: 3306
+      targetPort: 3306
+  selector:
+    io.kompose.service: database
+
+```
+
+Appliquons le **Manifest**
+
+```bash
+sudo k3s kubectl apply -f database-service.yaml
+```
+
+
+<aside class="notes">
+
+
+docker tag cartopoint:1.0 ghcr.io/cedric-esnault-ign/cartopoint:1.0
+docker login ghcr.io -u cedric-esnault-ign 
+docker push ghcr.io/cedric-esnault-ign/cartopoint:1.0
+
 sudo k3s kubectl exec --stdin --tty web-f9c8ff8db-kssc8 -- /bin/bash
-sudo k3s kubectl get service
-sudo k3s kubectl apply -f web-service.yaml 
 
 sudo k3s kubectl port-forward service/web 9999:8080
 
