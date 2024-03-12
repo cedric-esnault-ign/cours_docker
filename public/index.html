@@ -379,9 +379,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <pre class="shell"><code>docker container run hello-world
 # Alias : docker run hello-world</code></pre>
 <p>La commande par défaut de cette image affiche un message confirmant la bonne installation de <em>Docker Engine</em>. Si l’image n’est pas disponible en local, elle sera téléchargée sans avoir à faire un <code>docker image pull hello-world</code></p>
-<figure>
-<img data-src="/img/Hello-world.png" alt="HELLO WORLD" /><figcaption>HELLO WORLD</figcaption>
-</figure>
+<p><img data-src="img/Hello-world.png" /></p>
 </section></section>
 <section><section id="docker-utilisation" class="title-slide slide level1"><h1>Docker : utilisation</h1></section><section id="les-images-docker" class="slide level2">
 <h2>Les images Docker</h2>
@@ -412,9 +410,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul>
 </section><section id="architecture-des-images" class="slide level2 figcenter">
 <h2>Architecture des Images</h2>
-<figure>
-<img data-src="/img/container-layers.jpg" alt="IMAGE DOCKER" /><figcaption>IMAGE DOCKER</figcaption>
-</figure>
+<p><img data-src="img/container-layers.jpg" /></p>
 </section><section id="commandes-relatives-aux-images" class="slide level2">
 <h2>Commandes relatives aux images</h2>
 <p>Dans un premier temps, nous allons juste les utiliser afin de construire <a href="#//les-conteneurs">des Conteneurs Docker</a></p>
@@ -470,7 +466,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb15"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb15-1" title="1"><span class="ex">docker</span> container ls -a</a>
 <a class="sourceLine" id="cb15-2" title="2"><span class="ex">CONTAINER</span> ID    IMAGE       COMMAND              CREATED        STATUS                     PORTS       NAMES</a>
 <a class="sourceLine" id="cb15-3" title="3"><span class="ex">a5b74e24da65</span>    alpine      <span class="st">&quot;cat /etc/hostname&quot;</span>  9 seconds ago  Exited (0) <span class="ex">6</span> seconds ago               happy_cori</a></code></pre></div>
-<p>L’option <code>--rm</code> permet de détruire le conteneur une fois la commande terminé (Sinon, le conteneur reste présent dans l’état “Exited” )</p>
+<p>L’option <code>--rm</code> permet de détruire le conteneur une fois la commande terminé (Sinon, le conteneur reste présent dans l’état <em>Exited</em> )</p>
 </section><section id="lactivité-des-conteneurs" class="slide level2">
 <h2>L’activité des conteneurs</h2>
 <div class="sourceCode" id="cb16"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb16-1" title="1"><span class="ex">docker</span> container stats [NOM]</a></code></pre></div>
@@ -526,9 +522,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </tbody>
 </table>
 <p>Il en existe beaucoup d’autres : gestion des ressources, environnement d’exécution…</p>
-</section><section id="interagir-avec-le-conteneurs" class="slide level2">
-<h2>Interagir avec le conteneurs</h2>
-<div class="sourceCode" id="cb18"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb18-1" title="1"><span class="ex">docker</span> container cp CONTENEUR:SRC DEST</a></code></pre></div>
 <p>Permet de copier des fichiers entre l’hôte et un conteneur actif.</p>
 </section><section id="mise-en-réseau" class="slide level2">
 <h2>Mise en réseau</h2>
@@ -540,16 +533,16 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul>
 </section><section id="création-de-réseaux" class="slide level2">
 <h2>Création de réseaux</h2>
-<div class="sourceCode" id="cb19"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb19-1" title="1"><span class="co"># Créer un réseau</span></a>
-<a class="sourceLine" id="cb19-2" title="2"><span class="ex">docker</span> network create ...</a>
-<a class="sourceLine" id="cb19-3" title="3"><span class="co"># Connecter un conteneur sur un réseau</span></a>
-<a class="sourceLine" id="cb19-4" title="4"><span class="ex">docker</span> network connect ...</a>
-<a class="sourceLine" id="cb19-5" title="5"><span class="co"># Liste des réseaux</span></a>
-<a class="sourceLine" id="cb19-6" title="6"><span class="ex">docker</span> network ls ...</a>
-<a class="sourceLine" id="cb19-7" title="7"><span class="co"># Déconnecter un conteneur d&#39;un réseau</span></a>
-<a class="sourceLine" id="cb19-8" title="8"><span class="ex">docker</span> network disconnect ...</a>
-<a class="sourceLine" id="cb19-9" title="9"><span class="co"># Supprimer un réseau</span></a>
-<a class="sourceLine" id="cb19-10" title="10"><span class="ex">docker</span> network rm ...</a></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb18-1" title="1"><span class="co"># Créer un réseau</span></a>
+<a class="sourceLine" id="cb18-2" title="2"><span class="ex">docker</span> network create ...</a>
+<a class="sourceLine" id="cb18-3" title="3"><span class="co"># Connecter un conteneur sur un réseau</span></a>
+<a class="sourceLine" id="cb18-4" title="4"><span class="ex">docker</span> network connect ...</a>
+<a class="sourceLine" id="cb18-5" title="5"><span class="co"># Liste des réseaux</span></a>
+<a class="sourceLine" id="cb18-6" title="6"><span class="ex">docker</span> network ls ...</a>
+<a class="sourceLine" id="cb18-7" title="7"><span class="co"># Déconnecter un conteneur d&#39;un réseau</span></a>
+<a class="sourceLine" id="cb18-8" title="8"><span class="ex">docker</span> network disconnect ...</a>
+<a class="sourceLine" id="cb18-9" title="9"><span class="co"># Supprimer un réseau</span></a>
+<a class="sourceLine" id="cb18-10" title="10"><span class="ex">docker</span> network rm ...</a></code></pre></div>
 </section><section id="a-la-création-du-conteneur" class="slide level2">
 <h2>A la création du conteneur</h2>
 <p>La commande <code>docker container run</code> dispose de l’option <code>--net</code></p>
@@ -562,15 +555,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul>
 </section><section id="réseau-de-lhôte" class="slide level2">
 <h2>Réseau de l’hôte</h2>
-<div class="sourceCode" id="cb20"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb20-1" title="1"><span class="ex">docker</span> container run --rm --net host alpine ip a</a>
-<a class="sourceLine" id="cb20-2" title="2"><span class="ex">1</span>: lo: <span class="op">&lt;</span>LOOPBACK,UP,LOWER_UP<span class="op">&gt;</span> mtu 65536 qdisc noqueue state UNKNOWN qlen 1</a>
-<a class="sourceLine" id="cb20-3" title="3">    <span class="ex">link/loopback</span> 00:00:00:00:00:00 brd 00:00:00:00:00:00</a>
-<a class="sourceLine" id="cb20-4" title="4">    <span class="ex">inet</span> 127.0.0.1/8 scope host lo</a>
-<a class="sourceLine" id="cb20-5" title="5">       <span class="ex">valid_lft</span> forever preferred_lft forever</a>
-<a class="sourceLine" id="cb20-6" title="6"><span class="ex">33481</span>: eth0@if33482: <span class="op">&lt;</span>BROADCAST,MULTICAST,UP,LOWER_UP,M-DOWN<span class="op">&gt;</span> mtu 1500 qdisc noqueue state UP </a>
-<a class="sourceLine" id="cb20-7" title="7">    <span class="ex">link/ether</span> e6:bd:09:a3:dc:84 brd ff:ff:ff:ff:ff:ff</a>
-<a class="sourceLine" id="cb20-8" title="8">    <span class="ex">inet</span> 192.168.0.8/23 scope global eth0</a>
-<a class="sourceLine" id="cb20-9" title="9">       <span class="ex">valid_lft</span> forever preferred_lft forever</a></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb19-1" title="1"><span class="ex">docker</span> container run --rm --net host alpine ip a</a>
+<a class="sourceLine" id="cb19-2" title="2"><span class="ex">1</span>: lo: <span class="op">&lt;</span>LOOPBACK,UP,LOWER_UP<span class="op">&gt;</span> mtu 65536 qdisc noqueue state UNKNOWN qlen 1</a>
+<a class="sourceLine" id="cb19-3" title="3">    <span class="ex">link/loopback</span> 00:00:00:00:00:00 brd 00:00:00:00:00:00</a>
+<a class="sourceLine" id="cb19-4" title="4">    <span class="ex">inet</span> 127.0.0.1/8 scope host lo</a>
+<a class="sourceLine" id="cb19-5" title="5">       <span class="ex">valid_lft</span> forever preferred_lft forever</a>
+<a class="sourceLine" id="cb19-6" title="6"><span class="ex">33481</span>: eth0@if33482: <span class="op">&lt;</span>BROADCAST,MULTICAST,UP,LOWER_UP,M-DOWN<span class="op">&gt;</span> mtu 1500 qdisc noqueue state UP </a>
+<a class="sourceLine" id="cb19-7" title="7">    <span class="ex">link/ether</span> e6:bd:09:a3:dc:84 brd ff:ff:ff:ff:ff:ff</a>
+<a class="sourceLine" id="cb19-8" title="8">    <span class="ex">inet</span> 192.168.0.8/23 scope global eth0</a>
+<a class="sourceLine" id="cb19-9" title="9">       <span class="ex">valid_lft</span> forever preferred_lft forever</a></code></pre></div>
 <p>Ce mode est peu utilisé, il peut parfois entrer en collisions avec des réglages réseaux d’entreprise (VPN,…). Il pose aussi des problèmes de sécurité ( suppression de l’isolation réseau).</p>
 </section><section id="réseau-bridge-par-défaut" class="slide level2">
 <h2>Réseau bridge par défaut</h2>
@@ -587,7 +580,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul>
 </section><section id="exposer-un-port-sur-lhôte" class="slide level2">
 <h2>Exposer un port sur l’hôte</h2>
-<div class="sourceCode" id="cb21"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb21-1" title="1"><span class="ex">docker</span> container run --rm -p 8080:80 httpd:alpine</a></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb20-1" title="1"><span class="ex">docker</span> container run --rm -p 8080:80 httpd:alpine</a></code></pre></div>
 <p>-&gt; <a href="http://127.0.0.1:8080">http://127.0.0.1:8080</a></p>
 <p>Le port 8080 de la machine hôte est redirigé vers le port 80 du conteneur apache (httpd basé sur un OS alpine).</p>
 </section><section id="les-volumes" class="slide level2">
@@ -612,7 +605,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="fragment"><code>PATH_ON_CONTAINER</code> : où brancher ce dossier dans le conteneur ?</li>
 <li class="fragment"><code>MODE</code> (optionnel) : mode d’accès, principalement <em>rw</em> (par défaut) et <em>ro</em></li>
 </ul>
-<div class="sourceCode" id="cb22"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb22-1" title="1"><span class="ex">docker</span> container run --rm -it -v /:/mondossierlocal:ro alpine /bin/sh</a></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb21-1" title="1"><span class="ex">docker</span> container run --rm -it -v /:/mondossierlocal:ro alpine /bin/sh</a></code></pre></div>
 </section><section id="volume-docker" class="slide level2">
 <h2>Volume docker</h2>
 <ul>
@@ -631,43 +624,43 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul>
 </section><section id="créer-un-volume" class="slide level2">
 <h2>Créer un volume</h2>
-<div class="sourceCode" id="cb23"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb23-1" title="1"><span class="ex">docker</span> volume create --name NAME [OPTS]</a></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb22-1" title="1"><span class="ex">docker</span> volume create --name NAME [OPTS]</a></code></pre></div>
 </section><section id="créer-un-volume-lors-de-la-création-dun-conteneur" class="slide level2">
 <h2>Créer un volume lors de la création d’un conteneur</h2>
-<div class="sourceCode" id="cb24"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb24-1" title="1"><span class="ex">docker</span> container run -v [NAME]:[PATH_ON_CONTAINER]:[OPTS]</a></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb23-1" title="1"><span class="ex">docker</span> container run -v [NAME]:[PATH_ON_CONTAINER]:[OPTS]</a></code></pre></div>
 <p>On peut préciser le <em>driver</em> à utiliser. Le driver dépend du backend, par défaut local.</p>
 </section><section id="volume-anonyme" class="slide level2">
 <h2>Volume anonyme</h2>
 <p>Les métadonnées d’une image peuvent forcer la création d’un volume</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb25-1" title="1"><span class="ex">docker</span> inspect docker.io/rok4/dataset:bdortho5m-martinique                                            </a>
-<a class="sourceLine" id="cb25-2" title="2">[<span class="kw">{</span></a>
-<a class="sourceLine" id="cb25-3" title="3">  <span class="ex">//...</span></a>
-<a class="sourceLine" id="cb25-4" title="4">    <span class="st">&quot;Config&quot;</span>: <span class="kw">{</span></a>
-<a class="sourceLine" id="cb25-5" title="5">        <span class="ex">//...</span></a>
-<a class="sourceLine" id="cb25-6" title="6">        <span class="st">&quot;Volumes&quot;</span>: <span class="kw">{</span></a>
-<a class="sourceLine" id="cb25-7" title="7">          <span class="st">&quot;/pyramids/BDORTHO&quot;</span>: {<span class="kw">}</span></a>
-<a class="sourceLine" id="cb25-8" title="8">        <span class="kw">}</span>,</a>
-<a class="sourceLine" id="cb25-9" title="9">        <span class="ex">//...</span></a>
-<a class="sourceLine" id="cb25-10" title="10">    <span class="kw">}</span>,</a>
-<a class="sourceLine" id="cb25-11" title="11">  <span class="ex">//...</span></a>
-<a class="sourceLine" id="cb25-12" title="12">]</a></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb24-1" title="1"><span class="ex">docker</span> inspect docker.io/rok4/dataset:bdortho5m-martinique                                            </a>
+<a class="sourceLine" id="cb24-2" title="2">[<span class="kw">{</span></a>
+<a class="sourceLine" id="cb24-3" title="3">  <span class="ex">//...</span></a>
+<a class="sourceLine" id="cb24-4" title="4">    <span class="st">&quot;Config&quot;</span>: <span class="kw">{</span></a>
+<a class="sourceLine" id="cb24-5" title="5">        <span class="ex">//...</span></a>
+<a class="sourceLine" id="cb24-6" title="6">        <span class="st">&quot;Volumes&quot;</span>: <span class="kw">{</span></a>
+<a class="sourceLine" id="cb24-7" title="7">          <span class="st">&quot;/pyramids/BDORTHO&quot;</span>: {<span class="kw">}</span></a>
+<a class="sourceLine" id="cb24-8" title="8">        <span class="kw">}</span>,</a>
+<a class="sourceLine" id="cb24-9" title="9">        <span class="ex">//...</span></a>
+<a class="sourceLine" id="cb24-10" title="10">    <span class="kw">}</span>,</a>
+<a class="sourceLine" id="cb24-11" title="11">  <span class="ex">//...</span></a>
+<a class="sourceLine" id="cb24-12" title="12">]</a></code></pre></div>
 </section><section id="volume-docker-1" class="slide level2">
 <h2>Volume docker</h2>
 <p>Lister les volumes</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb26-1" title="1">$ <span class="ex">docker</span> volume ls</a>
-<a class="sourceLine" id="cb26-2" title="2"><span class="ex">DRIVER</span>              VOLUME NAME</a>
-<a class="sourceLine" id="cb26-3" title="3"><span class="bu">local</span>               2bd7394a7adebb03f073bd82048048124578e0b506adea3064fda5d38ef7b678</a>
-<a class="sourceLine" id="cb26-4" title="4"><span class="bu">local</span>               <span class="va">data</span>-telegraf</a>
-<a class="sourceLine" id="cb26-5" title="5"><span class="bu">local</span>               <span class="va">e0c1ad4b13ed61067082a3511feaae14dbdcacd19632594c129548e241575e0c</span></a>
-<a class="sourceLine" id="cb26-6" title="6"><span class="bu">local</span>               <span class="va">minidlna</span></a>
-<a class="sourceLine" id="cb26-7" title="7"><span class="bu">local</span>               <span class="va">mongodb</span></a></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb25-1" title="1">$ <span class="ex">docker</span> volume ls</a>
+<a class="sourceLine" id="cb25-2" title="2"><span class="ex">DRIVER</span>              VOLUME NAME</a>
+<a class="sourceLine" id="cb25-3" title="3"><span class="bu">local</span>               2bd7394a7adebb03f073bd82048048124578e0b506adea3064fda5d38ef7b678</a>
+<a class="sourceLine" id="cb25-4" title="4"><span class="bu">local</span>               <span class="va">data</span>-telegraf</a>
+<a class="sourceLine" id="cb25-5" title="5"><span class="bu">local</span>               <span class="va">e0c1ad4b13ed61067082a3511feaae14dbdcacd19632594c129548e241575e0c</span></a>
+<a class="sourceLine" id="cb25-6" title="6"><span class="bu">local</span>               <span class="va">minidlna</span></a>
+<a class="sourceLine" id="cb25-7" title="7"><span class="bu">local</span>               <span class="va">mongodb</span></a></code></pre></div>
 <p>Dans certains cas, Docker créé des volumes <em>“anonymes”</em>, leur nom est une longue chaîne alphanumérique</p>
 </section><section id="supprimer-un-volume" class="slide level2">
 <h2>Supprimer un volume</h2>
-<div class="sourceCode" id="cb27"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb27-1" title="1"><span class="ex">docker</span> volume rm NAME</a></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb26-1" title="1"><span class="ex">docker</span> volume rm NAME</a></code></pre></div>
 </section><section id="supprimer-un-volume-lors-de-la-suppression-dun-conteneur" class="slide level2">
 <h2>Supprimer un volume lors de la suppression d’un conteneur</h2>
-<div class="sourceCode" id="cb28"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb28-1" title="1"><span class="ex">docker</span> container rm -v CONTAINER_NAME</a></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb27-1" title="1"><span class="ex">docker</span> container rm -v CONTAINER_NAME</a></code></pre></div>
 <p>⚠️ Ne concerne que les volumes anonymes</p>
 </section><section id="gestion-des-données-à-la-création-dun-volume" class="slide level2">
 <h2>Gestion des données à la création d’un volume</h2>
@@ -685,8 +678,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </section><section id="volumes-avancés-1" class="slide level2">
 <h2>Volumes avancés</h2>
 <p>Un volume hôte est un <code>--mount</code> particulier.</p>
-<p><code>docker run -it -v /chemin/sur/mon/ordi:/data alpine sh</code></p>
-<p><code>docker run -it --mount \   type=bind,source=/chemin/sur/mon/ordi,target=/data \   alpine sh</code></p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb28-1" title="1"><span class="ex">docker</span> container run -it -v /chemin/sur/mon/ordi:/data alpine sh</a>
+<a class="sourceLine" id="cb28-2" title="2"><span class="ex">docker</span> container run -it \</a>
+<a class="sourceLine" id="cb28-3" title="3">--mount type=bind,source=/chemin/sur/mon/ordi,target=/data \</a>
+<a class="sourceLine" id="cb28-4" title="4">alpine sh</a></code></pre></div>
 </section><section id="a-vous-de-jouer-maintenant" class="slide level2">
 <h2>A vous de jouer maintenant</h2>
 <p>Lors de l’installation , nous avons créé un conteneur pour vérifier que Docker était bien installé</p>
@@ -753,8 +748,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="fragment">Démarrez un conteneur avec un shell interactif basé sur l’image <strong>alpine</strong></li>
 <li class="fragment">Dans un second terminal, observez les conteneurs en cours d’exécution</li>
 <li class="fragment">Stoppez le conteneur (sans le détruire)</li>
-<li class="fragment"><a href="https://docs.docker.com/reference/cli/docker/container/start/">Relancez</a> le conteneur et se <a href="https://docs.docker.com/reference/cli/docker/container/attach/">rattacher</a> à son terminal</li>
-<li class="fragment">Faire le ménage</li>
+<li class="fragment"><a href="https://docs.docker.com/reference/cli/docker/container/start/">Relancez</a> le conteneur et <a href="https://docs.docker.com/reference/cli/docker/container/attach/">rattachez</a> vous à son terminal</li>
+<li class="fragment">Faites le ménage</li>
 </ul>
 </section><section id="correction-4" class="slide level2">
 <h2>Correction</h2>
@@ -921,7 +916,13 @@ docker rm alpineContainer</code></pre>
 cd cours_docker/ressources</code></pre>
 </section><section id="apache" class="slide level2">
 <h2>Apache</h2>
-<p>L’image à utiliser ici est <code>httpd</code>. Les options <code>--name -d -p -v</code> peuvent être utiles. La racine du serveur web dans l’image est <code>/usr/local/apache2/htdocs/</code> * créez un dossier <code>apache-racine</code> pour le montage <strong>host</strong> * Lancez un conteneur avec un montage de la racine du serveur sur votre dossier <code>apache-racine</code> et exposant le port <em>80</em> du conteneur sur le port <em>8080</em> de la machine host. * Qu’affiche la page <a href="http://127.0.0.1:8080" class="uri">http://127.0.0.1:8080</a> ? * Utilisez le fichier <code>index-lamp.html</code> présent dans le dossier <strong>cartopoint</strong> pour remplacer la page d’accueil</p>
+<p>L’image à utiliser ici est <code>httpd</code>. Les options <code>--name -d -p -v</code> peuvent être utiles. La racine du serveur web dans l’image est <code>/usr/local/apache2/htdocs/</code></p>
+<ul>
+<li class="fragment">créez un dossier <code>apache-racine</code> pour le montage <strong>host</strong></li>
+<li class="fragment">Lancez un conteneur avec un montage de la racine du serveur sur votre dossier <code>apache-racine</code> et exposant le port <em>80</em> du conteneur sur le port <em>8080</em> de la machine host.</li>
+<li class="fragment">Qu’affiche la page <a href="http://127.0.0.1:8080" class="uri">http://127.0.0.1:8080</a> ?</li>
+<li class="fragment">Utilisez le fichier <code>index-lamp.html</code> présent dans le dossier <strong>cartopoint</strong> pour remplacer la page d’accueil</li>
+</ul>
 </section><section id="correction-12" class="slide level2">
 <h2>Correction</h2>
 <div class="sourceCode" id="cb53"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb53-1" title="1"><span class="ex">docker</span> run --name web -d -p 8080:80 -v <span class="st">&quot;</span><span class="va">$(</span><span class="bu">pwd</span><span class="va">)</span><span class="st">/apache-racine/:/usr/local/apache2/htdocs/&quot;</span> httpd:latest</a>
@@ -1613,15 +1614,16 @@ cd cours_docker/ressources</code></pre>
 </section></section>
 <section><section id="kubernetes" class="title-slide slide level1"><h1>Kubernetes</h1></section><section id="orchestration-de-conteneurs" class="slide level2">
 <h2>Orchestration de conteneurs</h2>
-<p>Quand on parle de <strong>Docker</strong> en 2023, on peut difficillement ne pas évoquer Kubernetes (<strong>K8S</strong>). <strong>K8S</strong> est une solution d’orchestration de conteneur mis au point par Google et devenue la référence en la matière. On peut résuler <strong>K8S</strong> à un <strong>super compose</strong>, même si il permet beaucoup plus de chose. Kubernetest a permis d’amener les conteneurs <strong>Docker</strong> en production en apportant le contrôle et la sécurité qui n’était pas au niveau d’un outils créé avant tout pour les développeurs.</p>
-<p><strong>Docker</strong> propose lui aussi son orchestrateur ; <strong>SWARM</strong>, dont a CLI est intégré au client <code>docker</code>. Celui -ci n’étant pas au niveau de kubernetes, nous n’en parlerons pas, même si il a eu l’avantage d’être plus simple que K8S il y a quelques années.</p>
+<p>Quand on parle de <strong>Docker</strong> en 2023, on peut difficillement ne pas évoquer Kubernetes (<strong>K8S</strong>).</p>
+<p><strong>K8S</strong> est une solution d’orchestration de conteneur mis au point par Google et devenue la référence en la matière. On peut résuler <strong>K8S</strong> à un <strong>super compose</strong>, même si il permet beaucoup plus de chose. Kubernetest a permis d’amener les conteneurs <strong>Docker</strong> en production en apportant le contrôle et la sécurité qui n’était pas au niveau d’un outils créé avant tout pour les développeurs.</p>
+<p><strong>Docker</strong> propose lui aussi son orchestrateur ; <strong>SWARM</strong>, dont la CLI est intégré au client <code>docker</code>. Celui -ci n’étant pas au niveau de kubernetes, nous n’en parlerons pas, même si il a eu l’avantage d’être plus simple que K8S il y a quelques années.</p>
 <aside class="notes">
 <p>curl -sfL https://get.k3s.io | sh - export KUBECONFIG=“/etc/rancher/k3s/k3s.yaml”</p>
 <p>kompose pour convertire une application docker-compose en manifests K8S</p>
 </aside>
 </section><section id="principe-de-kubernetes" class="slide level2">
 <h2>principe de Kubernetes</h2>
-<p>Une solution d’orchestration de conteneur va permettre de déployer et de maintenir en fonctionnement des conteneurs. Du point de vue de l’utilisateur déveoppeur, <strong>k8s</strong> c’est surtout :</p>
+<p>Une solution d’orchestration de conteneur va permettre de déployer et de maintenir en fonctionnement des conteneurs. Du point de vue de l’utilisateur développeur, <strong>k8s</strong> c’est surtout :</p>
 <ul>
 <li class="fragment">une API pour contrôler les objets <strong>k8s</strong> (listing, création, suppression etc…)</li>
 <li class="fragment">un client CLI (kubectl) pour interragir avec cette API</li>
@@ -1634,12 +1636,32 @@ cd cours_docker/ressources</code></pre>
 <li class="fragment">Les <strong><a href="https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/">Namespaces</a></strong> permettent une certaine isolation au sein d’un même cluster kubernetes (~projets).</li>
 <li class="fragment">Les <strong><a href="https://kubernetes.io/docs/concepts/architecture/nodes/">Noeuds</a></strong> sont les “machines” qui supportent les conteneurs (<strong>pods</strong>)</li>
 <li class="fragment">Les <strong><a href="https://kubernetes.io/docs/concepts/workloads/pods/">pods</a></strong> sont les plus simples objets <strong>k8s</strong>, ils peuvent contenir un ou plusieurs conteneurs</li>
-<li class="fragment">Les <strong><a href="https://kubernetes.io/docs/concepts/services-networking/service/">services</a></strong> représentent l’élement réseau de base dans <strong>k8s</strong>, ils permetent d’exposer un service sur un port par exemple. Ils réalisent la répartition sur les <strong>pods</strong> qui leur sont ratachés.</li>
-<li class="fragment">Les <strong><a href="https://kubernetes.io/docs/concepts/storage/volumes/">volumes</a></strong> permettent la persistance des données. C’est un élément à manier avec précaution car la persistence des données en volume est un élément complexe à gérer dans les architectures cloud-natives, on lui préférera du stockage Objet.</li>
-<li class="fragment">Les <strong><a href="https://kubernetes.io/docs/concepts/workloads/controllers/">workload management</a>"</strong> : Ils permettent d’organiser les <strong>pods</strong> , il en existe de plusieurs types, <strong>deployment</strong>,<strong>statefullset</strong>,<strong>daemonset</strong>,<strong>Jobs</strong>,<strong>Cronjobs</strong> etc…</li>
-<li class="fragment">Les <strong><a href="https://kubernetes.io/docs/concepts/configuration/configmap/">configMaps</a></strong> : les configmaps permettent de stocker des configurations pour les pods. Il existe aussi la notion de <strong>secret</strong> pour stocker des données plus sensibles (bien qu’ils ne soient pas chiffrés par défaut)</li>
+<li class="fragment">Les <strong><a href="https://kubernetes.io/docs/concepts/services-networking/service/">services</a></strong> représentent l’élement réseau de base dans <strong>k8s</strong>, ils permetent d’exposer un service sur un port par exemple. Ils réalisent la répartition sur les <strong>pods</strong> qui leur sont ratachés. Il existe plusieurs types de services <strong>k8s</strong>. Les <strong>ingress</strong> sont d’autres objets réseaux pour exposer les services du cluster.</li>
 </ul>
-<p>Il y a bien d’autres types d’aobjets Kubernetes !</p>
+</section><section id="concepts-de-k8s-1" class="slide level2">
+<h2>Concepts de k8s</h2>
+<ul>
+<li class="fragment">Les <strong><a href="https://kubernetes.io/docs/concepts/storage/volumes/">volumes</a></strong> permettent la persistance des données. C’est un élément à manier avec précaution car la persistence des données en volume est un élément complexe à gérer dans les architectures cloud-natives, on lui préférera du stockage Objet.</li>
+<li class="fragment">Les <strong><a href="https://kubernetes.io/docs/concepts/workloads/controllers/">workload management</a></strong> permettent d’organiser les <strong>pods</strong> , il en existe de plusieurs types, <strong>deployment</strong>,<strong>statefullset</strong>,<strong>daemonset</strong>,<strong>Jobs</strong>,<strong>Cronjobs</strong> etc…</li>
+<li class="fragment">Les <strong><a href="https://kubernetes.io/docs/concepts/configuration/configmap/">configMaps</a></strong> permettent de stocker des configurations pour les pods. Il existe aussi la notion de <strong>secret</strong> pour stocker des données plus sensibles (bien qu’ils ne soient pas chiffrés par défaut)</li>
+</ul>
+<p>Il y a bien d’autres types d’objets Kubernetes !</p>
+</section><section id="installation-1" class="slide level2">
+<h2>Installation</h2>
+<p>Pour pouvoir tester <strong>k8s</strong>, il va nous falloir installer une mini-distribution kubernetes : <a href="https://k3s.io/">k3s</a> Cette distribution permet de tester rapidement kubernetes sur un seul noeud en masquant sa complexité sous-jacente.</p>
+<div class="sourceCode" id="cb93"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb93-1" title="1"><span class="ex">curl</span> -sfL https://get.k3s.io <span class="kw">|</span> <span class="fu">sh</span> - </a></code></pre></div>
+<p>Après quelques instant, nous pouvns tester si le cluster (de 1 noeud…) est disponible :</p>
+<div class="sourceCode" id="cb94"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb94-1" title="1"><span class="fu">sudo</span> k3s kubectl get node</a></code></pre></div>
+<p><img data-src="img/k3s-ok.png" /></p>
+</section><section id="application" class="slide level2">
+<h2>Application</h2>
+<aside class="notes">
+<p>cd kompose/ kompose convert -f docker-compose.yml</p>
+<p>docker tag cartopoint:1.0 ghcr.io/cedric-esnault-ign/cartopoint:1.0 docker login ghcr.io -u cedric-esnault-ign docker push ghcr.io/cedric-esnault-ign/cartopoint:1.0</p>
+<p>sudo k3s kubectl apply -f databasedata-persistentvolumeclaim.yaml sudo k3s kubectl apply -f database-deployment.yaml sudo k3s kubectl apply -f lamp-networkpolicy.yaml sudo k3s kubectl apply -f web-deployment.yaml sudo k3s kubectl apply -f web-service.yaml sudo k3s kubectl apply -f web-deployment.yaml</p>
+<p>sudo k3s kubectl inspect sudo k3s kubectl inspect pod sudo k3s kubectl pods ls sudo k3s kubectl pods sudo k3s kubectl get pod sudo k3s kubectl get pods sudo k3s kubectl get pod sudo k3s kubectl inspect pods sudo k3s kubectl describe pod/web-f9c8ff8db-kssc8 sudo k3s kubectl get deployments sudo k3s kubectl describe deployment/web sudo k3s kubectl get pods sudo k3s kubectl get services sudo k3s kubectl port-forward sudo k3s kubectl port-forward -h sudo k3s kubectl port-forward service/truc 9999:80 sudo k3s kubectl get service sudo k3s kubectl port-forward service/web 9999:8080 sudo k3s kubectl apply -f database-deployment.yaml sudo k3s kubectl apply -f web-service.yaml sudo k3s kubectl port-forward service/web 9999:8080 sudo k3s kubectl get pod sudo k3s kubectl exec –stdin –tty web-f9c8ff8db-kssc8 – /bin/bash sudo k3s kubectl get service sudo k3s kubectl apply -f web-service.yaml</p>
+<p>sudo k3s kubectl port-forward service/web 9999:8080</p>
+</aside>
 </section></section>
             </div>
         </div>

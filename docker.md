@@ -329,8 +329,7 @@ docker container run hello-world
 La commande par défaut de cette image affiche un message confirmant la bonne installation de *Docker Engine*.
 Si l'image n'est pas disponible en local, elle sera téléchargée sans avoir à faire un `docker image pull hello-world`
 
-![HELLO WORLD](/img/Hello-world.png)
-
+![](img/Hello-world.png)
 
 # Docker : utilisation #
 
@@ -367,7 +366,7 @@ par exemple :
 
 ## Architecture des Images ##{.figcenter}
 
-![IMAGE DOCKER](/img/container-layers.jpg)
+![](img/container-layers.jpg)
 
 ## Commandes relatives aux images ##
 
@@ -444,7 +443,7 @@ CONTAINER ID    IMAGE       COMMAND              CREATED        STATUS          
 a5b74e24da65    alpine      "cat /etc/hostname"  9 seconds ago  Exited (0) 6 seconds ago               happy_cori
 ```
 
-L'option `--rm` permet de détruire le conteneur une fois la commande terminé (Sinon, le conteneur reste présent dans l'état "Exited" )
+L'option `--rm` permet de détruire le conteneur une fois la commande terminé (Sinon, le conteneur reste présent dans l'état *Exited* )
 
 ## L'activité des conteneurs ##
 
@@ -482,12 +481,6 @@ docker container rm NOM
 | `-d` | démarrer le conteneur en arrière-plan |
 
 Il en existe beaucoup d'autres : gestion des ressources, environnement d’exécution...
-
-## Interagir avec le conteneurs ##
-
-```bash
-docker container cp CONTENEUR:SRC DEST
-```
 
 Permet de copier des fichiers entre l'hôte et un conteneur actif.
 
@@ -679,11 +672,12 @@ L'option `--mount` permet des montages plus élaborés :
 
 Un volume hôte est un `--mount` particulier.
 
-`docker run -it -v /chemin/sur/mon/ordi:/data alpine sh`
-
-` docker run -it --mount \
-  type=bind,source=/chemin/sur/mon/ordi,target=/data \
-  alpine sh`
+```bash
+docker container run -it -v /chemin/sur/mon/ordi:/data alpine sh
+docker container run -it \
+--mount type=bind,source=/chemin/sur/mon/ordi,target=/data \
+alpine sh
+```
 
 ## A vous de jouer  maintenant ##
 
@@ -691,7 +685,6 @@ Lors de l'installation , nous avons créé un conteneur pour vérifier que Docke
 
 * Observez que le conteneur est bien existant et à l'arrêt
 * Si vous avez déjà testé les manipulations d'exemple, vous pouvez recréer un nouveau conteneur hello-world.
-
 
 ## Correction ##
 
@@ -775,8 +768,8 @@ docker tag bce5g99azq58 registry.ul.geoportail.rie.gouv.fr/rok4/rok4-builder
 * Démarrez un conteneur avec un shell interactif basé sur l'image **alpine**
 * Dans un second terminal, observez les conteneurs en cours d’exécution
 * Stoppez le conteneur (sans le détruire)
-* [Relancez](https://docs.docker.com/reference/cli/docker/container/start/) le conteneur et se [rattacher](https://docs.docker.com/reference/cli/docker/container/attach/) à son terminal
-* Faire le ménage
+* [Relancez](https://docs.docker.com/reference/cli/docker/container/start/) le conteneur et [rattachez](https://docs.docker.com/reference/cli/docker/container/attach/) vous à son terminal
+* Faites le ménage
 
 ## Correction ##
 
@@ -1018,10 +1011,11 @@ cd cours_docker/ressources
 ## Apache ##
 
 L'image à utiliser ici est `httpd`. Les options `--name -d -p -v ` peuvent être utiles. La racine du serveur web dans l'image est `/usr/local/apache2/htdocs/`
-* créez un dossier `apache-racine` pour le montage **host**
-* Lancez un conteneur avec un montage de la racine du serveur sur votre dossier `apache-racine` et exposant le port *80* du conteneur sur le port *8080* de la machine host.
-* Qu'affiche la page <http://127.0.0.1:8080> ?
-* Utilisez le fichier `index-lamp.html` présent dans le dossier **cartopoint** pour remplacer la page d’accueil
+
+- créez un dossier `apache-racine` pour le montage **host**
+- Lancez un conteneur avec un montage de la racine du serveur sur votre dossier `apache-racine` et exposant le port *80* du conteneur sur le port *8080* de la machine host.
+- Qu'affiche la page <http://127.0.0.1:8080> ?
+- Utilisez le fichier `index-lamp.html` présent dans le dossier **cartopoint** pour remplacer la page d’accueil
 
 
 ## Correction ##
@@ -1857,10 +1851,11 @@ networks:
 ## Orchestration de conteneurs ##
 
 Quand on parle de **Docker** en 2023, on peut difficillement ne pas évoquer Kubernetes (**K8S**).
+
 **K8S** est une solution d'orchestration de conteneur mis au point par Google et devenue la référence en la matière. On peut résuler **K8S** à un **super compose**, même si il permet beaucoup plus de chose.
 Kubernetest a permis d'amener les conteneurs **Docker** en production en apportant le contrôle et la sécurité qui n'était pas au niveau d'un outils créé avant tout pour les développeurs.
 
-**Docker** propose lui aussi son orchestrateur ; **SWARM**, dont a CLI est intégré au client `docker`. Celui -ci n'étant pas au niveau de kubernetes, nous n'en parlerons pas, même si il a eu l'avantage d'être plus simple que K8S il y a quelques années.
+**Docker** propose lui aussi son orchestrateur ; **SWARM**, dont la CLI est intégré au client `docker`. Celui -ci n'étant pas au niveau de kubernetes, nous n'en parlerons pas, même si il a eu l'avantage d'être plus simple que K8S il y a quelques années.
 
 
 <aside class="notes">
@@ -1874,7 +1869,7 @@ kompose pour convertire une application docker-compose en manifests K8S
 
 ## principe de Kubernetes ##
 
-Une solution d'orchestration de conteneur va permettre de déployer et de maintenir en fonctionnement des conteneurs. Du point de vue de l'utilisateur déveoppeur, **k8s** c'est surtout :
+Une solution d'orchestration de conteneur va permettre de déployer et de maintenir en fonctionnement des conteneurs. Du point de vue de l'utilisateur développeur, **k8s** c'est surtout :
 
 - une API pour contrôler les objets **k8s** (listing, création, suppression etc...)
 - un client CLI (kubectl) pour interragir avec cette API
@@ -1887,15 +1882,83 @@ L'API de **k8s** est extensible, c'est à dire qu'il est possible de créer de n
 - Les **[Namespaces](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/)** permettent une certaine isolation au sein d'un même cluster kubernetes (~projets).
 - Les **[Noeuds](https://kubernetes.io/docs/concepts/architecture/nodes/)** sont les "machines" qui supportent les conteneurs (**pods**)
 - Les **[pods](https://kubernetes.io/docs/concepts/workloads/pods/)** sont les plus simples objets **k8s**, ils peuvent contenir un ou plusieurs conteneurs
-- Les **[services](https://kubernetes.io/docs/concepts/services-networking/service/)** représentent l'élement réseau de base dans **k8s**, ils permetent d'exposer un service sur un port par exemple. Ils réalisent la répartition sur les **pods** qui leur sont ratachés.
+- Les **[services](https://kubernetes.io/docs/concepts/services-networking/service/)** représentent l'élement réseau de base dans **k8s**, ils permetent d'exposer un service sur un port par exemple. Ils réalisent la répartition sur les **pods** qui leur sont ratachés. Il existe plusieurs types de services **k8s**. Les **ingress** sont d'autres objets réseaux pour exposer les services du cluster.
+
+## Concepts de k8s ##
+
 - Les **[volumes](https://kubernetes.io/docs/concepts/storage/volumes/)** permettent la persistance des données. C'est un élément à manier avec précaution car la persistence des données en volume est un élément complexe à gérer dans les architectures cloud-natives, on lui préférera du stockage Objet.
-- Les **[workload management](https://kubernetes.io/docs/concepts/workloads/controllers/)"** : Ils permettent d'organiser les **pods** , il en existe de plusieurs types, **deployment**,**statefullset**,**daemonset**,**Jobs**,**Cronjobs** etc...
-- Les **[configMaps](https://kubernetes.io/docs/concepts/configuration/configmap/)** : les configmaps permettent de stocker des configurations pour les pods. Il existe aussi la notion de **secret** pour stocker des données plus sensibles (bien qu'ils ne soient pas chiffrés par défaut)
+- Les **[workload management](https://kubernetes.io/docs/concepts/workloads/controllers/)** permettent d'organiser les **pods** , il en existe de plusieurs types, **deployment**,**statefullset**,**daemonset**,**Jobs**,**Cronjobs** etc...
+- Les **[configMaps](https://kubernetes.io/docs/concepts/configuration/configmap/)** permettent de stocker des configurations pour les pods. Il existe aussi la notion de **secret** pour stocker des données plus sensibles (bien qu'ils ne soient pas chiffrés par défaut)
 
-Il y a bien d'autres types d'aobjets Kubernetes !
+Il y a bien d'autres types d'objets Kubernetes !
+
+## Installation ##
+
+Pour pouvoir tester **k8s**, il va nous falloir installer une mini-distribution kubernetes : [k3s](https://k3s.io/)
+Cette distribution permet de tester rapidement kubernetes sur un seul noeud en masquant sa complexité sous-jacente.
+
+```bash
+curl -sfL https://get.k3s.io | sh - 
+```
+
+Après quelques instant, nous pouvns tester si le cluster (de 1 noeud...) est disponible :
+
+```bash
+sudo k3s kubectl get node
+```
+
+![](img/k3s-ok.png)
+
+## Application ##
 
 
 
+<aside class="notes">
+
+
+cd kompose/ 
+kompose convert -f docker-compose.yml 
+
+docker tag cartopoint:1.0 ghcr.io/cedric-esnault-ign/cartopoint:1.0
+docker login ghcr.io -u cedric-esnault-ign 
+docker push ghcr.io/cedric-esnault-ign/cartopoint:1.0
+
+
+sudo k3s kubectl apply -f databasedata-persistentvolumeclaim.yaml
+sudo k3s kubectl apply -f database-deployment.yaml
+sudo k3s kubectl apply -f lamp-networkpolicy.yaml
+sudo k3s kubectl apply -f web-deployment.yaml
+sudo k3s kubectl apply -f web-service.yaml 
+sudo k3s kubectl apply -f web-deployment.yaml
 
 
 
+sudo k3s kubectl inspect 
+sudo k3s kubectl inspect pod 
+sudo k3s kubectl pods ls
+sudo k3s kubectl pods
+sudo k3s kubectl get pod
+sudo k3s kubectl get pods
+sudo k3s kubectl get pod
+sudo k3s kubectl inspect  pods
+sudo k3s kubectl describe pod/web-f9c8ff8db-kssc8
+sudo k3s kubectl get deployments
+sudo k3s kubectl describe  deployment/web
+sudo k3s kubectl get pods
+sudo k3s kubectl get services
+sudo k3s kubectl port-forward
+sudo k3s kubectl port-forward -h
+sudo k3s kubectl port-forward service/truc 9999:80
+sudo k3s kubectl get service
+sudo k3s kubectl port-forward service/web 9999:8080
+sudo k3s kubectl apply -f database-deployment.yaml
+sudo k3s kubectl apply -f web-service.yaml 
+sudo k3s kubectl port-forward service/web 9999:8080
+sudo k3s kubectl get pod
+sudo k3s kubectl exec --stdin --tty web-f9c8ff8db-kssc8 -- /bin/bash
+sudo k3s kubectl get service
+sudo k3s kubectl apply -f web-service.yaml 
+
+sudo k3s kubectl port-forward service/web 9999:8080
+
+</aside>
