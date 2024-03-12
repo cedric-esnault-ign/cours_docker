@@ -1878,22 +1878,22 @@ L'API de **k8s** est extensible, c'est à dire qu'il est possible de créer de n
 ## Concepts de k8s ##
 
 - Les **[manifest](https://kubernetes.io/docs/concepts/overview/working-with-objects/#describing-a-kubernetes-object)** permettent de représenter un objet **k8s** sous la forme d'un fichier *yaml* ou *json*
-- Les **[Namespaces](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/)** permettent une certaine isolation au sein d'un même cluster kubernetes (~projets).
-- Les **[Noeuds](https://kubernetes.io/docs/concepts/architecture/nodes/)** sont les "machines" qui supportent les conteneurs (**pods**)
+- Les **[namespaces](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/)** permettent une certaine isolation au sein d'un même cluster kubernetes (~projets).
+- Les **[noeuds](https://kubernetes.io/docs/concepts/architecture/nodes/)** sont les "machines" qui supportent les conteneurs (**pods**)
 - Les **[pods](https://kubernetes.io/docs/concepts/workloads/pods/)** sont les plus simples objets **k8s**, ils peuvent contenir un ou plusieurs conteneurs
 - Les **[services](https://kubernetes.io/docs/concepts/services-networking/service/)** représentent l'élement réseau de base dans **k8s**, ils permetent d'exposer un service sur un port par exemple. Ils réalisent la répartition sur les **pods** qui leur sont ratachés. Il existe plusieurs types de services **k8s**. Les **ingress** sont d'autres objets réseaux pour exposer les services du cluster.
 
 ## Concepts de k8s ##
 
 - Les **[volumes](https://kubernetes.io/docs/concepts/storage/volumes/)** permettent la persistance des données. C'est un élément à manier avec précaution car la persistence des données en volume est un élément complexe à gérer dans les architectures cloud-natives, on lui préférera du stockage Objet.
-- Les **[workload management](https://kubernetes.io/docs/concepts/workloads/controllers/)** permettent d'organiser les **pods** , il en existe de plusieurs types, **deployment**,**statefullset**,**daemonset**,**Jobs**,**Cronjobs** etc...
+- Les **[workload management](https://kubernetes.io/docs/concepts/workloads/controllers/)** permettent d'organiser les **pods** , il en existe de plusieurs types, **deployment**, **statefullset**, **daemonset**, **Jobs**, **Cronjobs** etc...
 - Les **[configMaps](https://kubernetes.io/docs/concepts/configuration/configmap/)** permettent de stocker des configurations pour les pods. Il existe aussi la notion de **secret** pour stocker des données plus sensibles (bien qu'ils ne soient pas chiffrés par défaut)
 
 Il y a bien d'autres types d'objets Kubernetes !
 
 ## Installation ##
 
-Pour pouvoir tester **k8s**, il va nous falloir installer une mini-distribution kubernetes : [k3s](https://k3s.io/)
+Pour pouvoir tester **k8s**, il va nous falloir installer une mini-distribution kubernetes : [k3s](https://k3s.io/). 
 Cette distribution permet de tester rapidement kubernetes sur un seul noeud en masquant sa complexité sous-jacente.
 
 ```bash
@@ -1910,7 +1910,7 @@ sudo k3s kubectl get node
 
 ## Application ##
 
-Nous allons essayer de déployer notre application cartopoint dans notre **k3s**, pour cela il faut définir les *Manifest* des différents objets nécéssaires.
+Nous allons essayer de déployer notre application cartopoint dans notre **k3s**, pour cela il faut définir les **Manifest** des différents objets nécéssaires.
 
 - un déploiement pour la partie web
 - un déploiement pour la partie base de donnée
@@ -1924,7 +1924,9 @@ Pour faire cela, nous allons utiliser l'outil [Kompose](https://kompose.io/) qui
 curl -L https://github.com/kubernetes/kompose/releases/download/v1.32.0/kompose-linux-amd64 -o kompose
 ```
 
-Puis de lancer la conversion :
+## Conversion ##
+
+Il faut ensuite lancer la conversion :
 
 ```bash
 kompose convert -f docker-compose.yaml
@@ -2015,14 +2017,14 @@ sudo k3s kubectl port-forward service/web 9999:8080
 
 Cette commande transfert le port 8080 du service **web** dans le **k3s**, vers le port 9999 de votre machine.
 
-Quelques soucis subsistents?
+Quelques soucis subsistent ?
 
 ## Premier soucis ##
 
 ```bash
 sudo k3s kubectl get pods
 ```
-Il semblerait que le pod **web** ne soit pas correctement démmaré
+Il semblerait que le pod **web** ne soit pas correctement démarré
 
 ```bash
 sudo k3s kubectl describe pod database-7dc4c66fd4-g4xww
@@ -2046,15 +2048,19 @@ sudo k3s kubectl apply -f web-deployment.yaml
 sudo k3s kubectl get pods
 ```
 
-Si tout se passe bien, nous devrions accéder maintenant au site https://127.0.0.1:9999
-
 ## D'autres soucis ##
 
-![](k3s-db-error.png)
+Si tout se passe bien, nous devrions accéder maintenant au site https://127.0.0.1:9999
+
+![](img/k3s-db-error.png)
 
 Il semblerait que non...
 
-Le soucis ici vient du fait que notre application web ne trouve pas sa base de donnée. En effet, Kompose nous avait averti que celle ci n'était pas exposé dans le dockerfile. Corrigeons ceci et créons un **Manifest** *database-service.yaml* pour exposer la base de donnée, exposées sur le port 3306.
+Le soucis ici vient du fait que notre application web ne trouve pas sa base de donnée. En effet, Kompose nous avait averti que celle ci n'était pas exposé dans le dockerfile.
+
+## Exposition ##
+
+Corrigeons ceci et créons un **Manifest** *database-service.yaml* pour exposer la base de donnée, exposées sur le port 3306.
 
 ```yaml
 apiVersion: v1

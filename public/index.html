@@ -1633,8 +1633,8 @@ cd cours_docker/ressources</code></pre>
 <h2>Concepts de k8s</h2>
 <ul>
 <li class="fragment">Les <strong><a href="https://kubernetes.io/docs/concepts/overview/working-with-objects/#describing-a-kubernetes-object">manifest</a></strong> permettent de représenter un objet <strong>k8s</strong> sous la forme d’un fichier <em>yaml</em> ou <em>json</em></li>
-<li class="fragment">Les <strong><a href="https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/">Namespaces</a></strong> permettent une certaine isolation au sein d’un même cluster kubernetes (~projets).</li>
-<li class="fragment">Les <strong><a href="https://kubernetes.io/docs/concepts/architecture/nodes/">Noeuds</a></strong> sont les “machines” qui supportent les conteneurs (<strong>pods</strong>)</li>
+<li class="fragment">Les <strong><a href="https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/">namespaces</a></strong> permettent une certaine isolation au sein d’un même cluster kubernetes (~projets).</li>
+<li class="fragment">Les <strong><a href="https://kubernetes.io/docs/concepts/architecture/nodes/">noeuds</a></strong> sont les “machines” qui supportent les conteneurs (<strong>pods</strong>)</li>
 <li class="fragment">Les <strong><a href="https://kubernetes.io/docs/concepts/workloads/pods/">pods</a></strong> sont les plus simples objets <strong>k8s</strong>, ils peuvent contenir un ou plusieurs conteneurs</li>
 <li class="fragment">Les <strong><a href="https://kubernetes.io/docs/concepts/services-networking/service/">services</a></strong> représentent l’élement réseau de base dans <strong>k8s</strong>, ils permetent d’exposer un service sur un port par exemple. Ils réalisent la répartition sur les <strong>pods</strong> qui leur sont ratachés. Il existe plusieurs types de services <strong>k8s</strong>. Les <strong>ingress</strong> sont d’autres objets réseaux pour exposer les services du cluster.</li>
 </ul>
@@ -1642,20 +1642,20 @@ cd cours_docker/ressources</code></pre>
 <h2>Concepts de k8s</h2>
 <ul>
 <li class="fragment">Les <strong><a href="https://kubernetes.io/docs/concepts/storage/volumes/">volumes</a></strong> permettent la persistance des données. C’est un élément à manier avec précaution car la persistence des données en volume est un élément complexe à gérer dans les architectures cloud-natives, on lui préférera du stockage Objet.</li>
-<li class="fragment">Les <strong><a href="https://kubernetes.io/docs/concepts/workloads/controllers/">workload management</a></strong> permettent d’organiser les <strong>pods</strong> , il en existe de plusieurs types, <strong>deployment</strong>,<strong>statefullset</strong>,<strong>daemonset</strong>,<strong>Jobs</strong>,<strong>Cronjobs</strong> etc…</li>
+<li class="fragment">Les <strong><a href="https://kubernetes.io/docs/concepts/workloads/controllers/">workload management</a></strong> permettent d’organiser les <strong>pods</strong> , il en existe de plusieurs types, <strong>deployment</strong>, <strong>statefullset</strong>, <strong>daemonset</strong>, <strong>Jobs</strong>, <strong>Cronjobs</strong> etc…</li>
 <li class="fragment">Les <strong><a href="https://kubernetes.io/docs/concepts/configuration/configmap/">configMaps</a></strong> permettent de stocker des configurations pour les pods. Il existe aussi la notion de <strong>secret</strong> pour stocker des données plus sensibles (bien qu’ils ne soient pas chiffrés par défaut)</li>
 </ul>
 <p>Il y a bien d’autres types d’objets Kubernetes !</p>
 </section><section id="installation-1" class="slide level2">
 <h2>Installation</h2>
-<p>Pour pouvoir tester <strong>k8s</strong>, il va nous falloir installer une mini-distribution kubernetes : <a href="https://k3s.io/">k3s</a> Cette distribution permet de tester rapidement kubernetes sur un seul noeud en masquant sa complexité sous-jacente.</p>
+<p>Pour pouvoir tester <strong>k8s</strong>, il va nous falloir installer une mini-distribution kubernetes : <a href="https://k3s.io/">k3s</a>. Cette distribution permet de tester rapidement kubernetes sur un seul noeud en masquant sa complexité sous-jacente.</p>
 <div class="sourceCode" id="cb93"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb93-1" title="1"><span class="ex">curl</span> -sfL https://get.k3s.io <span class="kw">|</span> <span class="fu">sh</span> - </a></code></pre></div>
 <p>Après quelques instant, nous pouvns tester si le cluster (de 1 noeud…) est disponible :</p>
 <div class="sourceCode" id="cb94"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb94-1" title="1"><span class="fu">sudo</span> k3s kubectl get node</a></code></pre></div>
 <p><img data-src="img/k3s-ok.png" /></p>
 </section><section id="application" class="slide level2">
 <h2>Application</h2>
-<p>Nous allons essayer de déployer notre application cartopoint dans notre <strong>k3s</strong>, pour cela il faut définir les <em>Manifest</em> des différents objets nécéssaires.</p>
+<p>Nous allons essayer de déployer notre application cartopoint dans notre <strong>k3s</strong>, pour cela il faut définir les <strong>Manifest</strong> des différents objets nécéssaires.</p>
 <ul>
 <li class="fragment">un déploiement pour la partie web</li>
 <li class="fragment">un déploiement pour la partie base de donnée</li>
@@ -1665,7 +1665,9 @@ cd cours_docker/ressources</code></pre>
 </ul>
 <p>Pour faire cela, nous allons utiliser l’outil <a href="https://kompose.io/">Kompose</a> qui permet de traduire un dockerfile en Manifests.</p>
 <div class="sourceCode" id="cb95"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb95-1" title="1"><span class="ex">curl</span> -L https://github.com/kubernetes/kompose/releases/download/v1.32.0/kompose-linux-amd64 -o kompose</a></code></pre></div>
-<p>Puis de lancer la conversion :</p>
+</section><section id="conversion" class="slide level2">
+<h2>Conversion</h2>
+<p>Il faut ensuite lancer la conversion :</p>
 <div class="sourceCode" id="cb96"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb96-1" title="1"><span class="ex">kompose</span> convert -f docker-compose.yaml</a></code></pre></div>
 <p><img data-src="img/kompose-result.png" /></p>
 <p>Une alerte est levée car nous n’avons pas précisé l’exposition de la base de donnée, nous y reviendrons.</p>
@@ -1720,11 +1722,11 @@ cd cours_docker/ressources</code></pre>
 <p>Puis, pour accéder à l’application, nous pouvons utiliser le proxy fourni par <strong>k3s</strong></p>
 <div class="sourceCode" id="cb104"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb104-1" title="1"><span class="fu">sudo</span> k3s kubectl port-forward service/web 9999:8080</a></code></pre></div>
 <p>Cette commande transfert le port 8080 du service <strong>web</strong> dans le <strong>k3s</strong>, vers le port 9999 de votre machine.</p>
-<p>Quelques soucis subsistents?</p>
+<p>Quelques soucis subsistent ?</p>
 </section><section id="premier-soucis" class="slide level2">
 <h2>Premier soucis</h2>
 <div class="sourceCode" id="cb105"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb105-1" title="1"><span class="fu">sudo</span> k3s kubectl get pods</a></code></pre></div>
-<p>Il semblerait que le pod <strong>web</strong> ne soit pas correctement démmaré</p>
+<p>Il semblerait que le pod <strong>web</strong> ne soit pas correctement démarré</p>
 <div class="sourceCode" id="cb106"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb106-1" title="1"><span class="fu">sudo</span> k3s kubectl describe pod database-7dc4c66fd4-g4xww</a></code></pre></div>
 <p>En effet l’image <strong>cartopoint:1.0</strong> n’est pas disponible! Modifions donc le <strong>Manifest</strong> <em>web-deployment.yaml</em> pour utiliser une image publique :</p>
 <div class="sourceCode" id="cb107"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb107-1" title="1">//...</a>
@@ -1736,12 +1738,15 @@ cd cours_docker/ressources</code></pre>
 <p>Appliquons la différence, et vérifions</p>
 <div class="sourceCode" id="cb108"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb108-1" title="1">sudo k3s kubectl apply -f web-deployment.yaml</a>
 <a class="sourceLine" id="cb108-2" title="2">sudo k3s kubectl get pods</a></code></pre></div>
-<p>Si tout se passe bien, nous devrions accéder maintenant au site https://127.0.0.1:9999</p>
 </section><section id="dautres-soucis" class="slide level2">
 <h2>D’autres soucis</h2>
-<p><img data-src="k3s-db-error.png" /></p>
+<p>Si tout se passe bien, nous devrions accéder maintenant au site https://127.0.0.1:9999</p>
+<p><img data-src="img/k3s-db-error.png" /></p>
 <p>Il semblerait que non…</p>
-<p>Le soucis ici vient du fait que notre application web ne trouve pas sa base de donnée. En effet, Kompose nous avait averti que celle ci n’était pas exposé dans le dockerfile. Corrigeons ceci et créons un <strong>Manifest</strong> <em>database-service.yaml</em> pour exposer la base de donnée, exposées sur le port 3306.</p>
+<p>Le soucis ici vient du fait que notre application web ne trouve pas sa base de donnée. En effet, Kompose nous avait averti que celle ci n’était pas exposé dans le dockerfile.</p>
+</section><section id="exposition" class="slide level2">
+<h2>Exposition</h2>
+<p>Corrigeons ceci et créons un <strong>Manifest</strong> <em>database-service.yaml</em> pour exposer la base de donnée, exposées sur le port 3306.</p>
 <div class="sourceCode" id="cb109"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb109-1" title="1"><span class="fu">apiVersion:</span><span class="at"> v1</span></a>
 <a class="sourceLine" id="cb109-2" title="2"><span class="fu">kind:</span><span class="at"> Service</span></a>
 <a class="sourceLine" id="cb109-3" title="3"><span class="fu">metadata:</span></a>
