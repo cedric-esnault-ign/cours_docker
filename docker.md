@@ -1296,7 +1296,7 @@ Certaines variables sont automatiquement ajouté (Les réglages de proxy par exe
 
 ## Multistage build ##
 
-Le conteneur de production ne doit contenir que ce qui est nécessaire pour le run, il ne doit rien rester dasn l'image en rapport avec le dev/build.
+Le conteneur de production ne doit contenir que ce qui est nécessaire pour le run, il ne doit rien rester dans l'image en rapport avec le dev/build.
 Pour optimiser le poids de l'image de RUN, on sépare la création de l'image en plusieurs phases.
 Un conteneur de *build* génère un package à copier sur le conteneur de *run*
 
@@ -1739,7 +1739,7 @@ command: some command && some other
 
 ## Services : autres options ##
 
-Quelques autres options sont interssantes :
+Quelques autres options sont intéressantes :
 
 ```yaml
 container_name: nomSpeficique
@@ -1764,7 +1764,7 @@ volumes:
 
 ## Les volumes temporaires ##
 
-Il est également possible de définir des volumes temporaires qui seront stocké en RAM et seront détruits à la destruction du conteneur
+Il est également possible de définir des volumes temporaires qui seront stockés en RAM et seront détruits avec le conteneur
 
 ```yaml
 tmpfs:

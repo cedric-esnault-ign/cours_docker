@@ -1294,7 +1294,7 @@ cd cours_docker/ressources</code></pre>
 </section>
 <section id="multistage-build" class="slide level2">
 <h2>Multistage build</h2>
-<p>Le conteneur de production ne doit contenir que ce qui est nécessaire pour le run, il ne doit rien rester dasn l’image en rapport avec le dev/build. Pour optimiser le poids de l’image de RUN, on sépare la création de l’image en plusieurs phases. Un conteneur de <em>build</em> génère un package à copier sur le conteneur de <em>run</em></p>
+<p>Le conteneur de production ne doit contenir que ce qui est nécessaire pour le run, il ne doit rien rester dans l’image en rapport avec le dev/build. Pour optimiser le poids de l’image de RUN, on sépare la création de l’image en plusieurs phases. Un conteneur de <em>build</em> génère un package à copier sur le conteneur de <em>run</em></p>
 </section>
 <section id="multistage-build-1" class="slide level2">
 <h2>Multistage build</h2>
@@ -1720,7 +1720,7 @@ cd cours_docker/ressources</code></pre>
 </section>
 <section id="services-autres-options" class="slide level2">
 <h2>Services : autres options</h2>
-<p>Quelques autres options sont interssantes :</p>
+<p>Quelques autres options sont intéressantes :</p>
 <div class="sourceCode" id="cb86"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true"></a><span class="fu">container_name</span><span class="kw">:</span><span class="at"> nomSpeficique</span></span>
 <span id="cb86-2"><a href="#cb86-2" aria-hidden="true"></a><span class="fu">restart </span><span class="kw">:</span><span class="at"> always</span></span>
 <span id="cb86-3"><a href="#cb86-3" aria-hidden="true"></a><span class="fu">read_only</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span></code></pre></div>
@@ -1740,7 +1740,7 @@ cd cours_docker/ressources</code></pre>
 </section>
 <section id="les-volumes-temporaires" class="slide level2">
 <h2>Les volumes temporaires</h2>
-<p>Il est également possible de définir des volumes temporaires qui seront stocké en RAM et seront détruits à la destruction du conteneur</p>
+<p>Il est également possible de définir des volumes temporaires qui seront stockés en RAM et seront détruits avec le conteneur</p>
 <div class="sourceCode" id="cb88"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true"></a><span class="fu">tmpfs</span><span class="kw">:</span></span>
 <span id="cb88-2"><a href="#cb88-2" aria-hidden="true"></a><span class="at">  </span><span class="kw">-</span><span class="at"> /tmp/app</span></span>
 <span id="cb88-3"><a href="#cb88-3" aria-hidden="true"></a><span class="at">  </span><span class="kw">-</span><span class="at"> /home/node/app/static:mode=700,size=1M,uid=1000,gid=10000</span></span></code></pre></div>
@@ -1896,7 +1896,7 @@ cd cours_docker/ressources</code></pre>
 <h2>Installation</h2>
 <p>Pour pouvoir tester <strong>k8s</strong>, il va nous falloir installer une mini-distribution kubernetes : <a href="https://k3s.io/">k3s</a>. Cette distribution permet de tester rapidement kubernetes sur un seul noeud en masquant sa complexité sous-jacente.</p>
 <div class="sourceCode" id="cb95"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb95-1"><a href="#cb95-1" aria-hidden="true"></a><span class="ex">curl</span> -sfL https://get.k3s.io <span class="kw">|</span> <span class="fu">sh</span> - </span></code></pre></div>
-<p>Après quelques instant, nous pouvns tester si le cluster (de 1 noeud…) est disponible :</p>
+<p>Après quelques instant, nous pouvons tester si le cluster (de 1 noeud…) est disponible :</p>
 <div class="sourceCode" id="cb96"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb96-1"><a href="#cb96-1" aria-hidden="true"></a><span class="fu">sudo</span> k3s kubectl get node</span></code></pre></div>
 <p><img data-src="img/k3s-ok.png" /></p>
 </section>
