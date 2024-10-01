@@ -2,7 +2,7 @@
 title : Docker par la pratique
 sub-title : IGN
 author : Cédric Esnault
-date : 12/03/2024 - IGN/ENSG
+date : 01/10/2024 - IGN/ENSG
 ---
 
 # Docker #
@@ -163,7 +163,6 @@ Les installations classiques de Docker sont composées de 2 éléments principau
 l'[OCI](https://opencontainers.org
 ) est Un organisme qui à pour but de normaliser les éléments constitutifs de la virtualisation et des conteneurs.
 C'est important car il existe également des alternatives/concurrents à Docker.
-
 
 <aside class=notes>
 
@@ -405,12 +404,14 @@ Cette commande créé le conteneur (l'environnement d'exécution) et lance le pr
 Exemple :
 
 ```bash
+docker container run alpine cat /etc/hostname
 docker container run --rm alpine cat /etc/hostname
 ```
 
 * On utilise l'image `alpine`
 * On exécute la commande `cat /etc/hostname`
 * Le conteneur affiche le contenu du fichier `/etc/hostname` et s'arrête.
+* L'option `--rm` permet de détruire le conteneur une fois la commande terminé (Sinon, le conteneur reste présent dans l'état *Exited* )
 
 ## Démarrer un conteneur ##
 
@@ -425,6 +426,8 @@ Démarre un shell dans le conteneur.
 *Comme si on était dans une VM.*
 
 Vous pouvez explorez le système de fichier pour voir ce qui s'y trouve.
+
+`Cette commande n'est pas toujours possible (voir --entrypoint)`{.note .fragment}
 
 ## Lister les conteneurs ##
 
@@ -443,7 +446,7 @@ CONTAINER ID    IMAGE       COMMAND              CREATED        STATUS          
 a5b74e24da65    alpine      "cat /etc/hostname"  9 seconds ago  Exited (0) 6 seconds ago               happy_cori
 ```
 
-L'option `--rm` permet de détruire le conteneur une fois la commande terminé (Sinon, le conteneur reste présent dans l'état *Exited* )
+On voit le premier conteneur  resté dans l'état *Exited*
 
 ## L'activité des conteneurs ##
 
@@ -479,10 +482,12 @@ docker container rm NOM
 | `-t` | forcer l'allocation d'un TTY |
 | `--rm` | supprimer le conteneur à la fin de son exécution |
 | `-d` | démarrer le conteneur en arrière-plan |
+| `--entrypoint` | redéfini le premier processus de l'image |
 
-Il en existe beaucoup d'autres : gestion des ressources, environnement d’exécution...
+Il en existe beaucoup d'autres : gestion des ressources, du réseau,  de l'environnement d’exécution, etc...
 
-Permet de copier des fichiers entre l'hôte et un conteneur actif.
+[Cas complexe de l'entrypoint](https://www.docker.com/blog/docker-best-practices-choosing-between-run-cmd-and-entrypoint/
+)
 
 ## Mise en réseau ##
 
@@ -1115,7 +1120,6 @@ docker volume prune
 docker run -v databasedata:/var/lib/mysql --net lamp -d --name database -e MARIADB_RANDOM_ROOT_PASSWORD=yes -e MARIADB_DATABASE=mymap -e MARIADB_USER=user -e MARIADB_PASSWORD=s3cr3t  mariadb
 ```
 
-
 # TP NextCloud #
 
 ## Déployer un nextCloud ##
@@ -1179,6 +1183,8 @@ docker image build DOCKERFILE_PATH
 
 `DOCKERFILE_PATH` est le chemin du dossier contenant le Dockerfile.
 
+`build` est ici un alias de `buildx`  que vous pouvez rencontrer, le moteur de construction par défaut étant [buildkit](https://docs.docker.com/build/buildkit/)
+
 La documentation de référence du docker file est présente ici :
 
 <https://docs.docker.com/engine/reference/builder/>
@@ -1217,9 +1223,9 @@ Lancer une commande
 RUN commande
 ```
 
-* installer des dépendances
-* déplacer des fichiers
-* compiler une librairie
+* Installer des dépendances
+* Déplacer des fichiers
+* Compiler une librairie
 * ...
 
 ## Instructions Dockerfile ##
@@ -1286,7 +1292,7 @@ Pour définir la valeur lors de la construction :
 docker image build --build-arg name=value .
 ```
 
-Certaines variables sont automatiquement ajouté (Les réglages de Proxy)
+Certaines variables sont automatiquement ajouté (Les réglages de proxy par exemple)
 
 ## Multistage build ##
 
@@ -1314,22 +1320,34 @@ Seul le dernier **FROM** sera contenu dans l'image finale
 
 ## Bonnes pratiques de conceptions ##
 
-* un conteneur est éphémère : **utilisation de volumes**
-* un conteneur doit être léger : **juste ce qu'il faut**
-* un seul processus par conteneur
-
+* Créer des conteneurs légers : **juste ce qu'il faut**
+* Ne laisser qu'un seul processus par conteneur : **microservices**
+* Créer des conteneurs éphémères : **utilisation de volumes**
+  * En mode cloud natif, on évitera l'utilisation de volume persistants en favorisant les applications stateless.
+* Passer toutes les configurations sous forme de variables d'environnements, à défaut via un volume (RO)
+* Minimiser et optimiser la taille des images
+* ...
+  
 <aside class="notes" >
 
 En mode cloud natif, on évitera l'utilisation de volume en favorisant les applications stateless.
 
 </aside>
 
-## Bonnes pratiques de conceptions ##
+## Bonnes pratiques de sécurité ##
 
-* minimiser le nombre de couche du système de fichiers **en minimisant les commandes RUN et en utilisant beaucoup de `&&`**
-* optimiser l'utilisation du cache de build :
-  - les commandes qui changent le moins en premiers (`EXPOSE` ...)
-  - les commandes ADD plutôt vers la fin
+* Choisir les bonnes images de base
+* Utiliser des images en **rootless**
+* Favoriser les images compatble avec **ReadOnlyFileSystem**
+* Exposer des ports > 1024
+* Scanner régulièrement les images avec un outil de scan
+* ...
+  
+## Bonnes pratiques Docker ##
+
+Mickaël Borne a regroupé un ensemble de bonnes pratiques qui sont disponibles ici :
+
+[Bonnes pratiques IGN](https://mborne.github.io/cours-devops/annexe/docker/bonnes-pratiques.html#les-bonnes-pratiques-classiques)
 
 # TP Dockerfile #
 
@@ -1559,7 +1577,7 @@ docker container run -p 8080:80 -e LIBREQR_CUSTOM_TEXT="Générateur de QR code 
 
 Nous pouvons voir ensemble les étapes nécessaires à la **Dockerisation** de vos applications.
 
-# Docker-compose #
+# Docker compose #
 
 ## Bilan docker ##
 
@@ -1583,7 +1601,7 @@ Imaginez la complexité pour déployer un CMS comprenant :
 
 ## Définition ##
 
-Docker-compose permet de définir tous les éléments nécessaires pour faire tourner une application multi-conteneurs.
+Docker compose permet de définir tous les éléments nécessaires pour faire tourner une application multi-conteneurs.
 
 - Un fichier définit les composants :
   - image
@@ -1594,12 +1612,16 @@ Docker-compose permet de définir tous les éléments nécessaires pour faire to
 
 ## Le fichier de définition ##
 
-L'application est définie dans un fichier au format YAML avec 3 sections principales, plus quelques autres informations :
+L'application est définie dans un fichier au format YAML avec 3 sections principales, plus quelques autres informations.
 
-- *la version du format* (obligatoire, en 2023 : `version: "3"`)
 - les **services**
 - les **volumes**
 - les **réseaux**
+
+Compose à été complètement réécrit en 2020 et intégré à la CLI Docker
+
+- On écrit donc `docker compose` et non plus `docker-compose`
+- La version du format (première ligne du ficher YAML) n'est plus obligatoire
 
 ## Les versions ##
 
@@ -1715,6 +1737,16 @@ Pour surcharger la commande par défaut, on utilise le paramètre **command**
 command: some command && some other
 ```
 
+## Services : autres options ##
+
+Quelques autres options sont interssantes :
+
+```yaml
+container_name: nomSpeficique
+restart : always
+read_only: true
+```
+
 ## Les volumes ##
 
 - Permet de définir des volumes (driver, options)
@@ -1728,6 +1760,16 @@ volumes:
   monvolume:
   monsecondvolume:
     driver: toto
+```
+
+## Les volumes temporaires ##
+
+Il est également possible de définir des volumes temporaires qui seront stocké en RAM et seront détruits à la destruction du conteneur
+
+```yaml
+tmpfs:
+  - /tmp/app
+  - /home/node/app/static:mode=700,size=1M,uid=1000,gid=10000
 ```
 
 ## Les réseaux ##
@@ -1750,6 +1792,12 @@ networks:
           ip_range: 192.168.91.0/25
           gateway: 192.168.91.1
 ```
+
+## Config ##
+
+Une nouvelle partie a fait son apparition pour simplifier la configuration des stack compose.
+
+  `#TODO`{.note .fragment}
 
 ## CLI ##
 
@@ -1779,18 +1827,18 @@ docker compose logs -f
 Nettoyage des conteneurs stoppés
 
 ```bash
-docker-compose rm
+docker compose rm
 ```
 
 Nettoyage des éléments
 
 ```bash
-docker-compose down
+docker compose down
 ```
 
 ## Documentation ##
 
-`docker-compose help`
+`docker compose help`
 
 ou
 
@@ -1803,10 +1851,10 @@ ou
 Pour ce TP, nous alons tenter de reproduire le TP LAMP en utilisant un docker-compose.yaml
 
 * Écrivez le docker-compose qui va réaliser les mêmes actions. N'oubliez pas  :
-  * les volumes
-  * les réseaux
-  * les variables d'environnements
-  * les dépendances
+  * Les volumes
+  * Les réseaux
+  * Les variables d'environnements
+  * Les dépendances
 * Lancez la stack en mode démon
 * Observez les logs
 * Notez le nom des conteneurs créés
@@ -1850,7 +1898,7 @@ networks:
 
 ## Orchestration de conteneurs ##
 
-Quand on parle de **Docker** en 2023, on peut difficillement ne pas évoquer Kubernetes (**K8S**).
+Quand on parle de **Docker** en 2024, on peut difficillement ne pas évoquer Kubernetes (**K8S**).
 
 **K8S** est une solution d'orchestration de conteneur mise au point par Google et devenue la référence en la matière. On peut résumer **K8S** à un **super compose**, même si il permet beaucoup plus de chose.
 **K8S** a permis d'amener les conteneurs **Docker** (créé avant tout pour les développeurs) en production , en apportant le contrôle et la sécurité nécéssaire.
@@ -1900,7 +1948,7 @@ Cette distribution permet de tester rapidement kubernetes sur un seul noeud en m
 curl -sfL https://get.k3s.io | sh - 
 ```
 
-Après quelques instant, nous pouvns tester si le cluster (de 1 noeud...) est disponible :
+Après quelques instant, nous pouvons tester si le cluster (de 1 noeud...) est disponible :
 
 ```bash
 sudo k3s kubectl get node
@@ -2098,3 +2146,18 @@ sudo k3s kubectl exec --stdin --tty web-f9c8ff8db-kssc8 -- /bin/bash
 sudo k3s kubectl port-forward service/web 9999:8080
 
 </aside>
+
+## visualisation ##
+
+Kubernetes fourni un outils (dashboard) pour visualiser rapidement le contenu d'un cluster.
+voici comment l'installer grace à **helm**, un outil qui permet de packager des applications pour **K8S**.
+
+Installation helm :
+
+```bash
+sudo snap install helm --classic
+```
+
+Puis suivre la documentation :
+
+<https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/>
