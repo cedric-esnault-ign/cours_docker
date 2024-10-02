@@ -1015,7 +1015,7 @@ cd cours_docker/ressources
 
 ## Apache ##
 
-L'image à utiliser ici est `httpd`. Les options `--name -d -p -v ` peuvent être utiles. La racine du serveur web dans l'image est `/usr/local/apache2/htdocs/`
+L'image à utiliser ici est `httpd`. Les options `--name -d -p -v --net ` peuvent être utiles. La racine du serveur web dans l'image est `/usr/local/apache2/htdocs/`
 
 - créez un dossier `apache-racine` pour le montage **host**
 - Lancez un conteneur avec un montage de la racine du serveur sur votre dossier `apache-racine` et exposant le port *80* du conteneur sur le port *8080* de la machine host.
@@ -1026,14 +1026,22 @@ L'image à utiliser ici est `httpd`. Les options `--name -d -p -v ` peuvent êtr
 ## Correction ##
 
 ```bash
-docker run --name web -d -p 8080:80 -v "$(pwd)/apache-racine/:/usr/local/apache2/htdocs/" httpd:latest
+docker create network lamp
+docker run --net lamp --name web -d -p 8080:80 -v "$(pwd)/apache-racine/:/usr/local/apache2/htdocs/" httpd:latest
 
 cp cartopoint/index-lamp.html apache-racine/index.html
 ```
 
+- **--name** défini le nom du conteneur
+- **-d** le laisse en arrière plan
+- **-p 8080:80** expose le port 80 
+- **-v ...**  partage un dossier local avec la racine du serveur web
+- **-net web** attache le conteneur au réseau *web*
+
+
 ## Un peu de php ##
 
-* Remplacez le fichier html par `index-lamp.php` (pensez à le renommer en index.php). qu'observez vous?
+* Remplacez le fichier `index.html` par `index-lamp.php` (pensez à le renommer en index.php). qu'observez vous?
 
 ## Un peu de php ##
 
@@ -1055,11 +1063,14 @@ Note : On déroge ici un peu à la règle 1 processus par conteneur. On pourrait
 
 ```bash
 docker rm -f web
-docker run --name web -d -p 8080:80 -v "$(pwd)/apache-racine/:/var/www/html/" php:7.4-apache
+docker run --net lamp --name web -d -p 8080:80 -v "$(pwd)/apache-racine/:/var/www/html/" php:7.4-apache
 
 cp cartopoint/index-lamp.php apache-racine/index.php
 
 ```
+
+On a pas besoin d'utiliser la commande `docker cp`car le dossier `apache-racine` est partagé entre l'host et le conteneur
+
 
 ## Ajout d'une Base De Données ##
 
@@ -1067,7 +1078,7 @@ Notre site web évolue ! Il va maintenant afficher une carte. Un clic permet de 
 
 * Utilisez l'image `cedricici/php:7.4-apache-mysql` puis remplacer le fichier `index.php` par le fichier `index-bdd.php`, observez les erreurs
 
-Pour respecter le principe d'un seul processus par conteneur, il faut lancer un second conteneur pour notre base de données. Utilisez l'image `mariadb`. Vous trouverez des informations sur la configuration de cette image sur [hub.docker.com](https://hub.docker.com/_/mariadb).
+Pour respecter le principe d'un seul processus par conteneur, il faut lancer un second conteneur pour notre base de données. Utilisez l'image `mariadb:10`. Vous trouverez des informations sur la configuration de cette image sur [hub.docker.com](https://hub.docker.com/_/mariadb). (Précisez bien la version 10, il y a des soucis de compatibilité avec les plus récentes)
 
 * Configurez la base de données de façon à ce que le code php fonctionne (nom d'utilisateur, mot de passe et base de données). L'option `-e` de `docker run` permet de passer des variables d'environnement au conteneur. Les deux conteneurs doivent se situer sur le même réseau pour pouvoir se "voir" (DNS)
 
@@ -1094,7 +1105,6 @@ Le fait de définir les paramètres de connexion à la base de données dans un 
 
 ```bash
 docker rm -f web
-docker network create lamp
 docker run --net lamp -d --name web -p 8080:80 -v $(pwd)/apache-racine/:/var/www/html/ cedricici/php:7.4-apache-mysql
 docker run --net lamp -d --name database -e MARIADB_RANDOM_ROOT_PASSWORD=yes -e MARIADB_DATABASE=mymap -e MARIADB_USER=user -e MARIADB_PASSWORD=s3cr3t  mariadb
 docker exec -it database mariadb -u user -D mymap --password="s3cr3t"
@@ -1181,7 +1191,7 @@ On construit une image avec un Dockerfile
 docker image build DOCKERFILE_PATH
 ```
 
-`DOCKERFILE_PATH` est le chemin du dossier contenant le Dockerfile.
+`DOCKERFILE_PATH` est le chemin du dossier contenant le Dockerfile. Il est conseillé de dédié un nouveau dossier pour construire les images, toutes les références seront relative à ce dossier (et on ne pourra pas en sortir)
 
 `build` est ici un alias de `buildx`  que vous pouvez rencontrer, le moteur de construction par défaut étant [buildkit](https://docs.docker.com/build/buildkit/)
 
@@ -1236,6 +1246,8 @@ Ajouter des fichiers locaux ou distants
 ADD <src> <dest>
 COPY <src> <dest>
 ```
+
+L'emplacement `<src>`est relatif au dossier de build.
 
 Globalement identiques mais :
 
@@ -1393,6 +1405,8 @@ Cette fois ci, nous allons créer pas à pas une image Docker pour une applicati
   * Exécuter la commande `npm install --production` afin d'installer les dépendances
   * Copier les sources (le dossier `/public` et le fichier `server.js` ) dans ce dossier
   * définir la commande par défaut : `npm start`
+* Construisez une image avec le nom de votre choix 
+
 
 <aside class="notes">
 
@@ -1864,7 +1878,6 @@ note : Il existe des solutions plus "sûr" pour passer des variables d'environne
 ## Correction ##
 
 ```yaml
-version: "3"
 services:
   web:
     image: cartopoint:1.0

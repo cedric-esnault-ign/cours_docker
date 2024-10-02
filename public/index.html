@@ -1033,7 +1033,7 @@ cd cours_docker/ressources</code></pre>
 </section>
 <section id="apache" class="slide level2">
 <h2>Apache</h2>
-<p>L’image à utiliser ici est <code>httpd</code>. Les options <code>--name -d -p -v</code> peuvent être utiles. La racine du serveur web dans l’image est <code>/usr/local/apache2/htdocs/</code></p>
+<p>L’image à utiliser ici est <code>httpd</code>. Les options <code>--name -d -p -v --net</code> peuvent être utiles. La racine du serveur web dans l’image est <code>/usr/local/apache2/htdocs/</code></p>
 <ul>
 <li class="fragment">créez un dossier <code>apache-racine</code> pour le montage <strong>host</strong></li>
 <li class="fragment">Lancez un conteneur avec un montage de la racine du serveur sur votre dossier <code>apache-racine</code> et exposant le port <em>80</em> du conteneur sur le port <em>8080</em> de la machine host.</li>
@@ -1043,14 +1043,22 @@ cd cours_docker/ressources</code></pre>
 </section>
 <section id="correction-12" class="slide level2">
 <h2>Correction</h2>
-<div class="sourceCode" id="cb53"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true"></a><span class="ex">docker</span> run --name web -d -p 8080:80 -v <span class="st">&quot;</span><span class="va">$(</span><span class="bu">pwd</span><span class="va">)</span><span class="st">/apache-racine/:/usr/local/apache2/htdocs/&quot;</span> httpd:latest</span>
-<span id="cb53-2"><a href="#cb53-2" aria-hidden="true"></a></span>
-<span id="cb53-3"><a href="#cb53-3" aria-hidden="true"></a><span class="fu">cp</span> cartopoint/index-lamp.html apache-racine/index.html</span></code></pre></div>
+<div class="sourceCode" id="cb53"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true"></a><span class="ex">docker</span> create network lamp</span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true"></a><span class="ex">docker</span> run --net lamp --name web -d -p 8080:80 -v <span class="st">&quot;</span><span class="va">$(</span><span class="bu">pwd</span><span class="va">)</span><span class="st">/apache-racine/:/usr/local/apache2/htdocs/&quot;</span> httpd:latest</span>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true"></a></span>
+<span id="cb53-4"><a href="#cb53-4" aria-hidden="true"></a><span class="fu">cp</span> cartopoint/index-lamp.html apache-racine/index.html</span></code></pre></div>
+<ul>
+<li class="fragment"><strong>–name</strong> défini le nom du conteneur</li>
+<li class="fragment"><strong>-d</strong> le laisse en arrière plan</li>
+<li class="fragment"><strong>-p 8080:80</strong> expose le port 80</li>
+<li class="fragment"><strong>-v …</strong> partage un dossier local avec la racine du serveur web</li>
+<li class="fragment"><strong>-net web</strong> attache le conteneur au réseau <em>web</em></li>
+</ul>
 </section>
 <section id="un-peu-de-php" class="slide level2">
 <h2>Un peu de php</h2>
 <ul>
-<li class="fragment">Remplacez le fichier html par <code>index-lamp.php</code> (pensez à le renommer en index.php). qu’observez vous?</li>
+<li class="fragment">Remplacez le fichier <code>index.html</code> par <code>index-lamp.php</code> (pensez à le renommer en index.php). qu’observez vous?</li>
 </ul>
 </section>
 <section id="un-peu-de-php-1" class="slide level2">
@@ -1070,9 +1078,10 @@ cd cours_docker/ressources</code></pre>
 <section id="correction-13" class="slide level2">
 <h2>Correction</h2>
 <div class="sourceCode" id="cb54"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true"></a><span class="ex">docker</span> rm -f web</span>
-<span id="cb54-2"><a href="#cb54-2" aria-hidden="true"></a><span class="ex">docker</span> run --name web -d -p 8080:80 -v <span class="st">&quot;</span><span class="va">$(</span><span class="bu">pwd</span><span class="va">)</span><span class="st">/apache-racine/:/var/www/html/&quot;</span> php:7.4-apache</span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true"></a><span class="ex">docker</span> run --net lamp --name web -d -p 8080:80 -v <span class="st">&quot;</span><span class="va">$(</span><span class="bu">pwd</span><span class="va">)</span><span class="st">/apache-racine/:/var/www/html/&quot;</span> php:7.4-apache</span>
 <span id="cb54-3"><a href="#cb54-3" aria-hidden="true"></a></span>
 <span id="cb54-4"><a href="#cb54-4" aria-hidden="true"></a><span class="fu">cp</span> cartopoint/index-lamp.php apache-racine/index.php</span></code></pre></div>
+<p>On a pas besoin d’utiliser la commande <code>docker cp</code>car le dossier <code>apache-racine</code> est partagé entre l’host et le conteneur</p>
 </section>
 <section id="ajout-dune-base-de-données" class="slide level2">
 <h2>Ajout d’une Base De Données</h2>
@@ -1080,7 +1089,7 @@ cd cours_docker/ressources</code></pre>
 <ul>
 <li class="fragment">Utilisez l’image <code>cedricici/php:7.4-apache-mysql</code> puis remplacer le fichier <code>index.php</code> par le fichier <code>index-bdd.php</code>, observez les erreurs</li>
 </ul>
-<p>Pour respecter le principe d’un seul processus par conteneur, il faut lancer un second conteneur pour notre base de données. Utilisez l’image <code>mariadb</code>. Vous trouverez des informations sur la configuration de cette image sur <a href="https://hub.docker.com/_/mariadb">hub.docker.com</a>.</p>
+<p>Pour respecter le principe d’un seul processus par conteneur, il faut lancer un second conteneur pour notre base de données. Utilisez l’image <code>mariadb:10</code>. Vous trouverez des informations sur la configuration de cette image sur <a href="https://hub.docker.com/_/mariadb">hub.docker.com</a>. (Précisez bien la version 10, il y a des soucis de compatibilité avec les plus récentes)</p>
 <ul>
 <li class="fragment">Configurez la base de données de façon à ce que le code php fonctionne (nom d’utilisateur, mot de passe et base de données). L’option <code>-e</code> de <code>docker run</code> permet de passer des variables d’environnement au conteneur. Les deux conteneurs doivent se situer sur le même réseau pour pouvoir se “voir” (DNS)</li>
 </ul>
@@ -1132,10 +1141,9 @@ cd cours_docker/ressources</code></pre>
 <section id="correction-15" class="slide level2">
 <h2>Correction</h2>
 <div class="sourceCode" id="cb55"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true"></a><span class="ex">docker</span> rm -f web</span>
-<span id="cb55-2"><a href="#cb55-2" aria-hidden="true"></a><span class="ex">docker</span> network create lamp</span>
-<span id="cb55-3"><a href="#cb55-3" aria-hidden="true"></a><span class="ex">docker</span> run --net lamp -d --name web -p 8080:80 -v <span class="va">$(</span><span class="bu">pwd</span><span class="va">)</span>/apache-racine/:/var/www/html/ cedricici/php:7.4-apache-mysql</span>
-<span id="cb55-4"><a href="#cb55-4" aria-hidden="true"></a><span class="ex">docker</span> run --net lamp -d --name database -e MARIADB_RANDOM_ROOT_PASSWORD=yes -e MARIADB_DATABASE=mymap -e MARIADB_USER=user -e MARIADB_PASSWORD=s3cr3t  mariadb</span>
-<span id="cb55-5"><a href="#cb55-5" aria-hidden="true"></a><span class="ex">docker</span> exec -it database mariadb -u user -D mymap --password=<span class="st">&quot;s3cr3t&quot;</span></span></code></pre></div>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true"></a><span class="ex">docker</span> run --net lamp -d --name web -p 8080:80 -v <span class="va">$(</span><span class="bu">pwd</span><span class="va">)</span>/apache-racine/:/var/www/html/ cedricici/php:7.4-apache-mysql</span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true"></a><span class="ex">docker</span> run --net lamp -d --name database -e MARIADB_RANDOM_ROOT_PASSWORD=yes -e MARIADB_DATABASE=mymap -e MARIADB_USER=user -e MARIADB_PASSWORD=s3cr3t  mariadb</span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true"></a><span class="ex">docker</span> exec -it database mariadb -u user -D mymap --password=<span class="st">&quot;s3cr3t&quot;</span></span></code></pre></div>
 </section>
 <section id="persistence-de-la-base-de-données" class="slide level2">
 <h2>Persistence de la Base De Données</h2>
@@ -1215,7 +1223,7 @@ cd cours_docker/ressources</code></pre>
 <h2>Construction d’une image</h2>
 <p>On construit une image avec un Dockerfile</p>
 <div class="sourceCode" id="cb58"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true"></a><span class="ex">docker</span> image build DOCKERFILE_PATH</span></code></pre></div>
-<p><code>DOCKERFILE_PATH</code> est le chemin du dossier contenant le Dockerfile.</p>
+<p><code>DOCKERFILE_PATH</code> est le chemin du dossier contenant le Dockerfile. Il est conseillé de dédié un nouveau dossier pour construire les images, toutes les références seront relative à ce dossier (et on ne pourra pas en sortir)</p>
 <p><code>build</code> est ici un alias de <code>buildx</code> que vous pouvez rencontrer, le moteur de construction par défaut étant <a href="https://docs.docker.com/build/buildkit/">buildkit</a></p>
 <p>La documentation de référence du docker file est présente ici :</p>
 <p><a href="https://docs.docker.com/engine/reference/builder/" class="uri">https://docs.docker.com/engine/reference/builder/</a></p>
@@ -1254,6 +1262,7 @@ cd cours_docker/ressources</code></pre>
 <p>Ajouter des fichiers locaux ou distants</p>
 <div class="sourceCode" id="cb62"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true"></a><span class="kw">ADD</span> &lt;src&gt; &lt;dest&gt;</span>
 <span id="cb62-2"><a href="#cb62-2" aria-hidden="true"></a><span class="kw">COPY</span> &lt;src&gt; &lt;dest&gt;</span></code></pre></div>
+<p>L’emplacement <code>&lt;src&gt;</code>est relatif au dossier de build.</p>
 <p>Globalement identiques mais :</p>
 <ul>
 <li class="fragment"><code>ADD</code> supporte les URL</li>
@@ -1387,6 +1396,7 @@ cd cours_docker/ressources</code></pre>
 <li class="fragment">Copier les sources (le dossier <code>/public</code> et le fichier <code>server.js</code> ) dans ce dossier</li>
 <li class="fragment">définir la commande par défaut : <code>npm start</code></li>
 </ul></li>
+<li class="fragment">Construisez une image avec le nom de votre choix</li>
 </ul>
 <aside class="notes">
 </aside>
@@ -1821,33 +1831,32 @@ cd cours_docker/ressources</code></pre>
 </section>
 <section id="correction-25" class="slide level2">
 <h2>Correction</h2>
-<div class="sourceCode" id="cb94"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true"></a><span class="fu">version</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;3&quot;</span></span>
-<span id="cb94-2"><a href="#cb94-2" aria-hidden="true"></a><span class="fu">services</span><span class="kw">:</span></span>
-<span id="cb94-3"><a href="#cb94-3" aria-hidden="true"></a><span class="at">  </span><span class="fu">web</span><span class="kw">:</span></span>
-<span id="cb94-4"><a href="#cb94-4" aria-hidden="true"></a><span class="at">    </span><span class="fu">image</span><span class="kw">:</span><span class="at"> cartopoint:1.0</span></span>
-<span id="cb94-5"><a href="#cb94-5" aria-hidden="true"></a><span class="at">    </span><span class="fu">ports</span><span class="kw">:</span></span>
-<span id="cb94-6"><a href="#cb94-6" aria-hidden="true"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="st">&quot;8080:80&quot;</span></span>
-<span id="cb94-7"><a href="#cb94-7" aria-hidden="true"></a><span class="at">    </span><span class="fu">networks</span><span class="kw">:</span></span>
-<span id="cb94-8"><a href="#cb94-8" aria-hidden="true"></a><span class="at">      </span><span class="kw">-</span><span class="at"> lamp</span></span>
-<span id="cb94-9"><a href="#cb94-9" aria-hidden="true"></a><span class="at">    </span><span class="fu">depends_on</span><span class="kw">:</span></span>
-<span id="cb94-10"><a href="#cb94-10" aria-hidden="true"></a><span class="at">      </span><span class="kw">-</span><span class="at"> database</span></span>
-<span id="cb94-11"><a href="#cb94-11" aria-hidden="true"></a><span class="at">  </span><span class="fu">database</span><span class="kw">:</span></span>
-<span id="cb94-12"><a href="#cb94-12" aria-hidden="true"></a><span class="at">    </span><span class="fu">image</span><span class="kw">:</span><span class="at"> mariadb</span></span>
-<span id="cb94-13"><a href="#cb94-13" aria-hidden="true"></a><span class="at">    </span><span class="fu">environment</span><span class="kw">:</span></span>
-<span id="cb94-14"><a href="#cb94-14" aria-hidden="true"></a><span class="at">      </span><span class="kw">-</span><span class="at"> MARIADB_RANDOM_ROOT_PASSWORD=yes</span></span>
-<span id="cb94-15"><a href="#cb94-15" aria-hidden="true"></a><span class="at">      </span><span class="kw">-</span><span class="at"> MARIADB_DATABASE=mymap</span></span>
-<span id="cb94-16"><a href="#cb94-16" aria-hidden="true"></a><span class="at">      </span><span class="kw">-</span><span class="at"> MARIADB_USER=user</span></span>
-<span id="cb94-17"><a href="#cb94-17" aria-hidden="true"></a><span class="at">      </span><span class="kw">-</span><span class="at"> MARIADB_PASSWORD=s3cr3t</span></span>
-<span id="cb94-18"><a href="#cb94-18" aria-hidden="true"></a><span class="at">    </span><span class="fu">volumes</span><span class="kw">:</span></span>
-<span id="cb94-19"><a href="#cb94-19" aria-hidden="true"></a><span class="at">      </span><span class="kw">-</span><span class="at"> databasedata:/var/lib/mysql</span></span>
-<span id="cb94-20"><a href="#cb94-20" aria-hidden="true"></a><span class="at">    </span><span class="fu">networks</span><span class="kw">:</span></span>
-<span id="cb94-21"><a href="#cb94-21" aria-hidden="true"></a><span class="at">      </span><span class="kw">-</span><span class="at"> lamp</span></span>
-<span id="cb94-22"><a href="#cb94-22" aria-hidden="true"></a></span>
-<span id="cb94-23"><a href="#cb94-23" aria-hidden="true"></a><span class="fu">volumes</span><span class="kw">:</span></span>
-<span id="cb94-24"><a href="#cb94-24" aria-hidden="true"></a><span class="at">  </span><span class="fu">databasedata</span><span class="kw">:</span></span>
-<span id="cb94-25"><a href="#cb94-25" aria-hidden="true"></a></span>
-<span id="cb94-26"><a href="#cb94-26" aria-hidden="true"></a><span class="fu">networks</span><span class="kw">:</span></span>
-<span id="cb94-27"><a href="#cb94-27" aria-hidden="true"></a><span class="at">  </span><span class="fu">lamp</span><span class="kw">:</span></span></code></pre></div>
+<div class="sourceCode" id="cb94"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true"></a><span class="fu">services</span><span class="kw">:</span></span>
+<span id="cb94-2"><a href="#cb94-2" aria-hidden="true"></a><span class="at">  </span><span class="fu">web</span><span class="kw">:</span></span>
+<span id="cb94-3"><a href="#cb94-3" aria-hidden="true"></a><span class="at">    </span><span class="fu">image</span><span class="kw">:</span><span class="at"> cartopoint:1.0</span></span>
+<span id="cb94-4"><a href="#cb94-4" aria-hidden="true"></a><span class="at">    </span><span class="fu">ports</span><span class="kw">:</span></span>
+<span id="cb94-5"><a href="#cb94-5" aria-hidden="true"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="st">&quot;8080:80&quot;</span></span>
+<span id="cb94-6"><a href="#cb94-6" aria-hidden="true"></a><span class="at">    </span><span class="fu">networks</span><span class="kw">:</span></span>
+<span id="cb94-7"><a href="#cb94-7" aria-hidden="true"></a><span class="at">      </span><span class="kw">-</span><span class="at"> lamp</span></span>
+<span id="cb94-8"><a href="#cb94-8" aria-hidden="true"></a><span class="at">    </span><span class="fu">depends_on</span><span class="kw">:</span></span>
+<span id="cb94-9"><a href="#cb94-9" aria-hidden="true"></a><span class="at">      </span><span class="kw">-</span><span class="at"> database</span></span>
+<span id="cb94-10"><a href="#cb94-10" aria-hidden="true"></a><span class="at">  </span><span class="fu">database</span><span class="kw">:</span></span>
+<span id="cb94-11"><a href="#cb94-11" aria-hidden="true"></a><span class="at">    </span><span class="fu">image</span><span class="kw">:</span><span class="at"> mariadb</span></span>
+<span id="cb94-12"><a href="#cb94-12" aria-hidden="true"></a><span class="at">    </span><span class="fu">environment</span><span class="kw">:</span></span>
+<span id="cb94-13"><a href="#cb94-13" aria-hidden="true"></a><span class="at">      </span><span class="kw">-</span><span class="at"> MARIADB_RANDOM_ROOT_PASSWORD=yes</span></span>
+<span id="cb94-14"><a href="#cb94-14" aria-hidden="true"></a><span class="at">      </span><span class="kw">-</span><span class="at"> MARIADB_DATABASE=mymap</span></span>
+<span id="cb94-15"><a href="#cb94-15" aria-hidden="true"></a><span class="at">      </span><span class="kw">-</span><span class="at"> MARIADB_USER=user</span></span>
+<span id="cb94-16"><a href="#cb94-16" aria-hidden="true"></a><span class="at">      </span><span class="kw">-</span><span class="at"> MARIADB_PASSWORD=s3cr3t</span></span>
+<span id="cb94-17"><a href="#cb94-17" aria-hidden="true"></a><span class="at">    </span><span class="fu">volumes</span><span class="kw">:</span></span>
+<span id="cb94-18"><a href="#cb94-18" aria-hidden="true"></a><span class="at">      </span><span class="kw">-</span><span class="at"> databasedata:/var/lib/mysql</span></span>
+<span id="cb94-19"><a href="#cb94-19" aria-hidden="true"></a><span class="at">    </span><span class="fu">networks</span><span class="kw">:</span></span>
+<span id="cb94-20"><a href="#cb94-20" aria-hidden="true"></a><span class="at">      </span><span class="kw">-</span><span class="at"> lamp</span></span>
+<span id="cb94-21"><a href="#cb94-21" aria-hidden="true"></a></span>
+<span id="cb94-22"><a href="#cb94-22" aria-hidden="true"></a><span class="fu">volumes</span><span class="kw">:</span></span>
+<span id="cb94-23"><a href="#cb94-23" aria-hidden="true"></a><span class="at">  </span><span class="fu">databasedata</span><span class="kw">:</span></span>
+<span id="cb94-24"><a href="#cb94-24" aria-hidden="true"></a></span>
+<span id="cb94-25"><a href="#cb94-25" aria-hidden="true"></a><span class="fu">networks</span><span class="kw">:</span></span>
+<span id="cb94-26"><a href="#cb94-26" aria-hidden="true"></a><span class="at">  </span><span class="fu">lamp</span><span class="kw">:</span></span></code></pre></div>
 </section></section>
 <section>
 <section id="kubernetes" class="title-slide slide level1">
