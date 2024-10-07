@@ -1074,13 +1074,13 @@ On a pas besoin d'utiliser la commande `docker cp`car le dossier `apache-racine`
 
 ## Ajout d'une Base De Données ##
 
-Notre site web évolue ! Il va maintenant afficher une carte. Un clic permet de créer un point, sauvegardé en base de données. Un clic sur un point le supprime. Au chargement de la page, on affiche tous les points de la base de données.
+Notre site web évolue ! Il va maintenant afficher une carte. Un clic permet de créer un point, sauvegardé en base de données. Un clic sur un point le supprime.
 
-* Utilisez l'image `cedricici/php:7.4-apache-mysql` puis remplacer le fichier `index.php` par le fichier `index-bdd.php`, observez les erreurs
+* Utilisez l'image `cedricici/php:7.4-apache-mysql` puis remplacez le fichier `index.php` par le fichier `index-bdd.php`, observez les erreurs
 
-Pour respecter le principe d'un seul processus par conteneur, il faut lancer un second conteneur pour notre base de données. Utilisez l'image `mariadb:10`. Vous trouverez des informations sur la configuration de cette image sur [hub.docker.com](https://hub.docker.com/_/mariadb). (Précisez bien la version 10, il y a des soucis de compatibilité avec les plus récentes)
+* Il faut ensuite lancer un second conteneur pour notre base de données. Utilisez l'image `mariadb:10`. Vous trouverez des informations sur la configuration de cette image sur [hub.docker.com](https://hub.docker.com/_/mariadb). (Précisez bien la version 10, il y a des soucis de compatibilité avec les plus récentes)
 
-* Configurez la base de données de façon à ce que le code php fonctionne (nom d'utilisateur, mot de passe et base de données). L'option `-e` de `docker run` permet de passer des variables d'environnement au conteneur. Les deux conteneurs doivent se situer sur le même réseau pour pouvoir se "voir" (DNS)
+* Configurez la base de données de façon à ce que le code php fonctionne (nom d'utilisateur, mot de passe et base de données). L'option `-e` de `docker run` permet de passer des variables d'environnement au conteneur. Les deux conteneurs doivent se situer sur le même réseau pour pouvoir se "parler" (DNS)
 
 ## Correction ##
 
@@ -1105,20 +1105,20 @@ Le fait de définir les paramètres de connexion à la base de données dans un 
 
 ```bash
 docker rm -f web
+docker network create lamp
 docker run --net lamp -d --name web -p 8080:80 -v $(pwd)/apache-racine/:/var/www/html/ cedricici/php:7.4-apache-mysql
-docker run --net lamp -d --name database -e MARIADB_RANDOM_ROOT_PASSWORD=yes -e MARIADB_DATABASE=mymap -e MARIADB_USER=user -e MARIADB_PASSWORD=s3cr3t  mariadb
+docker run --net lamp -d --name database -e MARIADB_RANDOM_ROOT_PASSWORD=yes -e MARIADB_DATABASE=mymap -e MARIADB_USER=user -e MARIADB_PASSWORD=s3cr3t  mariadb:10
+# Pour lancer un client mariadb d'observation de la base
 docker exec -it database mariadb -u user -D mymap --password="s3cr3t"
-
 ```
 
 ## Persistence de la Base De Données ##
 
 Détruisez les conteneurs, puis reconstruisez l'ensemble. Les points sont perdus **:-(**
   
-* Résolvez ce problème
+* Résolvez ce problème, vous trouverez les informations nécessaires sur la page dockerhub.
 
 <aside class="notes">
-
 
 </aside>
 
@@ -1127,7 +1127,7 @@ Détruisez les conteneurs, puis reconstruisez l'ensemble. Les points sont perdus
 ```bash
 docker rm -f database
 docker volume prune
-docker run -v databasedata:/var/lib/mysql --net lamp -d --name database -e MARIADB_RANDOM_ROOT_PASSWORD=yes -e MARIADB_DATABASE=mymap -e MARIADB_USER=user -e MARIADB_PASSWORD=s3cr3t  mariadb
+docker run -v databasedata:/var/lib/mysql --net lamp -d --name database -e MARIADB_RANDOM_ROOT_PASSWORD=yes -e MARIADB_DATABASE=mymap -e MARIADB_USER=user -e MARIADB_PASSWORD=s3cr3t  mariadb:10
 ```
 
 # TP NextCloud #
@@ -1191,7 +1191,7 @@ On construit une image avec un Dockerfile
 docker image build DOCKERFILE_PATH
 ```
 
-`DOCKERFILE_PATH` est le chemin du dossier contenant le Dockerfile. Il est conseillé de dédié un nouveau dossier pour construire les images, toutes les références seront relative à ce dossier (et on ne pourra pas en sortir)
+`DOCKERFILE_PATH` est le chemin du dossier contenant le Dockerfile. Il est conseillé de dédier un nouveau dossier pour construire les images, toutes les références seront relative à ce dossier (et on ne pourra pas en sortir)
 
 `build` est ici un alias de `buildx`  que vous pouvez rencontrer, le moteur de construction par défaut étant [buildkit](https://docs.docker.com/build/buildkit/)
 
@@ -1405,8 +1405,7 @@ Cette fois ci, nous allons créer pas à pas une image Docker pour une applicati
   * Exécuter la commande `npm install --production` afin d'installer les dépendances
   * Copier les sources (le dossier `/public` et le fichier `server.js` ) dans ce dossier
   * définir la commande par défaut : `npm start`
-* Construisez une image avec le nom de votre choix 
-
+* Construisez une image avec le nom de votre choix
 
 <aside class="notes">
 
@@ -1510,26 +1509,26 @@ Nous allons améliorer l'image en créant une image multistage
 ## Correction ##
 
 ```Dockerfile
-FROM debian as builder
+FROM debian AS builder
 RUN apt-get update && apt-get install -y gcc
 COPY prime.c prime.c
 RUN gcc prime.c -o prime
-FROM debian:stable-slim as runner
+FROM debian:stable-slim AS runner
 COPY --from=builder prime prime
-CMD [ "./prime","1" ]
+CMD [ "./prime","10000" ]
 
 ```
 
 ## Correction ##
 
-On peut même aller plus loin et utiliser une image plus petite et se basant sur l'image **scratch** qui ne contient rien. Cela pose tout de même quelques limitation, l'image ne contenant même pas de shell, il n'est pas possible de passer des paramètres.
+On peut même aller plus loin et utiliser une image plus petite et se basant sur l'image **scratch** qui ne contient rien. Il faut donc inclure les librairies dans le binaire final (option **-static**). Cela pose tout de même quelques limitation, l'image ne contenant même pas de shell, il n'est pas possible de passer des paramètres.
 
 ```Dockerfile
-FROM debian as builder
+FROM debian AS builder
 RUN apt-get update && apt-get install -y gcc
 COPY prime.c prime.c
 RUN gcc prime.c -o prime -static 
-FROM scratch as runner
+FROM scratch AS runner
 COPY --from=builder prime /prime
 CMD ["/prime","10000"]
 ```

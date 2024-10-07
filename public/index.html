@@ -1085,13 +1085,11 @@ cd cours_docker/ressources</code></pre>
 </section>
 <section id="ajout-dune-base-de-données" class="slide level2">
 <h2>Ajout d’une Base De Données</h2>
-<p>Notre site web évolue ! Il va maintenant afficher une carte. Un clic permet de créer un point, sauvegardé en base de données. Un clic sur un point le supprime. Au chargement de la page, on affiche tous les points de la base de données.</p>
+<p>Notre site web évolue ! Il va maintenant afficher une carte. Un clic permet de créer un point, sauvegardé en base de données. Un clic sur un point le supprime.</p>
 <ul>
-<li class="fragment">Utilisez l’image <code>cedricici/php:7.4-apache-mysql</code> puis remplacer le fichier <code>index.php</code> par le fichier <code>index-bdd.php</code>, observez les erreurs</li>
-</ul>
-<p>Pour respecter le principe d’un seul processus par conteneur, il faut lancer un second conteneur pour notre base de données. Utilisez l’image <code>mariadb:10</code>. Vous trouverez des informations sur la configuration de cette image sur <a href="https://hub.docker.com/_/mariadb">hub.docker.com</a>. (Précisez bien la version 10, il y a des soucis de compatibilité avec les plus récentes)</p>
-<ul>
-<li class="fragment">Configurez la base de données de façon à ce que le code php fonctionne (nom d’utilisateur, mot de passe et base de données). L’option <code>-e</code> de <code>docker run</code> permet de passer des variables d’environnement au conteneur. Les deux conteneurs doivent se situer sur le même réseau pour pouvoir se “voir” (DNS)</li>
+<li class="fragment"><p>Utilisez l’image <code>cedricici/php:7.4-apache-mysql</code> puis remplacez le fichier <code>index.php</code> par le fichier <code>index-bdd.php</code>, observez les erreurs</p></li>
+<li class="fragment"><p>Il faut ensuite lancer un second conteneur pour notre base de données. Utilisez l’image <code>mariadb:10</code>. Vous trouverez des informations sur la configuration de cette image sur <a href="https://hub.docker.com/_/mariadb">hub.docker.com</a>. (Précisez bien la version 10, il y a des soucis de compatibilité avec les plus récentes)</p></li>
+<li class="fragment"><p>Configurez la base de données de façon à ce que le code php fonctionne (nom d’utilisateur, mot de passe et base de données). L’option <code>-e</code> de <code>docker run</code> permet de passer des variables d’environnement au conteneur. Les deux conteneurs doivent se situer sur le même réseau pour pouvoir se “parler” (DNS)</p></li>
 </ul>
 </section>
 <section id="correction-14" class="slide level2">
@@ -1141,15 +1139,17 @@ cd cours_docker/ressources</code></pre>
 <section id="correction-15" class="slide level2">
 <h2>Correction</h2>
 <div class="sourceCode" id="cb55"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true"></a><span class="ex">docker</span> rm -f web</span>
-<span id="cb55-2"><a href="#cb55-2" aria-hidden="true"></a><span class="ex">docker</span> run --net lamp -d --name web -p 8080:80 -v <span class="va">$(</span><span class="bu">pwd</span><span class="va">)</span>/apache-racine/:/var/www/html/ cedricici/php:7.4-apache-mysql</span>
-<span id="cb55-3"><a href="#cb55-3" aria-hidden="true"></a><span class="ex">docker</span> run --net lamp -d --name database -e MARIADB_RANDOM_ROOT_PASSWORD=yes -e MARIADB_DATABASE=mymap -e MARIADB_USER=user -e MARIADB_PASSWORD=s3cr3t  mariadb</span>
-<span id="cb55-4"><a href="#cb55-4" aria-hidden="true"></a><span class="ex">docker</span> exec -it database mariadb -u user -D mymap --password=<span class="st">&quot;s3cr3t&quot;</span></span></code></pre></div>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true"></a><span class="ex">docker</span> network create lamp</span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true"></a><span class="ex">docker</span> run --net lamp -d --name web -p 8080:80 -v <span class="va">$(</span><span class="bu">pwd</span><span class="va">)</span>/apache-racine/:/var/www/html/ cedricici/php:7.4-apache-mysql</span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true"></a><span class="ex">docker</span> run --net lamp -d --name database -e MARIADB_RANDOM_ROOT_PASSWORD=yes -e MARIADB_DATABASE=mymap -e MARIADB_USER=user -e MARIADB_PASSWORD=s3cr3t  mariadb:10</span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true"></a><span class="co"># Pour lancer un client mariadb d&#39;observation de la base</span></span>
+<span id="cb55-6"><a href="#cb55-6" aria-hidden="true"></a><span class="ex">docker</span> exec -it database mariadb -u user -D mymap --password=<span class="st">&quot;s3cr3t&quot;</span></span></code></pre></div>
 </section>
 <section id="persistence-de-la-base-de-données" class="slide level2">
 <h2>Persistence de la Base De Données</h2>
 <p>Détruisez les conteneurs, puis reconstruisez l’ensemble. Les points sont perdus <strong>:-(</strong></p>
 <ul>
-<li class="fragment">Résolvez ce problème</li>
+<li class="fragment">Résolvez ce problème, vous trouverez les informations nécessaires sur la page dockerhub.</li>
 </ul>
 <aside class="notes">
 </aside>
@@ -1158,7 +1158,7 @@ cd cours_docker/ressources</code></pre>
 <h2>Correction</h2>
 <div class="sourceCode" id="cb56"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true"></a><span class="ex">docker</span> rm -f database</span>
 <span id="cb56-2"><a href="#cb56-2" aria-hidden="true"></a><span class="ex">docker</span> volume prune</span>
-<span id="cb56-3"><a href="#cb56-3" aria-hidden="true"></a><span class="ex">docker</span> run -v databasedata:/var/lib/mysql --net lamp -d --name database -e MARIADB_RANDOM_ROOT_PASSWORD=yes -e MARIADB_DATABASE=mymap -e MARIADB_USER=user -e MARIADB_PASSWORD=s3cr3t  mariadb</span></code></pre></div>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true"></a><span class="ex">docker</span> run -v databasedata:/var/lib/mysql --net lamp -d --name database -e MARIADB_RANDOM_ROOT_PASSWORD=yes -e MARIADB_DATABASE=mymap -e MARIADB_USER=user -e MARIADB_PASSWORD=s3cr3t  mariadb:10</span></code></pre></div>
 </section></section>
 <section>
 <section id="tp-nextcloud" class="title-slide slide level1">
@@ -1223,7 +1223,7 @@ cd cours_docker/ressources</code></pre>
 <h2>Construction d’une image</h2>
 <p>On construit une image avec un Dockerfile</p>
 <div class="sourceCode" id="cb58"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true"></a><span class="ex">docker</span> image build DOCKERFILE_PATH</span></code></pre></div>
-<p><code>DOCKERFILE_PATH</code> est le chemin du dossier contenant le Dockerfile. Il est conseillé de dédié un nouveau dossier pour construire les images, toutes les références seront relative à ce dossier (et on ne pourra pas en sortir)</p>
+<p><code>DOCKERFILE_PATH</code> est le chemin du dossier contenant le Dockerfile. Il est conseillé de dédier un nouveau dossier pour construire les images, toutes les références seront relative à ce dossier (et on ne pourra pas en sortir)</p>
 <p><code>build</code> est ici un alias de <code>buildx</code> que vous pouvez rencontrer, le moteur de construction par défaut étant <a href="https://docs.docker.com/build/buildkit/">buildkit</a></p>
 <p>La documentation de référence du docker file est présente ici :</p>
 <p><a href="https://docs.docker.com/engine/reference/builder/" class="uri">https://docs.docker.com/engine/reference/builder/</a></p>
@@ -1484,22 +1484,22 @@ cd cours_docker/ressources</code></pre>
 </section>
 <section id="correction-22" class="slide level2">
 <h2>Correction</h2>
-<div class="sourceCode" id="cb75"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true"></a><span class="kw">FROM</span> debian as builder</span>
+<div class="sourceCode" id="cb75"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true"></a><span class="kw">FROM</span> debian AS builder</span>
 <span id="cb75-2"><a href="#cb75-2" aria-hidden="true"></a><span class="kw">RUN</span> apt-get update &amp;&amp; apt-get install -y gcc</span>
 <span id="cb75-3"><a href="#cb75-3" aria-hidden="true"></a><span class="kw">COPY</span> prime.c prime.c</span>
 <span id="cb75-4"><a href="#cb75-4" aria-hidden="true"></a><span class="kw">RUN</span> gcc prime.c -o prime</span>
-<span id="cb75-5"><a href="#cb75-5" aria-hidden="true"></a><span class="kw">FROM</span> debian:stable-slim as runner</span>
+<span id="cb75-5"><a href="#cb75-5" aria-hidden="true"></a><span class="kw">FROM</span> debian:stable-slim AS runner</span>
 <span id="cb75-6"><a href="#cb75-6" aria-hidden="true"></a><span class="kw">COPY</span> --from=builder prime prime</span>
-<span id="cb75-7"><a href="#cb75-7" aria-hidden="true"></a><span class="kw">CMD</span> [ <span class="st">&quot;./prime&quot;</span>,<span class="st">&quot;1&quot;</span> ]</span></code></pre></div>
+<span id="cb75-7"><a href="#cb75-7" aria-hidden="true"></a><span class="kw">CMD</span> [ <span class="st">&quot;./prime&quot;</span>,<span class="st">&quot;10000&quot;</span> ]</span></code></pre></div>
 </section>
 <section id="correction-23" class="slide level2">
 <h2>Correction</h2>
-<p>On peut même aller plus loin et utiliser une image plus petite et se basant sur l’image <strong>scratch</strong> qui ne contient rien. Cela pose tout de même quelques limitation, l’image ne contenant même pas de shell, il n’est pas possible de passer des paramètres.</p>
-<div class="sourceCode" id="cb76"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true"></a><span class="kw">FROM</span> debian as builder</span>
+<p>On peut même aller plus loin et utiliser une image plus petite et se basant sur l’image <strong>scratch</strong> qui ne contient rien. Il faut donc inclure les librairies dans le binaire final (option <strong>-static</strong>). Cela pose tout de même quelques limitation, l’image ne contenant même pas de shell, il n’est pas possible de passer des paramètres.</p>
+<div class="sourceCode" id="cb76"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true"></a><span class="kw">FROM</span> debian AS builder</span>
 <span id="cb76-2"><a href="#cb76-2" aria-hidden="true"></a><span class="kw">RUN</span> apt-get update &amp;&amp; apt-get install -y gcc</span>
 <span id="cb76-3"><a href="#cb76-3" aria-hidden="true"></a><span class="kw">COPY</span> prime.c prime.c</span>
 <span id="cb76-4"><a href="#cb76-4" aria-hidden="true"></a><span class="kw">RUN</span> gcc prime.c -o prime -static </span>
-<span id="cb76-5"><a href="#cb76-5" aria-hidden="true"></a><span class="kw">FROM</span> scratch as runner</span>
+<span id="cb76-5"><a href="#cb76-5" aria-hidden="true"></a><span class="kw">FROM</span> scratch AS runner</span>
 <span id="cb76-6"><a href="#cb76-6" aria-hidden="true"></a><span class="kw">COPY</span> --from=builder prime /prime</span>
 <span id="cb76-7"><a href="#cb76-7" aria-hidden="true"></a><span class="kw">CMD</span> [<span class="st">&quot;/prime&quot;</span>,<span class="st">&quot;10000&quot;</span>]</span></code></pre></div>
 <div class="sourceCode" id="cb77"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true"></a>$ <span class="ex">docker</span> build -t prime:scratch  .</span>
