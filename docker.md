@@ -1887,7 +1887,7 @@ services:
     depends_on:
       - database
   database:
-    image: mariadb
+    image: mariadb:10
     environment:
       - MARIADB_RANDOM_ROOT_PASSWORD=yes
       - MARIADB_DATABASE=mymap
@@ -2084,6 +2084,7 @@ Quelques soucis subsistent ?
 ```bash
 sudo k3s kubectl get pods
 ```
+
 Il semblerait que le pod **web** ne soit pas correctement démarré
 
 ```bash
