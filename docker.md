@@ -1049,11 +1049,10 @@ cp cartopoint/index-lamp.html apache-racine/index.html
 
 Même en essayant  `http://127.0.0.1:8080/index.php`, le résultat n'est pas satisfaisant, il n'y a qu'une page verte alors qu'elle devrait afficher l'heure.
 
-* Recréez votre conteneur en utilisant l'image **php:8-apache** qui contient l'interpréteur PHP. ⚠️Attention⚠️, au niveau du montage dans cette image, la racine du serveur Web est maintenant `/var/www/html` et plus `/usr/local/apache2/htdocs/` !
+* Recréez votre conteneur en utilisant l'image **php:8-apache** qui contient l'interpréteur PHP. ⚠️Attention⚠️, au niveau du montage dans cette image, la racine du serveur Web est maintenant `/var/www/html` et plus `/usr/local/apache2/htdocs/`
+* Rafraichissez plusieurs fois la page et profitez-en pour regarder les logs `docker logs web`
 
-Note : on déroge ici un peu à la règle 1 processus par conteneur. On pourrait séparer Apache et PHP, mais la liaison serait plus complexe.
-
-* Rafraichissez plusieurs fois la page et profitez-en pour regarder les logs `docker logs <NAME>`
+`On déroge ici un peu à la règle 1 processus par conteneur. On pourrait séparer Apache et PHP, mais la liaison serait plus complexe`{.note .fragment}
 
 <aside class="notes">
 
@@ -1982,7 +1981,7 @@ sudo k3s kubectl get node
 Il est possible d'installer une interface WEB pour interragir plus facilement avec kubernetes. voici la méthode d'installation : 
 
 ```bash
-sudo -s # la conternement de root avec kubernetes est assez complexe
+sudo -s # On passe 'root' pour simplifier les manipulations
 export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 snap install helm --classic
 helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
@@ -2024,7 +2023,9 @@ Nous allons essayer de déployer notre application cartopoint dans notre **k3s**
 Pour faire cela, nous allons utiliser l'outil [Kompose](https://kompose.io/) qui permet de traduire un dockerfile en Manifest.
 
 ```bash
+# Dans le dossier ressources/
 curl -L https://github.com/kubernetes/kompose/releases/download/v1.32.0/kompose-linux-amd64 -o kompose
+chmod +x kompose
 ```
 
 ## Conversion ##
@@ -2199,3 +2200,18 @@ sudo k3s kubectl exec --stdin --tty web-f9c8ff8db-kssc8 -- /bin/bash
 sudo k3s kubectl port-forward service/web 9999:8080
 
 </aside>
+
+
+## Résultats ##
+
+Si tout s'est bien passé, vous devriez avoir l'application cartopoint fonctionnelle et voir les objets kubernetes correspondants dans le dashboard.
+
+
+# MERCI #
+
+## A vous de faire un bon usage de Docker maintenant ##
+
+N'hésitez pas à me faire des retours sur ce cours.
+
+**cedric.esnault@ign.fr**
+

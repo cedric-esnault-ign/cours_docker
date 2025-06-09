@@ -1066,12 +1066,10 @@ cd cours_docker/ressources</code></pre>
 <p><code>httpd</code> est de base un simple serveur web sans fonctionnalité PHP. Il faudrait ajouter PHP dans cette image et configurer httpd pour interpréter les fichiers PHP. Sans cela, httpd cherche uniquement les fichiers <code>index.html</code> si aucun fichier n’est précisé dans l’URL.</p>
 <p>Même en essayant <code>http://127.0.0.1:8080/index.php</code>, le résultat n’est pas satisfaisant, il n’y a qu’une page verte alors qu’elle devrait afficher l’heure.</p>
 <ul>
-<li class="fragment">Recréez votre conteneur en utilisant l’image <strong>php:8-apache</strong> qui contient l’interpréteur PHP. ⚠️Attention⚠️, au niveau du montage dans cette image, la racine du serveur Web est maintenant <code>/var/www/html</code> et plus <code>/usr/local/apache2/htdocs/</code> !</li>
+<li class="fragment">Recréez votre conteneur en utilisant l’image <strong>php:8-apache</strong> qui contient l’interpréteur PHP. ⚠️Attention⚠️, au niveau du montage dans cette image, la racine du serveur Web est maintenant <code>/var/www/html</code> et plus <code>/usr/local/apache2/htdocs/</code></li>
+<li class="fragment">Rafraichissez plusieurs fois la page et profitez-en pour regarder les logs <code>docker logs web</code></li>
 </ul>
-<p>Note : on déroge ici un peu à la règle 1 processus par conteneur. On pourrait séparer Apache et PHP, mais la liaison serait plus complexe.</p>
-<ul>
-<li class="fragment">Rafraichissez plusieurs fois la page et profitez-en pour regarder les logs <code>docker logs &lt;NAME&gt;</code></li>
-</ul>
+<p><code class="note fragment">On déroge ici un peu à la règle 1 processus par conteneur. On pourrait séparer Apache et PHP, mais la liaison serait plus complexe</code></p>
 <aside class="notes">
 </aside>
 </section>
@@ -1920,7 +1918,7 @@ cd cours_docker/ressources</code></pre>
 <section id="interface" class="slide level2">
 <h2>Interface</h2>
 <p>Il est possible d’installer une interface WEB pour interragir plus facilement avec kubernetes. voici la méthode d’installation :</p>
-<div class="sourceCode" id="cb98"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true"></a><span class="fu">sudo</span> -s <span class="co"># la conternement de root avec kubernetes est assez complexe</span></span>
+<div class="sourceCode" id="cb98"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true"></a><span class="fu">sudo</span> -s <span class="co"># On passe &#39;root&#39; pour simplifier les manipulations</span></span>
 <span id="cb98-2"><a href="#cb98-2" aria-hidden="true"></a><span class="bu">export</span> <span class="va">KUBECONFIG=</span>/etc/rancher/k3s/k3s.yaml</span>
 <span id="cb98-3"><a href="#cb98-3" aria-hidden="true"></a><span class="ex">snap</span> install helm --classic</span>
 <span id="cb98-4"><a href="#cb98-4" aria-hidden="true"></a><span class="ex">helm</span> repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/</span>
@@ -1946,7 +1944,9 @@ cd cours_docker/ressources</code></pre>
 <li class="fragment">une persistence pour la base de données</li>
 </ul>
 <p>Pour faire cela, nous allons utiliser l’outil <a href="https://kompose.io/">Kompose</a> qui permet de traduire un dockerfile en Manifest.</p>
-<div class="sourceCode" id="cb102"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true"></a><span class="ex">curl</span> -L https://github.com/kubernetes/kompose/releases/download/v1.32.0/kompose-linux-amd64 -o kompose</span></code></pre></div>
+<div class="sourceCode" id="cb102"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true"></a><span class="co"># Dans le dossier ressources/</span></span>
+<span id="cb102-2"><a href="#cb102-2" aria-hidden="true"></a><span class="ex">curl</span> -L https://github.com/kubernetes/kompose/releases/download/v1.32.0/kompose-linux-amd64 -o kompose</span>
+<span id="cb102-3"><a href="#cb102-3" aria-hidden="true"></a><span class="fu">chmod</span> +x kompose</span></code></pre></div>
 </section>
 <section id="conversion" class="slide level2">
 <h2>Conversion</h2>
@@ -2055,6 +2055,20 @@ cd cours_docker/ressources</code></pre>
 <p>sudo k3s kubectl exec –stdin –tty web-f9c8ff8db-kssc8 – /bin/bash</p>
 <p>sudo k3s kubectl port-forward service/web 9999:8080</p>
 </aside>
+</section>
+<section id="résultats" class="slide level2">
+<h2>Résultats</h2>
+<p>Si tout s’est bien passé, vous devriez avoir l’application cartopoint fonctionnelle et voir les objets kubernetes correspondants dans le dashboard.</p>
+</section></section>
+<section>
+<section id="merci" class="title-slide slide level1">
+<h1>MERCI</h1>
+
+</section>
+<section id="a-vous-de-faire-un-bon-usage-de-docker-maintenant" class="slide level2">
+<h2>A vous de faire un bon usage de Docker maintenant</h2>
+<p>N’hésitez pas à me faire des retours sur ce cours.</p>
+<p><strong>cedric.esnault@ign.fr</strong></p>
 </section></section>
             </div>
         </div>
