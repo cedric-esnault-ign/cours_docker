@@ -2,7 +2,7 @@
 title : Docker par la pratique
 sub-title : IGN
 author : Cédric Esnault
-date : 01/10/2024 - IGN/ENSG
+date : 10/06/2025 - IGN/ENSG
 ---
 
 # Docker #
@@ -59,7 +59,7 @@ Ce cours est librement inspiré de plusieurs sources dont celles de Thibault Cou
 - « *Partage* » du noyau
 - outils de packaging et de manipulation
 
-`Les conteneurs sont maintenant disponibles sous Windows!`{.note .fragment}
+`Les conteneurs sont aussi disponibles sous Windows!`{.note .fragment}
 
 <aside class="notes">
 
@@ -197,9 +197,9 @@ Cette règle peut parfois être transgressée lorsqu'une amélioration notable p
 
 ## Installation ##
 
-Mickaël Borne (IGN) a préparé une excellente documentation, basée sur la documentation officielle (<https://docs.docker.com/engine/install/ubuntu/>) pour installer Docker dans l'environnement IGN.
+Mickaël Borne (IGN) a préparé une excellente documentation, basée sur la documentation officielle (<https://docs.docker.com/engine/install/ubuntu/#install-using-the-convenience-script>) pour installer Docker dans l'environnement IGN.
 
-<http://dev-env.sai-experimental.ign.fr/outils/docker/installation-docker-ce/>
+<https://support.gitlab-pages.ign.fr/devsecops/outils/docker/installation-docker-ce/>
 
 Pour une installation à l'ENSG, nous simplifierons quelques aspects.
 
@@ -299,9 +299,9 @@ Pour éviter d'avoir à faire sudo docker, on peut ajouter un utilisateur au gro
   
 ```bash
 sudo adduser $USER docker
+newgrp docker
 ```
 
-* Redémarrer la session
 * Tester
 
 ```bash
@@ -421,7 +421,7 @@ Exemple :
 docker container run -it alpine /bin/sh
 ```
 
-Démarre un shell dans le conteneur.
+Démarre un shell dans le conteneur *(Exit pour quitter)*.
 
 *Comme si on était dans une VM.*
 
@@ -506,7 +506,7 @@ docker network create ...
 # Connecter un conteneur sur un réseau
 docker network connect ...
 # Lister les réseaux
-docker network ls ...
+docker network ls
 # Déconnecter un conteneur d'un réseau
 docker network disconnect ...
 # Supprimer un réseau
@@ -899,8 +899,8 @@ L'IP du conteneur n'est accessible que depuis la machine hébergeant le conteneu
 
 ```bash
 docker container run -p 8080:80 containous/whoami
-curl -s http://127.0.0.1
-curl -s http://<IP_HOST>
+curl -s http://127.0.0.1:8080
+curl -s http://<IP_HOST>:8080
 ```
 
 On peut toujours accéder au port 80 de l'IP du conteneur. On peut maintenant également accéder au port 8080 de la machine grâce à l'option `-p` y compris depuis l'extérieur de la machine (ici le LAN ENSG).
@@ -1015,18 +1015,18 @@ cd cours_docker/ressources
 
 ## Apache ##
 
-L'image à utiliser ici est `httpd`. Les options `--name -d -p -v --net ` peuvent être utiles. La racine du serveur web dans l'image est `/usr/local/apache2/htdocs/`
+L'image à utiliser ici est `httpd`. Les options `--name -d -p -v --net ` peuvent être utiles. La **racine** du serveur web dans l'image est `/usr/local/apache2/htdocs/`
 
-- créez un dossier `apache-racine` pour le montage **host**
-- Lancez un conteneur avec un montage de la racine du serveur sur votre dossier `apache-racine` et exposant le port *80* du conteneur sur le port *8080* de la machine host.
+- Dans le dossier `ressources`, créez un dossier `apache-racine` pour le montage **host**
+- Lancez un conteneur avec un montage de ce dossier `apache-racine` (chemin absolu) sur la **racine** du serveur et exposant le port *80* du conteneur sur le port *8080* de la machine host.
 - Qu'affiche la page <http://127.0.0.1:8080> ?
-- Utilisez le fichier `index-lamp.html` présent dans le dossier **cartopoint** pour remplacer la page d’accueil
+- Utilisez le contenu du fichier `index-lamp.html` présent dans le dossier **cartopoint** pour remplacer la page d’accueil (`index.html`)
 
 
 ## Correction ##
 
 ```bash
-docker create network lamp
+docker network create lamp
 docker run --net lamp --name web -d -p 8080:80 -v "$(pwd)/apache-racine/:/usr/local/apache2/htdocs/" httpd:latest
 
 cp cartopoint/index-lamp.html apache-racine/index.html
@@ -1036,12 +1036,12 @@ cp cartopoint/index-lamp.html apache-racine/index.html
 - **-d** le laisse en arrière plan
 - **-p 8080:80** expose le port 80 
 - **-v ...**  partage un dossier local avec la racine du serveur web
-- **-net web** attache le conteneur au réseau *web*
+- **--net web** attache le conteneur au réseau *web*
 
 
 ## Un peu de PHP ##
 
-* Remplacez le fichier `index.html` par `index-lamp.php` (pensez à le renommer en index.php). Qu'observez-vous?
+* Remplacez le fichier `index.html` par `index.php` avec le contenu du fichier `index-lamp.php`. Qu'observez-vous?
 
 ## Un peu de PHP ##
 
@@ -1049,7 +1049,7 @@ cp cartopoint/index-lamp.html apache-racine/index.html
 
 Même en essayant  `http://127.0.0.1:8080/index.php`, le résultat n'est pas satisfaisant, il n'y a qu'une page verte alors qu'elle devrait afficher l'heure.
 
-* Recréez votre conteneur en utilisant l'image **php:7.4-apache** qui contient l'interpréteur PHP. Attention, au niveau du montage dans cette image, la racine du serveur Web est maintenant `/var/www/html` et plus `/usr/local/apache2/htdocs/` !
+* Recréez votre conteneur en utilisant l'image **php:8-apache** qui contient l'interpréteur PHP. ⚠️Attention⚠️, au niveau du montage dans cette image, la racine du serveur Web est maintenant `/var/www/html` et plus `/usr/local/apache2/htdocs/` !
 
 Note : on déroge ici un peu à la règle 1 processus par conteneur. On pourrait séparer Apache et PHP, mais la liaison serait plus complexe.
 
@@ -1063,24 +1063,23 @@ Note : on déroge ici un peu à la règle 1 processus par conteneur. On pourrait
 
 ```bash
 docker rm -f web
-docker run --net lamp --name web -d -p 8080:80 -v "$(pwd)/apache-racine/:/var/www/html/" php:7.4-apache
+docker run --net lamp --name web -d -p 8080:80 -v "$(pwd)/apache-racine/:/var/www/html/" php:8-apache
 
 cp cartopoint/index-lamp.php apache-racine/index.php
 
 ```
 
-On n'a pas besoin d'utiliser la commande `docker cp`car le dossier `apache-racine` est partagé entre l'host et le conteneur
+On n'a pas besoin d'utiliser la commande `docker cp` car le dossier `apache-racine` est partagé entre l'host et le conteneur
 
 
 ## Ajout d'une Base De Données ##
 
 Notre site web évolue ! Il va maintenant afficher une carte. Un clic permet de créer un point, sauvegardé en base de données. Un clic sur un point le supprime.
 
-* Utilisez l'image `cedricici/php:7.4-apache-mysql` puis remplacez le fichier `index.php` par le fichier `index-bdd.php`, observez les erreurs
+* Utilisez l'image `cedricici/php:8-apache-mysql` puis remplacez le fichier `index.php` par le contenu du fichier `index-bdd.php`, observez les erreurs
+* Il faut ensuite lancer un second conteneur pour notre base de données. Utilisez l'image `mariadb:10.5`. Vous trouverez des informations sur la configuration de cette image sur [hub.docker.com](https://hub.docker.com/_/mariadb). (Précisez bien la version __10.5__ , il y a des soucis de compatibilité avec les plus récentes)
+* Configurez la base de données de façon à ce que le code PHP fonctionne (nom d'utilisateur, mot de passe et base de données). L'option `-e` de `docker run` permet de passer des variables d'environnement au conteneur. Les deux conteneurs doivent se situer sur le même réseau pour pouvoir se "parler" (DNS).
 
-* Il faut ensuite lancer un second conteneur pour notre base de données. Utilisez l'image `mariadb:10`. Vous trouverez des informations sur la configuration de cette image sur [hub.docker.com](https://hub.docker.com/_/mariadb). (Précisez bien la version 10, il y a des soucis de compatibilité avec les plus récentes)
-
-* Configurez la base de données de façon à ce que le code PHP fonctionne (nom d'utilisateur, mot de passe et base de données). L'option `-e` de `docker run` permet de passer des variables d'environnement au conteneur. Les deux conteneurs doivent se situer sur le même réseau pour pouvoir se "parler" (DNS)
 
 ## Correction ##
 
@@ -1106,8 +1105,8 @@ Le fait de définir les paramètres de connexion à la base de données dans un 
 ```bash
 docker rm -f web
 docker network create lamp
-docker run --net lamp -d --name web -p 8080:80 -v $(pwd)/apache-racine/:/var/www/html/ cedricici/php:7.4-apache-mysql
-docker run --net lamp -d --name database -e MARIADB_RANDOM_ROOT_PASSWORD=yes -e MARIADB_DATABASE=mymap -e MARIADB_USER=user -e MARIADB_PASSWORD=s3cr3t  mariadb:10
+docker run --net lamp -d --name web -p 8080:80 -v $(pwd)/apache-racine/:/var/www/html/ cedricici/php:8-apache-mysql
+docker run --net lamp -d --name database -e MARIADB_RANDOM_ROOT_PASSWORD=yes -e MARIADB_DATABASE=mymap -e MARIADB_USER=user -e MARIADB_PASSWORD=s3cr3t  mariadb:10.5
 # Pour lancer un client mariadb d'observation de la base
 docker exec -it database mariadb -u user -D mymap --password="s3cr3t"
 ```
@@ -1127,7 +1126,7 @@ Détruisez les conteneurs, puis reconstruisez l'ensemble. Les points sont perdus
 ```bash
 docker rm -f database
 docker volume prune
-docker run -v databasedata:/var/lib/mysql --net lamp -d --name database -e MARIADB_RANDOM_ROOT_PASSWORD=yes -e MARIADB_DATABASE=mymap -e MARIADB_USER=user -e MARIADB_PASSWORD=s3cr3t  mariadb:10
+docker run -v databasedata:/var/lib/mysql --net lamp -d --name database -e MARIADB_RANDOM_ROOT_PASSWORD=yes -e MARIADB_DATABASE=mymap -e MARIADB_USER=user -e MARIADB_PASSWORD=s3cr3t  mariadb:10.5
 ```
 
 # TP NextCloud #
@@ -1208,7 +1207,7 @@ Le **Dockerfile** est constitué d'une suite d'instructions, chaque ligne résul
 Un Dockerfile commence généralement par l'identification de l'image de base (la seule exception est le passage d'un argument `ARG` permettant de définir dynamiquement l'image de `FROM`).
 
 ```dockerfile
-FROM debian:jessie
+FROM debian:bookworm
 ```
 
 ## Instructions Dockerfile ##
@@ -1315,12 +1314,12 @@ Un conteneur de *build* génère un package à copier sur le conteneur de *run*
 ## Multistage build ##
 
 ```dockerfile
-FROM debian:jessie as builder
+FROM debian:bookworm as builder
 RUN apt-get update && apt-get install -y  build-essential BUILD_DEPENDENCIES
 ADD https://github.com/...../master.zip /master
 RUN make # Cette commande génère le fichier /master/monBinaire
 
-FROM debian:jessie
+FROM debian:bookworm
 RUN apt-get update && apt-get install RUN_DEPENDENCIES
 COPY --from=builder /master/monBinaire /opt/bin/
 CMD /opt/bin/monBinaire
@@ -1342,7 +1341,7 @@ Seul le dernier **FROM** sera contenu dans l'image finale
   
 <aside class="notes" >
 
-En mode cloud natif, on évitera l'utilisation de volume en favorisant les applications stateless.
+En mode cloud natif, on évitera l'utilisation de volume persistents en favorisant les applications stateless.
 
 </aside>
 
@@ -1352,7 +1351,7 @@ En mode cloud natif, on évitera l'utilisation de volume en favorisant les appli
 * Utiliser des images en **rootless**
 * Favoriser les images compatibles avec **ReadOnlyFileSystem**
 * Exposer des ports > 1024
-* Scanner régulièrement les images avec un outil de scan
+* Scanner régulièrement les images avec un outil de scan, ex : [Trivy](https://trivy.dev/latest/getting-started/)
 * ...
   
 ## Bonnes pratiques Docker ##
@@ -1367,8 +1366,8 @@ Mickaël Borne a regroupé un ensemble de bonnes pratiques qui sont disponibles 
 
 Nous allons ici simplement créer une nouvelle image pour avoir un moyen de livrer notre application.
 
-* Cette image sera basée sur l'image déjà référencée : `php:7.4-apache` avec le mot clé **FROM** (mais pas `cedricici/php:7.4-apache-mysql` qui est déjà un *build* d'image)
-* Installez les drivers mysql pour cette image avec le mot clé **RUN** , l'image `php:7.4-apache` contient une commade pour cela : `docker-php-ext-install mysqli pdo_mysql`
+* Cette image sera basée sur l'image déjà référencée : `php:8-apache` avec le mot clé **FROM** (mais pas `cedricici/php:8-apache-mysql` qui est déjà un *build* d'image)
+* Installez les drivers mysql pour cette image avec le mot clé **RUN** , l'image `php:8-apache` contient une commade pour cela : `docker-php-ext-install mysqli pdo_mysql`
 * Copiez le fichier `index-bdd.php` en `index.php` dans le dossier par défaut du serveur web.
 * Et c'est tout :D
 * Construisez une image nommée **cartopoint:1.0** à partir de ce Dockerfile avec la commande `docker build`
@@ -1378,7 +1377,7 @@ Nous allons ici simplement créer une nouvelle image pour avoir un moyen de livr
 ## Correction ##
 
 ```Dockerfile
-FROM php:7.4-apache
+FROM php:8-apache
 RUN docker-php-ext-install mysqli pdo_mysql
 COPY index-bdd.php /var/www/html/index.php
 ```
@@ -1524,7 +1523,7 @@ CMD [ "./prime","10000" ]
 On peut même aller plus loin et utiliser une image plus petite et se basant sur l'image **scratch** qui ne contient rien. Il faut donc inclure les librairies dans le binaire final (option **-static**). Cela pose tout de même quelques limitations : l'image ne contenant même pas de shell, il n'est pas possible de passer des paramètres.
 
 ```Dockerfile
-FROM debian AS builder
+FROM debian:bookworm AS builder
 RUN apt-get update && apt-get install -y gcc
 COPY prime.c prime.c
 RUN gcc prime.c -o prime -static 
@@ -1559,16 +1558,13 @@ Voici les ressources nécéssaires :
 ## Correction ##
 
 ```Dockerfile
-FROM php:7.4-apache
+FROM php:8-apache
 RUN apt-get update && \
     apt-get install -y unzip libpng-dev 
 RUN docker-php-ext-install gd
-ADD main.zip /main.zip
-ADD config.inc.php /var/www/html/
 WORKDIR /var/www/html
-RUN unzip /main.zip && \
-    mv libreqr/* . && \
-    chown -R www-data:www-data /var/www/html/
+COPY . .
+RUN chown -R www-data:www-data /var/www/html/
 ENV LIBREQR_THEME=libreqr \
     LIBREQR_DEFAULT_LOCALE=fr \
     LIBREQR_CUSTOM_TEXT_ENABLED=true \
@@ -1806,11 +1802,24 @@ networks:
           gateway: 192.168.91.1
 ```
 
-## Config ##
+## Extention ##
 
-Une nouvelle partie a fait son apparition pour simplifier la configuration des stacks compose.
+Les Dockerfile profittent aussi des évolution du format *Yaml*, il est maintenant possible d'[étendre](https://docs.docker.com/reference/compose-file/extension/) les items disponibles. On peut ainsi partager les variables d'environnements entre plusieurs services. 
 
-  `#TODO`{.note .fragment}
+```Yaml
+x-env: &env
+  environment:
+    - CONFIG_KEY
+    - EXAMPLE_KEY
+
+services:
+  first:
+    <<: *env
+    image: my-image:latest
+  second:
+    <<: *env
+    image: another-image:latest
+```
 
 ## CLI ##
 
@@ -1887,7 +1896,7 @@ services:
     depends_on:
       - database
   database:
-    image: mariadb:10
+    image: mariadb:10.5
     environment:
       - MARIADB_RANDOM_ROOT_PASSWORD=yes
       - MARIADB_DATABASE=mymap
@@ -1968,6 +1977,40 @@ sudo k3s kubectl get node
 
 ![](img/k3s-ok.png)
 
+## Interface ##
+
+Il est possible d'installer une interface WEB pour interragir plus facilement avec kubernetes. voici la méthode d'installation : 
+
+```bash
+sudo -s # la conternement de root avec kubernetes est assez complexe
+export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+snap install helm --classic
+helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
+helm upgrade --install kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard --create-namespace --namespace kubernetes-dashboard
+```
+
+## Interface : Accès ##
+
+Pour pouvoir accéder à ce dashboard, il faut gérer les utilisateurs et les droits. 
+Ces commandes créént un utilisateur administrateur pour le dashboard avec les bon droits
+
+```bash
+kubectl create serviceaccount dashboard-admin-sa -n kubernetes-dashboard && kubectl create clusterrolebinding dashboard-admin-sa --clusterrole=cluster-admin --serviceaccount=kubernetes-dashboard:dashboard-admin-sa
+```
+
+Il faut ensuite générer un token : 
+
+```bash
+kubectl -n kubernetes-dashboard create token dashboard-admin-sa --duration=24h
+```
+
+Puis exposer le dashboard sur notre machine à l'adresse suivante : <https://127.0.0.1:8443> 
+
+```bash
+kubectl -n kubernetes-dashboard port-forward svc/kubernetes-dashboard-kong-proxy 8443:443
+```
+
+
 ## Application ##
 
 Nous allons essayer de déployer notre application cartopoint dans notre **k3s**, pour cela il faut définir les **Manifests** des différents objets nécessaires.
@@ -2000,7 +2043,6 @@ Une alerte est levée car nous n'avons pas précisé l'exposition de la base de 
 
 **Kompose** a généré des fichiers **Manifest** :
 
-- **lamp-networking.yaml** : décrit les **network policy** propres à notre réseau, il permettra de configurer la sécurité, celui-ci n'est pas obligatoire
 - **web-deployment.yaml** : décrit le déploiement de la stack *web*
 - **database-deploiement.yaml** : décrit le déploiement de la stack *database*
 - **database-persistentcolumeclaim.yaml** : décrit la persistence des données de la database
@@ -2039,7 +2081,6 @@ Nous pouvons ensuite appliquer le reste des **Manifests**
 
 ```bash
 sudo k3s kubectl apply -f database-deployment.yaml
-sudo k3s kubectl apply -f lamp-networkpolicy.yaml
 sudo k3s kubectl apply -f web-deployment.yaml
 sudo k3s kubectl apply -f web-service.yaml 
 sudo k3s kubectl apply -f web-deployment.yaml
@@ -2056,7 +2097,7 @@ Si nous réappliquons les **Manifests** , **k3s** change de message :
 service/web configured
 ```
 
-Cela indique que le système est idempotent et qu'il prendra en compte toute modification mais uniquement celles-ci.
+Cela indique que le système est idempotent et qu'il prendra en compte toute nouvelle modification, mais uniquement celle-ci.
 
 ## Vérification ##
 
@@ -2149,7 +2190,6 @@ sudo k3s kubectl apply -f database-service.yaml
 
 <aside class="notes">
 
-
 docker tag cartopoint:1.0 ghcr.io/cedric-esnault-ign/cartopoint:1.0
 docker login ghcr.io -u cedric-esnault-ign 
 docker push ghcr.io/cedric-esnault-ign/cartopoint:1.0
@@ -2159,18 +2199,3 @@ sudo k3s kubectl exec --stdin --tty web-f9c8ff8db-kssc8 -- /bin/bash
 sudo k3s kubectl port-forward service/web 9999:8080
 
 </aside>
-
-## Visualisation ##
-
-Kubernetes fournit un outil (dashboard) pour visualiser rapidement le contenu d'un cluster.
-Voici comment l'installer grace à **helm**, un outil qui permet de packager des applications pour **K8S**.
-
-Installation helm :
-
-```bash
-sudo snap install helm --classic
-```
-
-Puis suivre la documentation :
-
-<https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/>

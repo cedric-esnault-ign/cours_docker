@@ -5,37 +5,39 @@
         $bdd = new PDO('mysql:host=database;dbname=mymap;charset=utf8', 'user', 's3cr3t');
         $bdd->exec("CREATE TABLE IF NOT EXISTS point (id INT KEY AUTO_INCREMENT, lon FLOAT, lat FLOAT);");
 
-        switch ($_GET['action']) {
-            case 'add':
-                if (isset($_GET['lon']) && isset($_GET['lat'])){
-                    $bdd->exec(sprintf("INSERT INTO point (lon, lat) values (%F , %F)", $_GET['lon'], $_GET['lat']));
-                }
-                exit;
-            case 'delete':
-                if (isset($_GET['id'])){
-                    $bdd->exec(sprintf("DELETE FROM point where id = '%d'", $_GET['id']));
-                }
-                exit;
-            case 'get':
-                $result = $bdd->query("select * from point;");
-                $features = array();
-                while ($donnees = $result->fetch()){
-                    $features[] = array(
-                        'type' => 'Feature',
-                        'properties' => array('id' => intval($donnees['id'])),
-                        'geometry' => array(
-                            'type' => 'Point',
-                            'coordinates' => array(floatval($donnees['lon']), floatval($donnees['lat']))
-                        )
-                        );
-                }
-                $new_data = array(
-                    'type' => "FeatureCollection",
-                    'features' => $features,
-                  );
-                header("Content-type: application/json");
-                echo json_encode($new_data, JSON_PRETTY_PRINT);
-                exit;
+        if (isset($_GET['action'])){
+            switch ($_GET['action']) {
+                case 'add':
+                    if (isset($_GET['lon']) && isset($_GET['lat'])){
+                        $bdd->exec(sprintf("INSERT INTO point (lon, lat) values (%F , %F)", $_GET['lon'], $_GET['lat']));
+                    }
+                    exit;
+                case 'delete':
+                    if (isset($_GET['id'])){
+                        $bdd->exec(sprintf("DELETE FROM point where id = '%d'", $_GET['id']));
+                    }
+                    exit;
+                case 'get':
+                    $result = $bdd->query("select * from point;");
+                    $features = array();
+                    while ($donnees = $result->fetch()){
+                        $features[] = array(
+                            'type' => 'Feature',
+                            'properties' => array('id' => intval($donnees['id'])),
+                            'geometry' => array(
+                                'type' => 'Point',
+                                'coordinates' => array(floatval($donnees['lon']), floatval($donnees['lat']))
+                            )
+                            );
+                    }
+                    $new_data = array(
+                        'type' => "FeatureCollection",
+                        'features' => $features,
+                    );
+                    header("Content-type: application/json");
+                    echo json_encode($new_data, JSON_PRETTY_PRINT);
+                    exit;
+            }
         }
         ?>
 
